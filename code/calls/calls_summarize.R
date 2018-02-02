@@ -1,18 +1,23 @@
+# summarize calls data and make plots
 library(tidyverse)
 library(MASS)
-log_scale  <- 1
+fig_path <- file.path('..', '..', 'figs')
+log_scale  <- read_rds(path = file.path(here::here(), 'out', 'log_scale.rds'))
+n_prior  <- read_rds(path = file.path(here::here(), 'out', 'n_prior.rds'))
 phones
 #phones$year<- phones$year - mean(phones$year)
 phones <- bind_cols(phones)
 if(log_scale) phones$calls <- log(phones$calls)
-plot(phones$year, log(phones$calls))
+plot(phones$year, phones$calls, ylab = if_else(as.logical(log_scale), 'log calls', 'calls'))
 
 x <- phones$year- mean(phones$year)
 y <- phones$calls
-rl_fit <- read_rds(file.path(here::here(), 'rl_fit.rds'))
-t_fit <- read_rds(file.path(here::here(), 't_fit.rds'))
+rl_fit <- read_rds(file.path(here::here(), 'out', 'rl_fit.rds'))
+t_fit <- read_rds(file.path(here::here(), 'out', 't_fit.rds'))
 nu <- 5
-normal_fit <- read_rds(file.path(here::here(), 'normal_fit.rds'))
+normal_fit <- read_rds(file.path(here::here(), 'out', 'normal_fit.rds'))
+
+#plot(log(rl_fit$w + 1e-20), cex = .2)
 
 
 #functions needed posteriors ----
@@ -88,12 +93,13 @@ ppd_rl <- sapply(x_grid, function(x){
 ppd_rl <- as_tibble(as.data.frame(cbind(t(ppd_rl), x_grid)))
 
 ppd_rl_gather <- gather(ppd_rl, key = 'sample', value = 'value', -x_grid)
+length(unique(ppd_rl_gather$sample))
 
 rl_cred_bounds <- ppd_rl_gather %>% 
   group_by(x_grid) %>% 
-  summarize(lower = quantile(value, probs = .05), upper = quantile(value, probs = .95), model = 'rl')
+  summarize(lower = quantile(value, probs = .05), upper = quantile(value, probs = .95), Model = 'restricted likelihood')
 
-# t model -----
+# t Model -----
 ppd_t <- sapply(x_grid, function(x){
   rpd_t(t_fit,x, n = n_samps)
 })
@@ -104,9 +110,9 @@ ppd_t_gather <- gather(ppd_t, key = 'sample', value = 'value', -x_grid)
 
 t_cred_bounds <- ppd_t_gather %>% 
   group_by(x_grid) %>% 
-  summarize(lower = quantile(value, probs = .05), upper = quantile(value, probs = .95), model = 't')
+  summarize(lower = quantile(value, probs = .05), upper = quantile(value, probs = .95), Model = 't')
 
-# normal model on subset of the data ----
+# normal Model on subset of the data ----
 ppd_normal <- sapply(x_grid, function(x){
   rpd_normal(normal_fit,x, n = n_samps)
 })
@@ -117,26 +123,29 @@ ppd_normal_gather <- gather(ppd_normal, key = 'sample', value = 'value', -x_grid
 
 normal_cred_bounds <- ppd_normal_gather %>% 
   group_by(x_grid) %>% 
-  summarize(lower = quantile(value, probs = .05), upper = quantile(value, probs = .95), model = 'normal')
+  summarize(lower = quantile(value, probs = .05), upper = quantile(value, probs = .95), Model = 'normal')
 
 
 
 # combine credible bounds -----
 cred_bounds <- bind_rows(rl_cred_bounds, t_cred_bounds, normal_cred_bounds) %>% 
-  gather(key = 'quantile', value = 'y', -x_grid, -model)
+  gather(key = 'quantile', value = 'y', -x_grid, -Model)
 
-ggplot(cred_bounds, aes(x = x_grid + mean(phones$year), y = y, group = interaction(quantile,model), col = model )) + geom_smooth(se = FALSE, lwd = .5) +
-  geom_point(data = bind_cols(phones)[-c(1:3),], mapping = aes(x = year, y = calls, group = NULL, col = NULL), size = .75) + labs(x = 'year', y = 'calls') + theme_bw() + scale_color_brewer(palette = 'Set2') 
+phones_df <- bind_cols(phones)
+phones_df$Calls <- c(rep('Used for prior', n_prior), rep('Used for fit', nrow(phones_df) - n_prior))
 
+ggplot(cred_bounds, aes(x = x_grid + mean(phones$year), y = y, group = interaction(quantile,Model), col = Model )) + geom_smooth(se = FALSE, lwd = .5) +
+  geom_point(data = phones_df, mapping = aes(x = year, y = calls, group = NULL, col = NULL, shape = Calls)) + labs(x = 'year', y = 'log calls') + theme_bw() + scale_color_brewer(palette = 'Set2') 
+ggsave(file.path(fig_path, 'calls_predictive.png'))
 
-# lengths of credible intervals
-cred_length <- spread(cred_bounds, quantile, y) %>%  mutate(difference = upper - lower)
-
-ggplot(filter(cred_length, model == "rl"), aes(x = x_grid, y = difference)) + geom_smooth(se = FALSE)
-  
-ggplot(filter(cred_length, model == "t"), aes(x = x_grid, y = difference)) + geom_smooth(se = FALSE)    
-
-
+# # lengths of credible intervals
+# cred_length <- spread(cred_bounds, quantile, y) %>%  mutate(difference = upper - lower)
+# 
+# ggplot(filter(cred_length, Model == "restricted likelihood"), aes(x = x_grid, y = difference)) + geom_smooth(se = FALSE)
+#   
+# ggplot(filter(cred_length, Model == "t"), aes(x = x_grid, y = difference)) + geom_smooth(se = FALSE)    
+# 
+# 
 
 
 
@@ -151,4 +160,4 @@ ggplot(filter(cred_length, model == "t"), aes(x = x_grid, y = difference)) + geo
 # lowers_t <- y_tilde[inds_lower]
 # uppers_t <- y_tilde[inds_upper]
 # 
-# t1_cred_bounds <- tibble(x_grid = x_grid, lower = lowers_t, upper = uppers_t, model = 't1')
+# t1_cred_bounds <- tibble(x_grid = x_grid, lower = lowers_t, upper = uppers_t, Model = 't1')

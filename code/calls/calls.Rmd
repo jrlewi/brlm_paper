@@ -14,6 +14,7 @@ library(mvtnorm)
 library(coda)
 library(MCMCpack)
 log_scale  <- 1
+write_rds(log_scale, path = file.path(here::here(), 'out', 'log_scale.rds'))
 ```
 
 ## Analysis of calls
@@ -31,6 +32,7 @@ plot(phones$year, phones$calls)
 
 ```{r prior}
 n_prior <- 3
+write_rds(n_prior, path = file.path(here::here(), 'out', 'n_prior.rds'))
 (fit <- lm(calls ~ year, data = phones[1:n_prior,]))
 
 
@@ -47,7 +49,7 @@ b0 <- 1
 ```
 
 ## Restricted Likelihood Fit
-```{r rl fit tukey with MAD, cache = TRUE}
+```{r rl fit tukey with MAD setup, cache = TRUE}
 y <- phones$calls[-c(1:n_prior)]
 X_fit <- cbind(1, phones$year[-c(1:n_prior)])
 
@@ -66,15 +68,6 @@ plot(phones$year, phones$calls)
 lines(phones$year[-c(1:n_prior)], fitted(rlm_fit))
 
 
-i <- 2
-par(mfrow = c(2,1))
-smp1 <- rnorm(1000, mu0[i], sqrt(Sigma0[i,i]))
-smp2 <- rnorm(1000, rlm_fit$coefficients[i], sqrt(vcov(rlm_fit)[i,i]))
-hist(smp1, xlim = range(smp1, smp2))
-hist(smp2, xlim = range(smp1, smp2))
-par(mfrow = c(1,1))
-
-
 
 cov_b <- vcov(rlm_fit)
 scale <- .25*rlm_fit$s
@@ -82,14 +75,17 @@ scale <- .25*rlm_fit$s
 N <- 1e5
 Nins <- 1e5
 set.seed(125)
+```
+
+```{r rl fit  , cache = TRUE}
 rl_fit <- rl_importance(y, X_fit, statistic = rlm_tukey, mu0 = mu0, Sigma0 = Sigma0, alpha = a0, beta = b0, cov_b = cov_b, scale = scale, smooth = 1, N = N,Nins = Nins)
 
 # check weights -----
-# plot(log(rl_fit$w + 1e-20), cex = .2)
-plot(rl_fit$w, cex = .2)
+plot(log(rl_fit$w + 1e-20), cex = .2)
+#plot(rl_fit$w, cex = .2)
 
 
-write_rds(rl_fit, path = file.path(here::here(), 'rl_fit.rds'))
+write_rds(rl_fit, path = file.path(here::here(), 'out', 'rl_fit.rds'))
 
 ```
 
@@ -105,18 +101,20 @@ t_fit <-bayesTdistLm(y=y, X_fit, mu0, Sigma0, a0=a0, b0=((nu-2)/nu)*b0, parInit=
 
 coda::traceplot(t_fit$mcmc)
 
-write_rds(t_fit, path = file.path(here::here(), 't_fit.rds'))
-
+write_rds(t_fit, path = file.path(here::here(), 'out','t_fit.rds'))
+```
+## Normal Distribution Fit
+```{r Normal distribution fit, cache = TRUE}
 # fit normal model on subset of the data.
 nkeep <- 1e4
 nburn <- 2e3
-normal_ind <- c(4:13,21:24)
+normal_ind <- c(4:14,22:24)
 y_normal <- phones$calls[normal_ind]
 X_normal <- cbind(1, phones$year[normal_ind])
 set.seed(127)
 normal_fit <- bayesLm(y_normal, X_normal, mu0, Sigma0, a0, b0, sigma2Int = rlm_fit$s^2, nkeep = nkeep, nburn = nburn)
 
 coda::traceplot(normal_fit$mcmc,smooth = TRUE)
-write_rds(normal_fit, path = file.path(here::here(), 'normal_fit.rds'))
+write_rds(normal_fit, path = file.path(here::here(),'out', 'normal_fit.rds'))
 ```
 
