@@ -1,0 +1,571 @@
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  20 JAN 2018 15:39
+entering extended mode
+ \write18 enabled.
+ %&-line parsing enabled.
+**"Blended Paradigm 4 25.tex"
+(./Blended Paradigm 4 25.tex
+LaTeX2e <2015/01/01>
+Babel <3.9l> and hyphenation patterns for 79 languages loaded.
+(/usr/local/texlive/2015/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2014/09/29 v1.4h Standard LaTeX document class
+(/usr/local/texlive/2015/texmf-dist/tex/latex/base/size12.clo
+File: size12.clo 2014/09/29 v1.4h Standard LaTeX file (size option)
+)
+\c@part=\count79
+\c@section=\count80
+\c@subsection=\count81
+\c@subsubsection=\count82
+\c@paragraph=\count83
+\c@subparagraph=\count84
+\c@figure=\count85
+\c@table=\count86
+\abovecaptionskip=\skip41
+\belowcaptionskip=\skip42
+\bibindent=\dimen102
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/preprint/fullpage.sty
+Package: fullpage 1999/02/23 1.1 (PWD)
+\FP@margin=\skip43
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amsmath.sty
+Package: amsmath 2013/01/14 v2.14 AMS math features
+\@mathmargin=\skip44
+
+For additional information on amsmath, use the `?' option.
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amstext.sty
+Package: amstext 2000/06/29 v2.01
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amsgen.sty
+File: amsgen.sty 1999/11/30 v2.0
+\@emptytoks=\toks14
+\ex@=\dimen103
+))
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amsbsy.sty
+Package: amsbsy 1999/11/29 v1.2d
+\pmbraise@=\dimen104
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsmath/amsopn.sty
+Package: amsopn 1999/12/14 v2.01 operator names
+)
+\inf@bad=\count87
+LaTeX Info: Redefining \frac on input line 210.
+\uproot@=\count88
+\leftroot@=\count89
+LaTeX Info: Redefining \overline on input line 306.
+\classnum@=\count90
+\DOTSCASE@=\count91
+LaTeX Info: Redefining \ldots on input line 378.
+LaTeX Info: Redefining \dots on input line 381.
+LaTeX Info: Redefining \cdots on input line 466.
+\Mathstrutbox@=\box26
+\strutbox@=\box27
+\big@size=\dimen105
+LaTeX Font Info:    Redeclaring font encoding OML on input line 566.
+LaTeX Font Info:    Redeclaring font encoding OMS on input line 567.
+\macc@depth=\count92
+\c@MaxMatrixCols=\count93
+\dotsspace@=\muskip10
+\c@parentequation=\count94
+\dspbrk@lvl=\count95
+\tag@help=\toks15
+\row@=\count96
+\column@=\count97
+\maxfields@=\count98
+\andhelp@=\toks16
+\eqnshift@=\dimen106
+\alignsep@=\dimen107
+\tagshift@=\dimen108
+\tagwidth@=\dimen109
+\totwidth@=\dimen110
+\lineht@=\dimen111
+\@envbody=\toks17
+\multlinegap=\skip45
+\multlinetaggap=\skip46
+\mathdisplay@stack=\toks18
+LaTeX Info: Redefining \[ on input line 2665.
+LaTeX Info: Redefining \] on input line 2666.
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/setspace/setspace.sty
+Package: setspace 2011/12/19 v6.7a set line spacing
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/graphics/graphicx.sty
+Package: graphicx 2014/10/28 v1.0g Enhanced LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/graphics/keyval.sty
+Package: keyval 2014/10/28 v1.15 key=value parser (DPC)
+\KV@toks@=\toks19
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/graphics/graphics.sty
+Package: graphics 2014/10/28 v1.0p Standard LaTeX Graphics (DPC,SPQR)
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/graphics/trig.sty
+Package: trig 1999/03/16 v1.09 sin cos tan (DPC)
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/latexconfig/graphics.cfg
+File: graphics.cfg 2010/04/23 v1.9 graphics configuration of TeX Live
+)
+Package graphics Info: Driver file: pdftex.def on input line 94.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/pdftex-def/pdftex.def
+File: pdftex.def 2011/05/27 v0.06d Graphics/color for pdfTeX
+
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/infwarerr.sty
+Package: infwarerr 2010/04/08 v1.3 Providing info/warning/error messages (HO)
+)
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/ltxcmds.sty
+Package: ltxcmds 2011/11/09 v1.22 LaTeX kernel commands for general use (HO)
+)
+\Gread@gobject=\count99
+))
+\Gin@req@height=\dimen112
+\Gin@req@width=\dimen113
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/psfrag/psfrag.sty
+Package: psfrag 1998/04/11 v3.04 PSfrag (MCG)
+\pfg@pcount=\count100
+\pfg@scount=\count101
+\pfg@temp=\write3
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/amsfonts.sty
+Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
+\symAMSa=\mathgroup4
+\symAMSb=\mathgroup5
+LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
+(Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/float/float.sty
+Package: float 2001/11/08 v1.3d Float enhancements (AL)
+\c@float@type=\count102
+\float@exts=\toks20
+\float@box=\box28
+\@float@everytoks=\toks21
+\@floatcapt=\box29
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/natbib/natbib.sty
+Package: natbib 2010/09/13 8.31b (PWD, AO)
+\bibhang=\skip47
+\bibsep=\skip48
+LaTeX Info: Redefining \cite on input line 694.
+\c@NAT@ctr=\count103
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amscls/amsthm.sty
+Package: amsthm 2015/03/04 v2.20.2
+\thm@style=\toks22
+\thm@bodyfont=\toks23
+\thm@headfont=\toks24
+\thm@notefont=\toks25
+\thm@headpunct=\toks26
+\thm@preskip=\skip49
+\thm@postskip=\skip50
+\thm@headsep=\skip51
+\dth@everypar=\toks27
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/multirow/multirow.sty
+\bigstrutjot=\dimen114
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/tools/hhline.sty
+Package: hhline 2014/10/28 v2.03 Table rule package (DPC)
+)
+(/Users/john/Library/texmf/tex/latex/caption/subcaption.sty
+Package: subcaption 2013/04/16 v1.1-75 Sub-captions (AR)
+
+(/Users/john/Library/texmf/tex/latex/caption/caption.sty
+Package: caption 2013/05/02 v3.3-89 Customizing captions (AR)
+
+(/Users/john/Library/texmf/tex/latex/caption/caption3.sty
+Package: caption3 2013/05/02 v1.6-88 caption3 kernel (AR)
+Package caption3 Info: TeX engine: e-TeX on input line 57.
+\captionmargin=\dimen115
+\captionmargin@=\dimen116
+\captionwidth=\dimen117
+\caption@tempdima=\dimen118
+\caption@indent=\dimen119
+\caption@parindent=\dimen120
+\caption@hangindent=\dimen121
+)
+\c@ContinuedFloat=\count104
+Package caption Info: float package is loaded.
+)
+\c@subfigure=\count105
+\c@subtable=\count106
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/rotating/rotating.sty
+Package: rotating 2009/03/28 v2.16a rotated objects in LaTeX
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/base/ifthen.sty
+Package: ifthen 2014/09/29 v1.1c Standard LaTeX ifthen package (DPC)
+)
+\c@r@tfl@t=\count107
+\rotFPtop=\skip52
+\rotFPbot=\skip53
+\rot@float@box=\box30
+\rot@mess@toks=\toks28
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/graphics/color.sty
+Package: color 2014/10/28 v1.1a Standard LaTeX Color (DPC)
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/latexconfig/color.cfg
+File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
+)
+Package color Info: Driver file: pdftex.def on input line 142.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/graphics/dvipsnam.def
+File: dvipsnam.def 2014/10/14 v3.0j Driver-dependent file (DPC,SPQR)
+))
+\c@theorem=\count108
+
+(/usr/local/texlive/2015/texmf-dist/tex/generic/ulem/ulem.sty
+\UL@box=\box31
+\UL@hyphenbox=\box32
+\UL@skip=\skip54
+\UL@hook=\toks29
+\UL@height=\dimen122
+\UL@pe=\count109
+\UL@pixel=\dimen123
+\ULC@box=\box33
+Package: ulem 2012/05/18
+\ULdepth=\dimen124
+)
+No file "Blended Paradigm 4 25".aux.
+\openout1 = `"Blended Paradigm 4 25.aux"'.
+
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 162.
+LaTeX Font Info:    ... okay on input line 162.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 162.
+LaTeX Font Info:    ... okay on input line 162.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 162.
+LaTeX Font Info:    ... okay on input line 162.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 162.
+LaTeX Font Info:    ... okay on input line 162.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 162.
+LaTeX Font Info:    ... okay on input line 162.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 162.
+LaTeX Font Info:    ... okay on input line 162.
+(/usr/local/texlive/2015/texmf-dist/tex/context/base/supp-pdf.mkii
+[Loading MPS to PDF converter (version 2006.09.02).]
+\scratchcounter=\count110
+\scratchdimen=\dimen125
+\scratchbox=\box34
+\nofMPsegments=\count111
+\nofMParguments=\count112
+\everyMPshowfont=\toks30
+\MPscratchCnt=\count113
+\MPscratchDim=\dimen126
+\MPnumerator=\count114
+\makeMPintoPDFobject=\count115
+\everyMPtoPDFconversion=\toks31
+) (/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/pdftexcmds.sty
+Package: pdftexcmds 2011/11/29 v0.20 Utility functions of pdfTeX for LuaTeX (HO
+)
+
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/ifluatex.sty
+Package: ifluatex 2010/03/01 v1.3 Provides the ifluatex switch (HO)
+Package ifluatex Info: LuaTeX not detected.
+)
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/ifpdf.sty
+Package: ifpdf 2011/01/30 v2.3 Provides the ifpdf switch (HO)
+Package ifpdf Info: pdfTeX in PDF mode is detected.
+)
+Package pdftexcmds Info: LuaTeX not detected.
+Package pdftexcmds Info: \pdf@primitive is available.
+Package pdftexcmds Info: \pdf@ifprimitive is available.
+Package pdftexcmds Info: \pdfdraftmode found.
+)
+(/usr/local/texlive/2015/texmf-dist/tex/latex/oberdiek/epstopdf-base.sty
+Package: epstopdf-base 2010/02/09 v2.5 Base part for package epstopdf
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/oberdiek/grfext.sty
+Package: grfext 2010/08/19 v1.1 Manage graphics extensions (HO)
+
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/kvdefinekeys.sty
+Package: kvdefinekeys 2011/04/07 v1.3 Define keys (HO)
+))
+(/usr/local/texlive/2015/texmf-dist/tex/latex/oberdiek/kvoptions.sty
+Package: kvoptions 2011/06/30 v3.11 Key value format for package options (HO)
+
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/kvsetkeys.sty
+Package: kvsetkeys 2012/04/25 v1.16 Key value parser (HO)
+
+(/usr/local/texlive/2015/texmf-dist/tex/generic/oberdiek/etexcmds.sty
+Package: etexcmds 2011/02/16 v1.5 Avoid name clashes with e-TeX commands (HO)
+Package etexcmds Info: Could not find \expanded.
+(etexcmds)             That can mean that you are not using pdfTeX 1.50 or
+(etexcmds)             that some package has redefined \expanded.
+(etexcmds)             In the latter case, load this package earlier.
+)))
+Package grfext Info: Graphics extension search list:
+(grfext)             [.png,.pdf,.jpg,.mps,.jpeg,.jbig2,.jb2,.PNG,.PDF,.JPG,.JPE
+G,.JBIG2,.JB2,.eps]
+(grfext)             \AppendGraphicsExtensions on input line 452.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
+File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Liv
+e
+))
+Package caption Info: Begin \AtBeginDocument code.
+Package caption Info: rotating package is loaded.
+Package caption Info: End \AtBeginDocument code.
+LaTeX Font Info:    Try loading font information for U+msa on input line 164.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/umsa.fd
+File: umsa.fd 2013/01/14 v3.01 AMS symbols A
+)
+LaTeX Font Info:    Try loading font information for U+msb on input line 164.
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/umsb.fd
+File: umsb.fd 2013/01/14 v3.01 AMS symbols B
+)
+LaTeX Font Info:    Try loading font information for OMS+cmr on input line 164.
+
+
+(/usr/local/texlive/2015/texmf-dist/tex/latex/base/omscmr.fd
+File: omscmr.fd 2014/09/29 v2.5h Standard LaTeX font definitions
+)
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 164.
+LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <7> not available
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 164.
+
+pdfTeX warning (Object streams): \pdfobjcompresslevel > 0 requires \pdfminorver
+sion > 4. Object streams disabled now.
+[1
+Non-PDF special ignored!
+
+{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+Overfull \hbox (0.56279pt too wide) in paragraph at lines 195--197
+\OT1/cmr/m/n/10.95 KEYWORDS: Ap-prox-i-mate Bayesian com-pu-ta-tion, Markov cha
+in Monte Carlo,
+ []
+
+
+Package natbib Warning: Citation `garthwaite2005' on page 2 undefined on input 
+line 214.
+
+
+Package natbib Warning: Citation `ohagan2006' on page 2 undefined on input line
+ 214.
+
+
+Package natbib Warning: Citation `berger2006' on page 2 undefined on input line
+ 215.
+
+
+Package natbib Warning: Citation `kass1995' on page 2 undefined on input line 2
+17.
+
+
+Package natbib Warning: Citation `box1980' on page 2 undefined on input line 21
+9.
+
+[2]
+
+Package natbib Warning: Citation `lee2013' on page 3 undefined on input line 24
+1.
+
+[3]
+
+LaTeX Warning: Reference `restrictedlikelihood' on page 4 undefined on input li
+ne 282.
+
+
+LaTeX Warning: Reference `BayesLinMod' on page 4 undefined on input line 283.
+
+
+LaTeX Warning: Reference `Applications' on page 4 undefined on input line 284.
+
+
+LaTeX Warning: Reference `Conclusions' on page 4 undefined on input line 285.
+
+
+LaTeX Warning: Reference `BayesLinMod' on page 4 undefined on input line 287.
+
+[4]
+
+Package natbib Warning: Citation `lewis2014' on page 5 undefined on input line 
+296.
+
+[5]
+
+Package natbib Warning: Citation `ratcliff1993' on page 6 undefined on input li
+ne 323.
+
+
+LaTeX Warning: Reference `OutlyingCases' on page 6 undefined on input line 357.
+
+
+
+LaTeX Warning: Reference `Censoring' on page 6 undefined on input line 358.
+
+[6]
+
+Package natbib Warning: Citation `savage1969' on page 7 undefined on input line
+ 388.
+
+
+Package natbib Warning: Citation `pettitt1983' on page 7 undefined on input lin
+e 388.
+
+
+Package natbib Warning: Citation `pettitt1982' on page 7 undefined on input lin
+e 388.
+
+
+Package natbib Warning: Citation `hoff2013' on page 7 undefined on input line 3
+88.
+
+
+Package natbib Warning: Citation `lewis2012' on page 7 undefined on input line 
+389.
+
+
+Package natbib Warning: Citation `doksum1990' on page 7 undefined on input line
+ 390.
+
+
+Package natbib Warning: Citation `clarke1995' on page 7 undefined on input line
+ 390.
+
+
+Package natbib Warning: Citation `yuan2004' on page 7 undefined on input line 3
+90.
+
+
+Package natbib Warning: Citation `hwang2005' on page 7 undefined on input line 
+390.
+
+
+Package natbib Warning: Citation `pratt1965' on page 7 undefined on input line 
+398.
+
+
+Package natbib Warning: Citation `tavare1997' on page 7 undefined on input line
+ 399.
+
+
+Package natbib Warning: Citation `pritchard1999' on page 7 undefined on input l
+ine 399.
+
+
+Package natbib Warning: Citation `marjoram2003' on page 7 undefined on input li
+ne 399.
+
+
+Package natbib Warning: Citation `fearnhead2012' on page 7 undefined on input l
+ine 399.
+
+
+Package natbib Warning: Citation `joyce2008' on page 7 undefined on input line 
+400.
+
+[7]
+
+Package natbib Warning: Citation `albert1988' on page 8 undefined on input line
+ 409.
+
+
+Package natbib Warning: Citation `hoffwakefield2013' on page 8 undefined on inp
+ut line 409.
+
+[8]
+
+Package natbib Warning: Citation `lewis2012' on page 9 undefined on input line 
+417.
+
+
+Package natbib Warning: Citation `huber1964' on page 9 undefined on input line 
+417.
+
+
+Package natbib Warning: Citation `lewis2014' on page 9 undefined on input line 
+417.
+
+
+LaTeX Warning: Reference `highDim' on page 9 undefined on input line 422.
+
+
+Package natbib Warning: Citation `stigler1977' on page 9 undefined on input lin
+e 435.
+
+
+Package natbib Warning: Citation `chan1980' on page 9 undefined on input line 4
+35.
+
+
+Package natbib Warning: Citation `gelman2004' on page 9 undefined on input line
+ 435.
+
+
+LaTeX Warning: Reference `highDim' on page 9 undefined on input line 448.
+
+
+LaTeX Warning: Reference `LinearModel' on page 9 undefined on input line 450.
+
+[9]
+
+Package natbib Warning: Citation `huber2009' on page 10 undefined on input line
+ 460.
+
+[10]
+
+LaTeX Warning: Reference `RestrictedpredDist' on page 11 undefined on input lin
+e 471.
+
+
+LaTeX Warning: Reference `fig:newcombBeta' on page 11 undefined on input line 4
+73.
+
+
+LaTeX Warning: Reference `fig:newcombPred' on page 11 undefined on input line 4
+73.
+
+
+LaTeX Warning: Reference `fig:newcombSig2' on page 11 undefined on input line 4
+79.
+
+[11]
+
+LaTeX Warning: Reference `RestrictedpredDist' on page 12 undefined on input lin
+e 499.
+
+
+LaTeX Warning: Reference `fig:newcombPred' on page 12 undefined on input line 5
+00.
+
+
+LaTeX Warning: Reference `fig:newcombSig2' on page 12 undefined on input line 5
+06.
+
+
+LaTeX Warning: File `posteriorBetaNewcombDataParamSet2trim_2.pdf' not found on 
+input line 517.
+
+
+! Package pdftex.def Error: File `posteriorBetaNewcombDataParamSet2trim_2.pdf' 
+not found.
+
+See the pdftex.def package documentation for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.517 ...eriorBetaNewcombDataParamSet2trim_2.pdf}}
+                                                  \quad
+? 
+! Emergency stop.
+ ...                                              
+                                                  
+l.517 ...eriorBetaNewcombDataParamSet2trim_2.pdf}}
+                                                  \quad
+Using draft setting for this image.
+Try typing  <return>  to proceed.
+If that doesn't work, type  X <return>  to quit.
+
+ 
+Here is how much of TeX's memory you used:
+ 4450 strings out of 493089
+ 65085 string characters out of 6134842
+ 135424 words of memory out of 5000000
+ 7840 multiletter control sequences out of 15000+600000
+ 16739 words of font info for 64 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 42i,11n,40p,1288b,322s stack positions out of 5000i,500n,10000p,200000b,80000s
+!  ==> Fatal error occurred, no output PDF file produced!
