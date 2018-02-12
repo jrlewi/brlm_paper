@@ -10,7 +10,7 @@ fit_lms <- readRDS('out/fit_lms.rds')
 fit_lts <- readRDS('out/fit_lts.rds')
 fit_normal <- readRDS('out/fit_normal.rds')
 fit_t <- readRDS('out/fit_t.rds')
-
+fit_mixture <- readRDS('out/fit_mixture.rds')
 
 extract_pdf <- function(fit, model){
 beta <- tibble(beta = fit$muPost[,1], posterior = fit$muPost[,2], Model = model)
@@ -23,6 +23,8 @@ pdf_huber <- extract_pdf(fit_huber, 'Huber')
 pdf_lms <- extract_pdf(fit_lms, 'LMS')
 pdf_lts <- extract_pdf(fit_lts, 'LTS')
 
+
+
 compute_pdf <- function(samples, model){
   pdf_beta <- density(samples[,1])
   pdf_sigma2 <- density(samples[,2])
@@ -33,14 +35,15 @@ compute_pdf <- function(samples, model){
 
 pdf_normal <- compute_pdf(fit_normal, 'Normal')
 pdf_t <- compute_pdf(fit_t, 't')
+fit_mix_good <- cbind(fit_mixture$beta, fit_mixture$sigma2)
+pdf_mixture <- compute_pdf(fit_mix_good, 'Mixture')
 
-
-model_order <- c('Normal', 't', 'Tukey', 'Huber', 'LMS', 'LTS')
-beta_pdfs <- bind_rows(pdf_normal$beta, pdf_t$beta, pdf_tukey$beta, pdf_huber$beta, pdf_lms$beta, pdf_lts$beta)
+model_order <- c('Normal', 't', 'Mixture', 'Tukey', 'Huber', 'LMS', 'LTS')
+beta_pdfs <- bind_rows(pdf_normal$beta, pdf_t$beta, pdf_mixture$beta, pdf_tukey$beta, pdf_huber$beta, pdf_lms$beta, pdf_lts$beta)
 beta_pdfs$Model <- factor(beta_pdfs$Model, levels = model_order)
 
 
-sigma2_pdfs <- bind_rows(pdf_normal$sigma2, pdf_t$sigma2, pdf_tukey$sigma2, pdf_huber$sigma2, pdf_lms$sigma2, pdf_lts$sigma2)
+sigma2_pdfs <- bind_rows(pdf_normal$sigma2, pdf_t$sigma2, pdf_mixture$sigma2, pdf_tukey$sigma2, pdf_huber$sigma2, pdf_lms$sigma2, pdf_lts$sigma2)
 sigma2_pdfs$Model <- factor(sigma2_pdfs$Model, levels = model_order)
 
 
@@ -58,7 +61,7 @@ ggplot(sigma2_pdfs, aes(x = sigma2, y = posterior, group = Model, col = Model)) 
 ggsave(file.path(fig_path, 'speed_of_light_sigma2.png'))
 
 
-# Predictive Distributions
+# Predictive Distributions ----
 
 
 predictive_t <- function(fit_t){
@@ -95,6 +98,27 @@ sum(diff(post_pred_normal$y_tilde)*post_pred_normal$pred_dist[-1])
 sum(diff(post_pred_normal$y_tilde)*post_pred_normal$y_tilde[-1]*post_pred_normal$pred_dist[-1])
 
 
+
+# using only the 'good' piece. i.e. the small variance component
+predictive_mixture <- function(fit_mix_good){
+  mu <- as.numeric(fit_mix_good[,1])
+  sigma2 <- as.numeric(fit_mix_good[,2])
+  y_tilde <- seq(-50, 100, length.out = 100)
+  pred_dist <- sapply(y_tilde, function(yy){
+    mean(dnorm(yy, mu, sqrt(sigma2)))
+  })
+  tibble(y_tilde = y_tilde, pred_dist = pred_dist, Model = 'Mixture')
+}
+
+post_pred_mixture <- predictive_mixture(fit_mix_good)
+plot(post_pred_mixture$y_tilde, log(post_pred_mixture$pred_dist))
+sum(diff(post_pred_mixture$y_tilde)*post_pred_mixture$pred_dist[-1])
+
+sum(diff(post_pred_mixture$y_tilde)*post_pred_mixture$y_tilde[-1]*post_pred_mixture$pred_dist[-1])
+mean(fit_mixture$beta)
+
+
+
 predictive_rlm <- function(fit_tukey, model){
   y_tilde <- seq(-50, 100, length.out = 100)
   joint <- as.data.frame(fit_tukey$jointPost)
@@ -126,7 +150,7 @@ sum(post_pred_lms$pred_dist[-1]*diff(post_pred_lms$y_tilde)*post_pred_lms$y_tild
 
 
 
-predictive_distributions <- bind_rows(post_pred_normal, post_pred_t, post_pred_tukey, post_pred_huber, post_pred_lms, post_pred_lts)
+predictive_distributions <- bind_rows(post_pred_normal, post_pred_t,post_pred_mixture, post_pred_tukey, post_pred_huber, post_pred_lms, post_pred_lts)
 predictive_distributions$Model <- factor(predictive_distributions$Model, levels = model_order)
 
 predictive_distributions <- predictive_distributions %>% 
