@@ -16,7 +16,11 @@ rl_fit <- read_rds(file.path(here::here(), 'out', 'rl_fit.rds'))
 t_fit <- read_rds(file.path(here::here(), 'out', 't_fit.rds'))
 nu <- 5
 normal_fit <- read_rds(file.path(here::here(), 'out', 'normal_fit.rds'))
-
+mixture_fit <- read_rds(file.path(here::here(), 'out', 'mixture_fit.rds'))
+# samples from 'good' part of model
+mixture_fit_good <- cbind(mixture_fit$beta0[,1],mixture_fit$beta1[,1], mixture_fit$sigma[,1])
+apply(mixture_fit_good, 2, mean)
+rl_fit$fit
 #plot(log(rl_fit$w + 1e-20), cex = .2)
 
 
@@ -40,6 +44,7 @@ rpd_rl <- function(rl_fit,x, n){
   ind <- sample(1:n_imps, size = n, prob = w, replace = TRUE)
   rnorm(n, means[ind], sig[ind])
 }
+apply(rl_fit$impSamps, 2, function(x) mean(sample(x, 10000, prob = rl_fit$w, replace = TRUE)))
 
 
 rpd_normal <- function(normal_fit,x, n){
@@ -54,6 +59,27 @@ rpd_normal <- function(normal_fit,x, n){
   rnorm(n, means[ind], sig[ind])
 }
 
+rpd_mixture <- function(mixture_fit_good,x, n){
+  # x = scalar, 
+  # y_tilde = vector of ys to eval pdd 
+  # n number of samples
+  n_imps <- nrow(mixture_fit_good)
+  betas <- mixture_fit_good[,1:2]
+  means <-c(1, x)%*%t(betas)
+  sig <- mixture_fit_good[,3]
+  ind <- sample(1:n_imps, size = n, replace = TRUE)
+  rnorm(n, means[ind], sig[ind])
+}
+mean_mix <- apply(mixture_fit_good, 2, mean)
+mean_mix
+means_rl <- apply(rl_fit$impSamps, 2, function(x) mean(sample(x, 100000, prob = rl_fit$w, replace = TRUE)))
+library(MASS)
+robust <- rlm(phones$calls[-c(1:3)]~c(phones$year-mean(phones$year))[-c(1:3)], psi = psi.bisquare)
+
+plot(x, y)
+abline(a = mean_mix[1], b = mean_mix[2])
+abline(a = means_rl[1], b = means_rl[2], col= 2)
+abline(a = coef(robust)[1], b =coef(robust)[2], col= 3)
 
 rpd_t <- function(t_fit,x, n){
   # x = scalar - year to predict
@@ -123,19 +149,33 @@ ppd_normal_gather <- gather(ppd_normal, key = 'sample', value = 'value', -x_grid
 
 normal_cred_bounds <- ppd_normal_gather %>% 
   group_by(x_grid) %>% 
-  summarize(lower = quantile(value, probs = .05), upper = quantile(value, probs = .95), Model = 'normal')
+  summarize(lower = quantile(value, probs = .05), upper = quantile(value, probs = .95), Model = 'Normal')
+
+
+#Mixture Model ---
+ppd_mixture <- sapply(x_grid, function(x){
+  rpd_mixture(mixture_fit_good,x, n = n_samps)
+})
+
+ppd_mixture <- as_tibble(as.data.frame(cbind(t(ppd_mixture), x_grid)))
+
+ppd_mixture_gather <- gather(ppd_mixture, key = 'sample', value = 'value', -x_grid)
+
+mixture_cred_bounds <- ppd_mixture_gather %>% 
+  group_by(x_grid) %>% 
+  summarize(lower = quantile(value, probs = .05), upper = quantile(value, probs = .95), Model = 'Mixture')
 
 
 
 # combine credible bounds -----
-cred_bounds <- bind_rows(rl_cred_bounds, t_cred_bounds, normal_cred_bounds) %>% 
+cred_bounds <- bind_rows(normal_cred_bounds, t_cred_bounds, mixture_cred_bounds, rl_cred_bounds) %>% 
   gather(key = 'quantile', value = 'y', -x_grid, -Model)
 
 phones_df <- bind_cols(phones)
 phones_df$Calls <- c(rep('Used for prior', n_prior), rep('Used for fit', nrow(phones_df) - n_prior))
 
 ggplot(cred_bounds, aes(x = x_grid + mean(phones$year), y = y, group = interaction(quantile,Model), col = Model )) + geom_smooth(se = FALSE, lwd = .5) +
-  geom_point(data = phones_df, mapping = aes(x = year, y = calls, group = NULL, col = NULL, shape = Calls)) + labs(x = 'year', y = 'log calls') + theme_bw() + scale_color_brewer(palette = 'Set2') 
+  geom_point(data = phones_df, mapping = aes(x = year, y = calls, group = NULL, col = NULL, shape = Calls)) + labs(x = 'year', y = 'log calls') + theme_bw() + scale_color_brewer(palette = 'Set2') #+ geom_abline(slope =  mean_mix[2]  , intercept = mean_mix[1] - mean_mix[2]*mean(phones$year))
 ggsave(file.path(fig_path, 'calls_predictive.png'))
 
 # # lengths of credible intervals
