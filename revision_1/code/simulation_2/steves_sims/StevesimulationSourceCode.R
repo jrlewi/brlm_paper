@@ -4,8 +4,8 @@
 
 #requires sourcing linearRegressionHuberAndProposal2.R #path may need to be changed
 # Adjust source for Steve's directories at work
-# source('../linearRegressionHuberAndProposal2.R')
-source('//trad/profs$/maceachern.1/Desktop/LEWIS.LEE/codeForPaper/codeForPaper/linearRegressionHuberAndProposal2.R')
+source('linearRegressionHuberAndProposal2.R')
+# source('//trad/profs$/maceachern.1/Desktop/LEWIS.LEE/codeForPaper/codeForPaper/linearRegressionHuberAndProposal2.R')
 
 
 #
@@ -13,7 +13,7 @@ source('//trad/profs$/maceachern.1/Desktop/LEWIS.LEE/codeForPaper/codeForPaper/l
 # theta_i \sim N(mu, tau^2)
 # Y_ij | \theta_i \sim N(\theta_i, sigma_i^2)  
 # with a fairly flat distribution on mu, tau^2 and sigma_i^2.
-# mu \propto 1, \tau^2 \propto 1/\tau^2, sigma_i^2 \propto \sigma_2^2
+# mu \propto 1, \tau^2 \propto 1/\tau^2 = IG(0,0), sigma_i^2 \~ IG(ass, bss)
 # i runs from 1 to 90
 #
 

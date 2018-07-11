@@ -70,7 +70,7 @@ fn.chi.prop2<-function(u, k=1.345, deriv=0, b=.71016){
 #---------------
 
 #the linear equation to solve is of the form A*deriv=b
-#function should only input y's that satisfy l1obs and s1obs
+#function should only input y's that satisfy the conditioning statistic values (l1obs and s1obs)
 
 
 #for simplicity this is set up only to handle the default tunning constants given by fn.psi.huber, fn.psi.bisquare  and fn.psi.prop2
