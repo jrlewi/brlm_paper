@@ -9,7 +9,7 @@ date() # SteveMod
 
 # rm(list=ls())
 # source('//trad/profs$/maceachern.1/Desktop/LEWIS.LEE/codeForPaper/codeForPaper/simulation/StevesimulationSourceCode.R')
-source('StevesimulationSourceCode.R')
+source('SimulationSourceCode.R')
 st<-Sys.time()
 set.seed(123) # for reproducible results
 
