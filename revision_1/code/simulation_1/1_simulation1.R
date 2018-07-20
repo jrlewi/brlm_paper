@@ -21,8 +21,8 @@ set.seed(123)
 # true_model <- 't'
 
 #simulation parameters ----
-n_sim <- 100
-samp_sizes <- c(25, 50, 100)
+n_sim <- 2
+samp_sizes <- c(25, 50) #, 100)
 
 for(true_model in c("Normal", "Mixture 1", "Mixture 2", "Student-t")){
 
@@ -53,9 +53,9 @@ data_gen <- function(n){
 
 # prior parameters ----
 eta <- 0
-tau <- 10
-a <- 2.1
-b <- 1
+tau <- 2
+a <- 10
+b <- 9
 
 
 # set up empty tibbles to store results----

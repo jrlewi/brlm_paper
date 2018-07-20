@@ -19,7 +19,7 @@ transformed parameters{
 }
 
 model {
-  nu ~ normal(3, 30);
+  nu ~ normal(3, 3);
   sigma2 ~  inv_gamma(a, (nu-2)*b/nu);
   beta ~ normal(eta, tau);
   y ~ student_t(nu, beta, sigma);

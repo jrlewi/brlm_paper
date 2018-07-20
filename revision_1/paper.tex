@@ -1035,6 +1035,71 @@ values of $U^\top B$ are the same as the non-unit singular values of $W^\top A$.
 \subsection{Simulation 1}
 
 \subsection{Simulation 2}
+Data generating model:
+\begin{equation}
+\label{gensim2}
+\begin{split}
+\theta_{i}  \sim &  N(\mu, \tau^{2}),  \ i = 1, 2, \dots, 90  \\ 
+y_{ij} \sim & (1-p_{i})N(\theta_{i}, \sigma^{2}) + p_{i}N(\theta_{i}, m_{i}\sigma^{2}), j = 1, 2,..., n_{i}
+\end{split}
+\end{equation}
+with $\mu = 0, \tau^{2} = 1, \sigma^{2} = 4$. The values of $p_{i}, m_{i}$, and $n_{i}$ depend on the group and are formed using 5 replicates of the full factorial design over factors $p_{i},m_{i},n_{i}$ with levels $p_{i} = .1, .2, .3$, $m_{i} = 9, 25$, and $n_{i} = 25, 50, 100$. The full model for fitting is a corresponding normal model without contamination:
+\begin{equation}
+\label{fullsim2}
+\begin{split}
+\mu \propto 1, \ & \tau^{2} \propto \tau^{-2}, \\
+\theta_{i}\sim N(\mu, \tau^{2}), \ & \sigma^{2}_{i} \sim IG(a_{s}, b_{s}),  \ i = 1, 2, \dots, 90, \\ 
+y_{ij}\sim  N(\theta_{i},\sigma^{2}_{i}), \ j = 1, 2, \dots, n_{i}
+\end{split}
+\end{equation}
+For the restricted likelihood versions we condition on robust M-estimators of location and scale in each group: $T_{i}(\by_{i}) = (\hat\theta_{i}, \hat\sigma^{2}_{i}), i = 1, 2, ..., 90$. The two versions used are Huber's and Tukey's location estimator both coupled with Huber's scale estimator. The estimates from the Bayesian models are compared to these estimates. To complete the specification of model \eqref{fullsim2} we must specify $a_{s}$ and $b_{s}$. For this we use a variety of values representing different levels of prior knowledge. For each we set $b_{s} = 4a_{s}c_{s}$ resulting in a prior mean for each $\sigma^{2}_{i}$ of $\frac{4c_{s}a_{s}}{a_{s}-1}, \ a_{s} >1$. The larger $a_{s}$, the more informative the prior. With $c_{s} = 1$ the shrinkage (for large $a_{s}$) is to the true value of $\sigma^{2} = 4$ of the variance of the good component of data in the data generating model. We consider $a_{s} = 1.25, 2.5, 5, 10, 20 $ and $c_{s} = 1/2, 1/\sqrt{2}, 1, \sqrt{2}, 2$. Values of $c_{s} \neq 1$ will result in shrinkage towards the wrong value of $\sigma^{2}$ with strength growing with $a_{s}$.
+
+A single (\red{maybe need to do more...each run through takes about 3 hours on my laptop and current code, maybe 10 different sets would suffice}) set of data is generated from \eqref{gensim2}. The models compared are: the full model \eqref{fullsim2}, the two restricted likelihood versions of this full model, classical robust linear models fit individually to each group. 
+
+
+
+We compare fits of each model using $MSE = \frac{1}{90}\sum_{i = 1}^{90} (\hat\theta_{i} -\theta_{i})^{2}$ with $\hat\theta_{i}$ the estimate of $\theta_{i}$ from the corresponding model. 
+
+Results for MSE
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale = .3]{mse_sim2_facet_scale.png}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale = .3]{mse_sim2_facet_as.png}
+\end{figure}
+
+
+Big picture - restricted methods beating corresponding robust regressions (labeled rlm). MSE robustness to prior on $\sigma_{i}^{2}$
+
+
+Results for KL (plots are average of the KLs computed for each group):
+\begin{figure}[H]
+\centering
+\includegraphics[scale = .3]{kl_sim2_facet_scale.png}
+\end{figure}
+
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale = .3]{kl_sim2_facet_as.png}
+\end{figure}
+
+One explaination for the idea that 'shrinking towards smaller values' may do slightly better than shrinking toward the true value is the fact that we used default tuning parameters to define M-Estimators. For the amount of contaimination in each group, the expected value of the variance estimate (Huber's proposal 2) is larger that $\sigma^{2} = 4$. The histogram below demonstrates a sample of variaince estimates for data generated from one of the contamination groups....the estimates are consitently above 4. Thus it appears the prior mean must be smaller than the true value to get the `correct' amount of shrinkage. There is a suggestion that if the prior is too strong (large $a_{s}$), at some point, shrinking to too small a value degrades performance....which would be expected. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale = .3]{hist_sig2_ests.png}
+\end{figure}
+
+
+
+
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
