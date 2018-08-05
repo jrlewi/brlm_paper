@@ -78,7 +78,7 @@ anyNA(pooled_marginals)
 # Finding TLM with a specific base model -----
 
 
-base_model <- 'Rlm - Huber'
+base_model <- 'Student-t'
 trimming_fraction <- 0.3
 
 marginals_open_type1 <- pooled_marginals %>% 
