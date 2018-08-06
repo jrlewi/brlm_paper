@@ -28,11 +28,11 @@ state_sizes <- analysis_data %>%
 
 #Set prior parameters ----
 #place holders - needed to update
-mu_0 <- 1
+mu0 <- 1
 Sigma0 <- .1
 a0 <- 1
 b0 <- 1
-mu_bstr <- 1
+mu_bstr <- .5
 psi_bstr <- 1
 swSq <- 1
 w1 <- 1
@@ -129,21 +129,19 @@ for(n in ns){
   # simulation -----
   system.time(  
     for(i in 1:reps){
-      
-      
-      training_set <- sampling::strata(analysis_data, "State", strata_sizes, method = c('srswor'))
+
+    strat_sample <- sampling::strata(analysis_data, "State", strata_sizes, method = c('srswor'))
       
       
       #trainIndices <- sort(sample(1:N, n))
-      holdIndices <- c(1:N)[-training_set$ID_unit]
+      holdIndices <- c(1:N)[-strat_sample$ID_unit]
       holdIndicesMatrix[i,] <- holdIndices
-      train <- analysis_data[training_set$ID_unit,]
+      train <- analysis_data[strat_sample$ID_unit,]
       hold <- analysis_data[holdIndices,]
       yholdout <- hold$sqrt_count_2012
       y_hold[i,] <- yholdout
      
-      
-      #Stopppppped  
+ 
       
       #type 1, open agencies to predict in holdout set
       open <- hold$Count_2012 > 0 
@@ -152,16 +150,80 @@ for(n in ns){
       y_type1[i,] <-type1
       
       
-      #regresssions ----
-      y <- train$sqrt_count_2012 
+      # Set up regressions ----
       
-      #get model matrix from holdoutset
-      #fit1 is on the holdoutset
-      fit1 <- lm(sqrt_count_2012 ~ sqrt_count_2010 - 1,data = hold)
-      Xholdout <- model.matrix(fit1)
+      #prepare data for fitting function; get ols preds and marginals on holdoutset
+      #y is list of responses from each group
+      #X is list of design matrices for each group
+  
+        by_state <- train %>% 
+        group_by(State) %>% 
+        nest() 
+      
+      state_model <- function(df){
+        lm(sqrt_count_2012 ~ sqrt_count_2010 - 1, y = TRUE, x = TRUE, data = df)
+      }
+      
+      models <- by_state$data %>% 
+        map(state_model) 
+      names(models) <- by_state$State
       
       
-      #rlm on training:Tukey -----
+      y <- models %>% 
+        map(.f = function(m) m$y)
+      
+      X <- models %>% 
+        map(.f = function(m) m$x)
+      
+      
+      betaHats <- models %>% 
+        map(.f = function(m) coef(m)) %>% 
+        unlist()
+      
+      sigHats <- models %>% 
+        map(.f = function(m) summary(m)$s) %>% 
+        unlist()
+      
+
+      
+      #prepare the holdout data for predictions
+      #yhold is list of holdout responses from each group
+      #Xhold is list of holfout design matrices for each group
+      by_state_hold <- hold %>% 
+        group_by(State) %>% 
+        nest()
+      
+      models_hold <- by_state_hold$data %>% 
+        map(state_model) 
+      names(models_hold) <- by_state_hold$State
+      
+      yhold <- models_hold %>% 
+        map(.f = function(m) m$y)
+      
+      Xhold <- models_hold %>% 
+        map(.f = function(m) m$x)
+      
+      olsPreds <- by_state_hold$data %>% 
+        map2(.x = ., .y = models_hold, .f = function(x, y){
+          predict(y, newdata = x)
+        })
+      
+      
+      
+      olsMarginals <- list(yhold, olsPreds, models) %>% 
+        pmap(.f = function(y, prd, m){
+          dnorm(y,prd,summary(m)$sigma) 
+        })
+          
+
+      # olsPredListofLists[[i]][[group]]<-olsPreds
+      # olsMarginalsListofLists[[i]][[group]]<-dnorm(yhold[[group]],olsPreds,summary(fit)$sigma)
+        
+   #Fit regressions models ------
+      
+    #unpooled regressions -----
+
+    #rlm on training:Tukey -----
       rlmfit <- rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, psi=psi.bisquare, scale.est='Huber',data = train, maxit=1000)
       X <- model.matrix(rlmfit) #model matrix for all regressions
       p <- ncol(X) #number of regression coefs
@@ -172,9 +234,8 @@ for(n in ns){
       rlmPredMat[i,] <- rlmPreds
       margRlm[i,] <- dnorm(yholdout,mean=rlmPreds, sd=rlmfit$s)
       
-      
-      
-      #rlm on training: Huber ----
+    
+    #rlm on training: Huber ----
       rlmfitHuber <- rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, psi=psi.huber, scale.est='Huber',data = train, maxit=1000)
       
       rlmEstimatesHuber[,i]<-c(coef(rlmfitHuber),rlmfitHuber$s^2)
@@ -183,32 +244,60 @@ for(n in ns){
       margRlmHuber[i,] <- dnorm(yholdout,mean=rlmPredsHuber, sd=rlmfitHuber$s)
       
       
-      #ols on training ----
+    #ols on training ----
       olsFit <- lm(sqrt_count_2012 ~ sqrt_count_2010 - 1,data=train)
       olsEstimates[,i] <- c(coef(olsFit),summary(olsFit)$sigma^2)
       olsPreds <- Xholdout%*%coef(olsFit)
       olsPredMat[i,] <- olsPreds
       margOls[i,] <- dnorm(yholdout,mean=olsPreds, sd=summary(olsFit)$sigma)
       
+
+  #Hierarchical Models -----      
       
       #normal theory bayes model ----
       
-      nTheory <- brlm::bayesLm(y, X , 
-                               mu0 = beta_0, 
-                               Sigma0 = var_beta_0, 
-                               a0 = a_0, 
-                               b0 = b_0, 
-                               sigma2Int = sigma2Int, 
-                               nkeep = nkeep, 
-                               nburn= nburn)
-      #posterior means of beta
-      ##plot(nTheory$mcmc, ask=FALSE, density=FALSE)
-      postMeansNtheory <- colMeans(nTheory$mcmc)
-      nTheoryEstimates[,i] <- postMeansNtheory
-      betaNTheory <- postMeansNtheory[1:p]
-      sigma2Ntheory <- postMeansNtheory[p+1]
-      nTheoryPreds <- Xholdout%*%betaNTheory
-      nTheoryPredMat[i,] <- nTheoryPreds
+      #tunning parameters
+      step_logbstar <- abs(log(mu_bstr/(sqrt(mu_bstr*(1-mu_bstr)/(psi_bstr+1))))) #abs log(mean/sd)
+      mu_rho_step <- .3 #(w1/(w1+w1))/sqrt(w1*w2/((w1+w2)^2*(w1+w1+1)))
+      psi_rho_step <- a_psir^.5 #mean/sd
+      rho_step <- .1
+      
+      nis <- unlist(lapply(y, length), use.names=FALSE)
+      step_Z <- brlm:::fn.compute.Z(mean(sigHats^2), a0, b0)/(sqrt(nis))
+      
+      
+      nTheory <- brlm::hierNormTheoryLm(y,
+                                        X,
+                                        nkeep,
+                                        nburn,
+                                        mu0,
+                                        Sigma0,
+                                        a0, 
+                                        b0,
+                                        mu_bstr,
+                                        psi_bstr,
+                                        swSq = 1,
+                                        w1,
+                                        w2, 
+                                        a_psir,
+                                        b_psir)
+    
+      # nTheory <- brlm::bayesLm(y, X , 
+      #                          mu0 = beta_0, 
+      #                          Sigma0 = var_beta_0, 
+      #                          a0 = a_0, 
+      #                          b0 = b_0, 
+      #                          sigma2Int = sigma2Int, 
+      #                          nkeep = nkeep, 
+      #                          nburn= nburn)
+      # #posterior means of beta
+      # ##plot(nTheory$mcmc, ask=FALSE, density=FALSE)
+      # postMeansNtheory <- colMeans(nTheory$mcmc)
+      # nTheoryEstimates[,i] <- postMeansNtheory
+      # betaNTheory <- postMeansNtheory[1:p]
+      # sigma2Ntheory <- postMeansNtheory[p+1]
+      # nTheoryPreds <- Xholdout%*%betaNTheory
+      # nTheoryPredMat[i,] <- nTheoryPreds
       
       # get marginals f(y_h) for each element in holdout set 
       nMuMatrix <- Xholdout%*%(t(nTheory$mcmc)[1:p,])
@@ -219,10 +308,9 @@ for(n in ns){
       margNTheory[i,] <- rowMeans(dnorm(yholdout,mean = nMuMatrix, sd = nSigmaMat))
       
       
-      # restricted likelihood -----
-      
-      
-      #Tukey version ----
+
+# restricted likelihood models -----
+#Tukey version ----
       restricted <- brlm::restrictedBayesLm(y, X, 
                                             regEst='Tukey', 
                                             scaleEst='Huber',
@@ -255,7 +343,7 @@ for(n in ns){
       margRest[i,] <- rowMeans(dnorm(yholdout,mean=restMuMatrix, sd=restSigmaMat))
       
       
-      #Huber version ----
+#Huber version ----
       restrictedHuber <- brlm::restrictedBayesLm(y, X,
                                                  regEst='Huber',
                                                  scaleEst='Huber',
@@ -320,9 +408,7 @@ for(n in ns){
     }
   )
   
-  # save output
-  # rm(list=setdiff(ls(),c('y_hold','yOpenMat','y_open_type1','acceptY','acceptYHuber','acceptT', 'n','rlmEstimates',"rlmEstimatesHuber",'nTheoryEstimates','restrictedEstimates',"restrictedEstimatesHuber",'tmodelEstimates','olsEstimates', 'mu0Star', 'Sigma0Star','margNTheory','margRest',"margRestHuber",'margT','margRlm',"margRlmHuber",'margOls','holdIndicesMatrix',"rlmPredMat", 'rlmPredHuberMat','olsPredMat','nTheoryPredMat','restPredMat','restPredHuberMat','tPredMat', 'reps', 'run')))
-  
+
   
   out <- list(y_hold = y_hold,
               y_open = y_open,
@@ -354,7 +440,5 @@ for(n in ns){
               tmodelEstimates = tmodelEstimates)
   
   write_rds(out, file.path(here::here(), paste0('pooled_reg_n', n, '.rds' )))
-  
-  
   
 }
