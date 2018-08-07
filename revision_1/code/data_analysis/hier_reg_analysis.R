@@ -1,6 +1,6 @@
 # Hierarchical regression - i.e., grouped by states. 
 
-
+# 
 # library(devtools)
 # install_github('jrlewi/brlm')
 library(sampling) #for stratified sampling
@@ -47,10 +47,10 @@ nu <- 3 #df for t-model
 ns <- c(1000) #, 2000) #sample size for training set
 reps <- 2 # number of training sets
 
-nburn <- 2000 #set length of mcmc chains
-nkeep <- 2000
-nkeept <- 4000 #for the t-model.
-
+nburn <- 200 #set length of mcmc chains
+nkeep <- 200
+nkeept <- 400 #for the t-model.
+maxit <- 400 #parameter in MASS::rlm
 
 #set seed 
 set.seed(123)
@@ -160,27 +160,27 @@ for(n in ns){
         group_by(State) %>% 
         nest() 
       
-      state_model <- function(df){
+      state_lm <- function(df){
         lm(sqrt_count_2012 ~ sqrt_count_2010 - 1, y = TRUE, x = TRUE, data = df)
       }
       
-      models <- by_state$data %>% 
-        map(state_model) 
-      names(models) <- by_state$State
+      models_lm <- by_state$data %>% 
+        map(state_lm) 
+      names(models_lm) <- by_state$State
       
       
-      y <- models %>% 
+      y <- models_lm %>% 
         map(.f = function(m) m$y)
       
-      X <- models %>% 
+      X <- models_lm %>% 
         map(.f = function(m) m$x)
       
       
-      betaHats <- models %>% 
+      betaHats <- models_lm %>% 
         map(.f = function(m) coef(m)) %>% 
         unlist()
       
-      sigHats <- models %>% 
+      sigHats <- models_lm %>% 
         map(.f = function(m) summary(m)$s) %>% 
         unlist()
       
@@ -193,24 +193,23 @@ for(n in ns){
         group_by(State) %>% 
         nest()
       
-      models_hold <- by_state_hold$data %>% 
-        map(state_model) 
-      names(models_hold) <- by_state_hold$State
+      models_lm_hold <- by_state_hold$data %>% 
+      map(state_lm) 
+      names(models_lm_hold) <- by_state_hold$State
       
-      yhold <- models_hold %>% 
+      yhold <- models_lm_hold %>% 
         map(.f = function(m) m$y)
       
-      Xhold <- models_hold %>% 
+      Xhold <- models_lm_hold %>% 
         map(.f = function(m) m$x)
       
       olsPreds <- by_state_hold$data %>% 
-        map2(.x = ., .y = models_hold, .f = function(x, y){
+        map2(.x = ., .y = models_lm_hold, .f = function(x, y){
           predict(y, newdata = x)
         })
       
-      
-      
-      olsMarginals <- list(yhold, olsPreds, models) %>% 
+    
+      olsMarginals <- list(yhold, olsPreds, models_lm) %>% 
         pmap(.f = function(y, prd, m){
           dnorm(y,prd,summary(m)$sigma) 
         })
@@ -224,28 +223,42 @@ for(n in ns){
     #unpooled regressions -----
 
     #rlm on training:Tukey -----
-      rlmfit <- rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, psi=psi.bisquare, scale.est='Huber',data = train, maxit=1000)
-      X <- model.matrix(rlmfit) #model matrix for all regressions
-      p <- ncol(X) #number of regression coefs
+  
+      state_rlm <- function(df){
+        rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, psi=psi.bisquare, scale.est='Huber', data = df, maxit=1000)
+      }
+      
+      models_rlm <- by_state$data %>% 
+        map(state_rlm) 
+      names(models_rlm) <- by_state_hold$State
+      
+      #fix this ----
       sigma2Int <- rlmfit$s^2 #to start mcmc
       rlmEstimates[,i] <- c(coef(rlmfit),rlmfit$s^2)
       rlmPreds <- Xholdout%*%coef(rlmfit)
-      #rlmPreds <- predict(rlmfit, newdata = data.frame(sqrt_count_2010 = Xholdout))
       rlmPredMat[i,] <- rlmPreds
       margRlm[i,] <- dnorm(yholdout,mean=rlmPreds, sd=rlmfit$s)
       
     
     #rlm on training: Huber ----
-      rlmfitHuber <- rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, psi=psi.huber, scale.est='Huber',data = train, maxit=1000)
       
+      state_rlm_huber <- function(df){
+        rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, psi=psi.huber, scale.est='Huber', data = df, maxit=1000)
+      }
+      
+      models_rlm_huber <- by_state$data %>% 
+        map(state_rlm_huber) 
+      names(models_rlm_huber) <- by_state_hold$State
+      
+      #fix this ----- 
       rlmEstimatesHuber[,i]<-c(coef(rlmfitHuber),rlmfitHuber$s^2)
       rlmPredsHuber<-Xholdout%*%coef(rlmfitHuber)
       rlmPredHuberMat[i,] <- rlmPredsHuber
       margRlmHuber[i,] <- dnorm(yholdout,mean=rlmPredsHuber, sd=rlmfitHuber$s)
       
       
-    #ols on training ----
-      olsFit <- lm(sqrt_count_2012 ~ sqrt_count_2010 - 1,data=train)
+    #ols on training done above----
+     models_lm 
       olsEstimates[,i] <- c(coef(olsFit),summary(olsFit)$sigma^2)
       olsPreds <- Xholdout%*%coef(olsFit)
       olsPredMat[i,] <- olsPreds
@@ -254,9 +267,9 @@ for(n in ns){
 
   #Hierarchical Models -----      
       
-      #normal theory bayes model ----
+#normal theory bayes model ----
       
-      #tunning parameters
+      #tunning parameters for MH step on bstar, mu_rho, psi_rho, and rho
       step_logbstar <- abs(log(mu_bstr/(sqrt(mu_bstr*(1-mu_bstr)/(psi_bstr+1))))) #abs log(mean/sd)
       mu_rho_step <- .3 #(w1/(w1+w1))/sqrt(w1*w2/((w1+w2)^2*(w1+w1+1)))
       psi_rho_step <- a_psir^.5 #mean/sd
@@ -264,7 +277,6 @@ for(n in ns){
       
       nis <- unlist(lapply(y, length), use.names=FALSE)
       step_Z <- brlm:::fn.compute.Z(mean(sigHats^2), a0, b0)/(sqrt(nis))
-      
       
       nTheory <- brlm::hierNormTheoryLm(y,
                                         X,
@@ -280,16 +292,14 @@ for(n in ns){
                                         w1,
                                         w2, 
                                         a_psir,
-                                        b_psir)
+                                        b_psir,
+                                        step_logbstar, 
+                                        mu_rho_step, 
+                                        psi_rho_step, 
+                                        rho_step,
+                                        step_Z)
     
-      # nTheory <- brlm::bayesLm(y, X , 
-      #                          mu0 = beta_0, 
-      #                          Sigma0 = var_beta_0, 
-      #                          a0 = a_0, 
-      #                          b0 = b_0, 
-      #                          sigma2Int = sigma2Int, 
-      #                          nkeep = nkeep, 
-      #                          nburn= nburn)
+   # fix this -----
       # #posterior means of beta
       # ##plot(nTheory$mcmc, ask=FALSE, density=FALSE)
       # postMeansNtheory <- colMeans(nTheory$mcmc)
@@ -311,18 +321,31 @@ for(n in ns){
 
 # restricted likelihood models -----
 #Tukey version ----
-      restricted <- brlm::restrictedBayesLm(y, X, 
-                                            regEst='Tukey', 
-                                            scaleEst='Huber',
-                                            mu0 = beta_0, 
-                                            Sigma0 = var_beta_0, 
-                                            a0 = a_0, 
-                                            b0 = b_0, 
-                                            sigma2Int = sigma2Int, 
-                                            nkeep = nkeep, 
-                                            nburn= nburn, 
-                                            maxit=1000)
+      restricted <- brlm::hierNormTheoryRestLm(y,
+                                        X,
+                                        regEst = 'Tukey',
+                                        scaleEst='Huber',
+                                        nkeep, 
+                                        nburn,
+                                        mu0,
+                                        Sigma0,
+                                        a0, 
+                                        b0,
+                                        mu_bstr,
+                                        psi_bstr,
+                                        swSq=1,
+                                        w1,
+                                        w2, 
+                                        a_psir,
+                                        b_psir,
+                                        maxit=maxit,
+                                        step_logbstar, 
+                                        mu_rho_step, 
+                                        psi_rho_step, 
+                                        rho_step,
+                                        step_Z)
       
+      #fix this ----
       postMeansRest <- colMeans(restricted$mcmc)
       restrictedEstimates[,i] <- postMeansRest
       betaRest <- postMeansRest[1:p]
@@ -344,19 +367,31 @@ for(n in ns){
       
       
 #Huber version ----
-      restrictedHuber <- brlm::restrictedBayesLm(y, X,
-                                                 regEst='Huber',
-                                                 scaleEst='Huber',
-                                                 mu0 = beta_0, 
-                                                 Sigma0 = var_beta_0, 
-                                                 a0 = a_0, 
-                                                 b0 = b_0, 
-                                                 sigma2Int = sigma2Int, 
-                                                 nkeep = nkeep, 
-                                                 nburn= nburn, 
-                                                 maxit=1000)
+      restricted_huber <- brlm::hierNormTheoryRestLm(y,
+                                               X,
+                                               regEst = 'Huber',
+                                               scaleEst='Huber',
+                                               nkeep, 
+                                               nburn,
+                                               mu0,
+                                               Sigma0,
+                                               a0, 
+                                               b0,
+                                               mu_bstr,
+                                               psi_bstr,
+                                               swSq=1,
+                                               w1,
+                                               w2, 
+                                               a_psir,
+                                               b_psir,
+                                               maxit=maxit,
+                                               step_logbstar, 
+                                               mu_rho_step, 
+                                               psi_rho_step, 
+                                               rho_step,
+                                               step_Z)
       
-      
+      #fix this ----- 
       postMeansRestHuber <- colMeans(restrictedHuber$mcmc)
       restrictedEstimatesHuber[,i] <- postMeansRestHuber
       betaRestHuber <- postMeansRestHuber[1:p]
@@ -375,21 +410,32 @@ for(n in ns){
       
       
       
-      # t-model ----
-      
+  # t-model ----
       #Note the change of prior on sigma2. In the other models the variance parameter is given  an IG(a_0,b_0) prior
       #the variance for the t model is (nu/(nu-2))sigma2~IG(a_0, b_0),  implies sigma2=(nu-2)/nu var(Y)~IG(a_0,(nu-2)/nu b_0)
       
-      tmodel <- brlm::bayesTdistLm(y, X,
-                                   mu0 = beta_0, 
-                                   Sigma0 = var_beta_0, 
-                                   a0 = a_0, 
-                                   b0 = ((nu-2)/nu)*b_0,
-                                   parInit = NULL,
-                                   nu = nu, 
-                                   nkeep = nkeept, 
-                                   nburn = nburn,
-                                   rwTune = NULL)  
+      tModel <- brlm::hier_TLm(y,
+                            X,
+                            nkeep,
+                            nburn,
+                            mu0,
+                            Sigma0,
+                            a0, 
+                            ((nu-2)/nu)*b0,
+                            mu_bstr,
+                            psi_bstr,
+                            swSq = 1,
+                            w1,
+                            w2, 
+                            a_psir,
+                            b_psir,
+                            nu,
+                            step_logbstar,
+                            mu_rho_step,
+                            psi_rho_step,
+                            rho_step,
+                            step_Z)
+      
       postMeansT <- colMeans(tmodel$mcmc)
       tmodelEstimates[,i] <- postMeansT
       betaT <- postMeansT[1:p]
