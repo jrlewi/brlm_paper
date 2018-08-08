@@ -87,7 +87,7 @@ for(n in ns){
   nTheoryEstimates <- array(NA, c(p+1,nGroups,reps)) #normal theory Bayes
   restrictedEstimates <- array(NA, c(p+1,nGroups,reps)) #Our method with Tukey's
   restrictedEstimatesHuber <- array(NA, c(p+1,nGroups,reps)) #Our method with Huber's
-  tmodelEstimates <- array(NA, c(p+1,nGroups,reps))) #thick tailed Bayes
+  tmodelEstimates <- array(NA, c(p+1,nGroups,reps)) #thick tailed Bayes
   
   
   #marginals of each y in holdout set  ------
@@ -124,9 +124,10 @@ for(n in ns){
   tdensity<-function(y, mean, sigma){
     (gamma(.5*(nu+1))/(gamma(.5*nu)*sigma*sqrt(nu*pi)))*(1+((y-mean)/sigma)^2/nu)^(-.5*(nu+1))
   }
+  fits<-function(betahats, X){X%*%betahats}
   
  
-  # simulation -----
+# simulation -----
   system.time(  
     for(i in 1:reps){
 
@@ -151,7 +152,6 @@ for(n in ns){
       
       
       # Set up regressions ----
-      
       #prepare data for fitting function; get ols preds and marginals on holdoutset
       #y is list of responses from each group
       #X is list of design matrices for each group
@@ -202,21 +202,18 @@ for(n in ns){
       
       Xhold <- models_lm_hold %>% 
         map(.f = function(m) m$x)
-      
+     
+    
       olsPreds <- by_state_hold$data %>% 
-        map2(.x = ., .y = models_lm_hold, .f = function(x, y){
+        map2(.x = ., .y = models_lm, .f = function(x, y){
           predict(y, newdata = x)
         })
       
-    
       olsMarginals <- list(yhold, olsPreds, models_lm) %>% 
         pmap(.f = function(y, prd, m){
           dnorm(y,prd,summary(m)$sigma) 
         })
           
-
-      # olsPredListofLists[[i]][[group]]<-olsPreds
-      # olsMarginalsListofLists[[i]][[group]]<-dnorm(yhold[[group]],olsPreds,summary(fit)$sigma)
         
    #Fit regressions models ------
       
@@ -230,43 +227,48 @@ for(n in ns){
       
       models_rlm <- by_state$data %>% 
         map(state_rlm) 
-      names(models_rlm) <- by_state_hold$State
+      names(models_rlm) <- by_state$State
       
-      #fix this ----
-      sigma2Int <- rlmfit$s^2 #to start mcmc
-      rlmEstimates[,i] <- c(coef(rlmfit),rlmfit$s^2)
-      rlmPreds <- Xholdout%*%coef(rlmfit)
-      rlmPredMat[i,] <- rlmPreds
-      margRlm[i,] <- dnorm(yholdout,mean=rlmPreds, sd=rlmfit$s)
+      
+      rlmPreds <- by_state_hold$data %>% 
+        map2(.x = ., .y = models_rlm, .f = function(x, y){
+          predict(y, newdata = x)
+        })
+      
+      rlmMarginals <- list(yhold, rlmPreds, models_rlm) %>% 
+        pmap(.f = function(y, prd, m){
+          dnorm(y,prd,summary(m)$sigma) 
+        })
+      
+      
+    
       
     
     #rlm on training: Huber ----
       
-      state_rlm_huber <- function(df){
+      state_rlm <- function(df){
         rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, psi=psi.huber, scale.est='Huber', data = df, maxit=1000)
       }
       
-      models_rlm_huber <- by_state$data %>% 
-        map(state_rlm_huber) 
-      names(models_rlm_huber) <- by_state_hold$State
+      models_rlm <- by_state$data %>% 
+        map(state_rlm) 
+      names(models_rlm) <- by_state$State
       
-      #fix this ----- 
-      rlmEstimatesHuber[,i]<-c(coef(rlmfitHuber),rlmfitHuber$s^2)
-      rlmPredsHuber<-Xholdout%*%coef(rlmfitHuber)
-      rlmPredHuberMat[i,] <- rlmPredsHuber
-      margRlmHuber[i,] <- dnorm(yholdout,mean=rlmPredsHuber, sd=rlmfitHuber$s)
+      rlmPreds <- by_state_hold$data %>% 
+        map2(.x = ., .y = models_rlm, .f = function(x, y){
+          predict(y, newdata = x)
+        })
       
-      
-    #ols on training done above----
-     models_lm 
-      olsEstimates[,i] <- c(coef(olsFit),summary(olsFit)$sigma^2)
-      olsPreds <- Xholdout%*%coef(olsFit)
-      olsPredMat[i,] <- olsPreds
-      margOls[i,] <- dnorm(yholdout,mean=olsPreds, sd=summary(olsFit)$sigma)
+      rlmMarginals_huber <- list(yhold, rlmPreds, models_rlm) %>% 
+        pmap(.f = function(y, prd, m){
+          dnorm(y,prd,summary(m)$sigma) 
+        })
       
 
-  #Hierarchical Models -----      
-      
+
+#Hierarchical Models -----      
+
+##################################################    
 #normal theory bayes model ----
       
       #tunning parameters for MH step on bstar, mu_rho, psi_rho, and rho
@@ -298,28 +300,53 @@ for(n in ns){
                                         psi_rho_step, 
                                         rho_step,
                                         step_Z)
-    
-   # fix this -----
-      # #posterior means of beta
-      # ##plot(nTheory$mcmc, ask=FALSE, density=FALSE)
-      # postMeansNtheory <- colMeans(nTheory$mcmc)
-      # nTheoryEstimates[,i] <- postMeansNtheory
-      # betaNTheory <- postMeansNtheory[1:p]
-      # sigma2Ntheory <- postMeansNtheory[p+1]
-      # nTheoryPreds <- Xholdout%*%betaNTheory
-      # nTheoryPredMat[i,] <- nTheoryPreds
+      #betal
+      betal <- array(NA, c(p,nkeep, nGroups))
+      betal[p,,] <- t(nTheory$betal) #format expected for marginals computation
+      postMeansBetal <- apply(betal,c(1,3) , mean)
+      #postMeansBetal <- apply(nTheory$betal,1 , mean)
+      diagnostic_betal <- geweke.diag(mcmc(t(nTheory$betal)))
+      nTheorybetalConverge[] <- abs(diagnostic_betal$z)
+      nTheoryGroupBetaMeans[,,i] <- postMeansBetal 
+      postSDsBetal <- apply(nTheory$betal,c(1) , sd)
+      nTheoryGroupBetaSDs[,,i]<-postSDsBetal
+      #Beta
+      postMeansBETA <- mean(nTheory$Beta) #colMeans(nTheory$Beta)
+      nTheoryBetaMeans[,i] <- postMeansBETA
+      postSDsBeta <- sd(nTheory$Beta) #apply(nTheory$Beta,2 , sd)
+      nTheoryBetaSDs[,i] <- postSDsBeta
+      nTheoryBETAconverge[,i] <- abs(geweke.diag(mcmc(nTheory$Beta))$z)
+      #sigma2s
+      postMeansSigma2s <- colMeans(nTheory$sigma2s)
+      nTheorySigma2Means[,i] <- postMeansSigma2s
+      postSDsSigma2s <- apply(nTheory$sigma2s,2,sd)
+      nTheorySigma2SDs[,i] <- postSDsSigma2s
+      #sigma2s converge?
+      nTheorySigma2Converge[,i] <- abs(geweke.diag(mcmc(nTheory$sigma2s))$z)
+      #bstar converge
+      nTheorybstarConverge[i] <- abs(geweke.diag(mcmc(nTheory$bstar))$z)
+      #mu_rho converge
+      nTheoryMuRhoConverge[i] <- abs(geweke.diag(mcmc(nTheory$mu_rho))$z)
+      #psi_rho_converge 
+      nTheoryPsiRhoConverge[i] <- abs(geweke.diag(mcmc(nTheory$psi_rho))$z)
+      #rho_converge
+      nTheoryRhoConverge[i] <- abs(geweke.diag(mcmc(nTheory$rho))$z)
       
-      # get marginals f(y_h) for each element in holdout set 
-      nMuMatrix <- Xholdout%*%(t(nTheory$mcmc)[1:p,])
-      #sd's across samples for each houldout set
-      nSigmaMat <- matrix(sqrt(rep(t(nTheory$mcmc)[p+1,],N-n)),N-n,nkeep, byrow = TRUE)
-      #nSigmaMat2<-(sqrt(t(nTheory$mcmc)[p+1,]))
-      #this is estiamate L(y_h) of the marginal f(y_h) for each y_h in the holdout set for normal model
-      margNTheory[i,] <- rowMeans(dnorm(yholdout,mean = nMuMatrix, sd = nSigmaMat))
+     
+      #predictions on holdout set
+      postMeansBetalList<-split(postMeansBetal, rep(1:ncol(postMeansBetal), each = nrow(postMeansBetal)))
+      nTheoryPreds <- mapply(fits, postMeansBetalList,Xhold)
+      nTheoryPredListofLists[[i]]<-nTheoryPreds
       
+#computing marginal likelihoods for each element in holdout sample
+nTheoryMarginalsListofLists[[i]]<-brlm::fn.compute.marginals.hierModelNormal(betal, nTheory$sigma2s, yhold,Xhold)
+  
       
-
+  
+################################################
 # restricted likelihood models -----
+
+################################################
 #Tukey version ----
       restricted <- brlm::hierNormTheoryRestLm(y,
                                         X,
@@ -344,28 +371,61 @@ for(n in ns){
                                         psi_rho_step, 
                                         rho_step,
                                         step_Z)
-      
-      #fix this ----
-      postMeansRest <- colMeans(restricted$mcmc)
-      restrictedEstimates[,i] <- postMeansRest
-      betaRest <- postMeansRest[1:p]
-      sigma2Rest <- postMeansRest[p+1]
-      restPreds <- Xholdout%*%betaRest
-      restPredMat[i,] <- restPreds
-      acceptY[i] <- mean(restricted$yAccept)
-      
-      
-      # get marginals f(y_h) for each element in holdout set 
-      #means across samples for each holdout set
-      restMuMatrix <- Xholdout%*%(t(restricted$mcmc)[1:p,])
-      #sd's across samples for each houldout set
-      restSigmaMat <- matrix(sqrt(rep(t(restricted$mcmc)[p+1,],N-n)),N-n,nkeep, byrow=TRUE)
-      
-      
-      #estiamate (L(y_h)) of the marginal f(y_h) for each y_h in the holdout set for  restricted model
-      margRest[i,] <- rowMeans(dnorm(yholdout,mean=restMuMatrix, sd=restSigmaMat))
-      
-      
+
+#betal
+betal <- array(NA, c(p,nkeep, nGroups))
+betal[p,,] <- t(restricted$betal) #get in format expected for marginals computation
+
+diagnostic_betal <- geweke.diag(mcmc(t(restricted$betal)))
+restrictedbetalConverge[] <- abs(diagnostic_betal$z)
+
+postMeansBetal<-apply(betal,c(1,3) , mean)
+restrictedGroupBetaMeans[,,i]<-postMeansBetal
+postSDsBetal<-apply(betal,c(1,3) , sd)
+restrictedGroupBetaSDs[,,i]<-postSDsBetal
+
+#post means Beta
+postMeansBETA<-mean(restricted$Beta) #colMeans(restricted$Beta)
+restrictedBetaMeans[,i]<-postMeansBETA
+postSDsBeta<-sd(restricted$Beta) #apply(restricted$Beta,2 , sd)
+restrictedBetaSDs[,i]<-postSDsBeta
+
+#Beta converge?
+restrictedBETAconverge[,i]<-abs(geweke.diag(mcmc(restricted$Beta))$z)
+
+#post means sigma2s
+postMeansSigma2s<-colMeans(restricted$sigma2s)
+restrictedSigma2Means[,i]<-postMeansSigma2s
+
+#post sds sigma2s
+postSDsSigma2s<-apply(restricted$sigma2s,2,sd)
+restrictedSigma2SDs[,i]<-postSDsSigma2s
+#sigma2s converge?
+restrictedSigma2Converge[,i]<-abs(geweke.diag(mcmc(restricted$sigma2s))$z)
+
+#bstar converge
+restrictedbstarConverge[i]<-abs(geweke.diag(mcmc(restricted$bstar))$z)
+#mu_rho converge
+restrictedMuRhoConverge[i]<-abs(geweke.diag(mcmc(restricted$mu_rho))$z)
+#psi_rho_converge 
+restrictedPsiRhoConverge[i]<-abs(geweke.diag(mcmc(restricted$psi_rho))$z)
+#rho_converge
+restrictedRhoConverge[i]<-abs(geweke.diag(mcmc(restricted$rho))$z)
+
+#Acceptance rates
+yAccept[i,]<-restricted$yAccept #just the column means
+
+#predictionss on holdout set
+postMeansBetalList <- split(postMeansBetal, rep(1:ncol(postMeansBetal), each = nrow(postMeansBetal)))
+restrictedPreds <- mapply(fits, postMeansBetalList,Xhold)
+restrictedPredListofLists[[i]]<-restrictedPreds
+
+#computing marginal likelihoods for each element in holdout sample
+restrictedMarginalsListofLists[[i]]<-fn.compute.marginals.hierModelNormal(betal, restricted$sigma2s, yhold,Xhold)
+
+################################################
+
+################################################     
 #Huber version ----
       restricted_huber <- brlm::hierNormTheoryRestLm(y,
                                                X,
@@ -390,29 +450,62 @@ for(n in ns){
                                                psi_rho_step, 
                                                rho_step,
                                                step_Z)
+#betal
+betal <- array(NA, c(p,nkeep, nGroups))
+betal[p,,] <- t(restricted_huber$betal) #get in format expected for marginals computation
+
+diagnostic_betal <- geweke.diag(mcmc(t(restricted_huber$betal)))
+restricted_huberbetalConverge[] <- abs(diagnostic_betal$z)
+
+postMeansBetal<-apply(betal,c(1,3) , mean)
+restricted_huberGroupBetaMeans[,,i]<-postMeansBetal
+postSDsBetal<-apply(betal,c(1,3) , sd)
+restricted_huberGroupBetaSDs[,,i]<-postSDsBetal
+
+#post means Beta
+postMeansBETA<-mean(restricted_huber$Beta) #colMeans(restricted_huber$Beta)
+restricted_huberBetaMeans[,i]<-postMeansBETA
+postSDsBeta<-sd(restricted_huber$Beta) #apply(restricted_huber$Beta,2 , sd)
+restricted_huberBetaSDs[,i]<-postSDsBeta
+
+#Beta converge?
+restricted_huberBETAconverge[,i]<-abs(geweke.diag(mcmc(restricted_huber$Beta))$z)
+
+#post means sigma2s
+postMeansSigma2s<-colMeans(restricted_huber$sigma2s)
+restricted_huberSigma2Means[,i]<-postMeansSigma2s
+
+#post sds sigma2s
+postSDsSigma2s<-apply(restricted_huber$sigma2s,2,sd)
+restricted_huberSigma2SDs[,i]<-postSDsSigma2s
+#sigma2s converge?
+restricted_huberSigma2Converge[,i]<-abs(geweke.diag(mcmc(restricted_huber$sigma2s))$z)
+
+#bstar converge
+restricted_huberbstarConverge[i]<-abs(geweke.diag(mcmc(restricted_huber$bstar))$z)
+#mu_rho converge
+restricted_huberMuRhoConverge[i]<-abs(geweke.diag(mcmc(restricted_huber$mu_rho))$z)
+#psi_rho_converge 
+restricted_huberPsiRhoConverge[i]<-abs(geweke.diag(mcmc(restricted_huber$psi_rho))$z)
+#rho_converge
+restricted_huberRhoConverge[i]<-abs(geweke.diag(mcmc(restricted_huber$rho))$z)
+
+#Acceptance rates
+yAccept[i,]<-restricted_huber$yAccept #just the column means
+
+#predictionss on holdout set
+postMeansBetalList <- split(postMeansBetal, rep(1:ncol(postMeansBetal), each = nrow(postMeansBetal)))
+restricted_huberPreds <- mapply(fits, postMeansBetalList,Xhold)
+restricted_huberPredListofLists[[i]]<-restricted_huberPreds
+
+#computing marginal likelihoods for each element in holdout sample
+restricted_huberMarginalsListofLists[[i]]<-fn.compute.marginals.hierModelNormal(betal, restricted_huber$sigma2s, yhold,Xhold)  
+
       
-      #fix this ----- 
-      postMeansRestHuber <- colMeans(restrictedHuber$mcmc)
-      restrictedEstimatesHuber[,i] <- postMeansRestHuber
-      betaRestHuber <- postMeansRestHuber[1:p]
-      sigma2RestHuber <- postMeansRestHuber[p+1]
-      restPredsHuber <- Xholdout%*%betaRestHuber
-      restPredHuberMat[i,] <- restPredsHuber
-      acceptYHuber[i] <- mean(restrictedHuber$yAccept)
-      
-      #means across samples for each holdout set
-      restMuMatrixHuber <- Xholdout%*%(t(restrictedHuber$mcmc)[1:p,])
-      #sd's across samples for each houldout set
-      restSigmaMatHuber <- matrix(sqrt(rep(t(restrictedHuber$mcmc)[p+1,],N-n)),N-n,nkeep, byrow=TRUE)
-      
-      #estiamate L(y_h) of the marginal f(y_h) for each y_h in the holdout set for         restricted model
-      margRestHuber[i,] <- rowMeans(dnorm(yholdout,mean=restMuMatrixHuber, sd=restSigmaMatHuber))
-      
-      
-      
-  # t-model ----
-      #Note the change of prior on sigma2. In the other models the variance parameter is given  an IG(a_0,b_0) prior
-      #the variance for the t model is (nu/(nu-2))sigma2~IG(a_0, b_0),  implies sigma2=(nu-2)/nu var(Y)~IG(a_0,(nu-2)/nu b_0)
+################################################      
+# t-model ----
+#Note the change of prior on sigma2. In the other models the variance parameter is given  an IG(a_0,b_0) prior
+#the variance for the t model is (nu/(nu-2))sigma2~IG(a_0, b_0),  implies sigma2=(nu-2)/nu var(Y)~IG(a_0,(nu-2)/nu b_0)
       
       tModel <- brlm::hier_TLm(y,
                             X,
@@ -435,27 +528,61 @@ for(n in ns){
                             psi_rho_step,
                             rho_step,
                             step_Z)
-      
-      postMeansT <- colMeans(tmodel$mcmc)
-      tmodelEstimates[,i] <- postMeansT
-      betaT <- postMeansT[1:p]
-      sigma2T <- postMeansT[p+1]
-      TPreds <- Xholdout%*%betaT
-      tPredMat[i,] <- TPreds
-      acceptT[i] <- mean(tmodel$acceptSigma2)
-      
-      
-      # estimate marginals.
-      tMuMatrix <- Xholdout%*%(t(tmodel$mcmc)[1:p,])
-      tSigmaMat <- matrix(sqrt(rep(t(tmodel$mcmc)[p+1,],N-n)),N-n,nkeept, byrow = TRUE)
-      
-      margT[i,] <- rowMeans(tdensity(yholdout, mean=tMuMatrix,sigma=tSigmaMat))
-      print(i)
+  
+#betal
+betal <- array(NA, c(p,nkeep, nGroups))
+betal[p,,] <- t(tModel$betal) #get in format expected for marginals computation
+
+diagnostic_betal <- geweke.diag(mcmc(t(tModel$betal)))
+tModelbetalConverge[] <- abs(diagnostic_betal$z)
+
+postMeansBetal<-apply(betal,c(1,3) , mean)
+tModelGroupBetaMeans[,,i]<-postMeansBetal
+postSDsBetal<-apply(betal,c(1,3) , sd)
+tModelGroupBetaSDs[,,i]<-postSDsBetal
+
+#post means Beta
+postMeansBETA <- mean(tModel$Beta) #colMeans(tModel$Beta)
+tModelBetaMeans[,i] <- postMeansBETA
+postSDsBeta <- sd(tModel$Beta) #apply(tModel$Beta,2 , sd)
+tModelBetaSDs[,i] <- postSDsBeta
+
+#Beta converge?
+tModelBETAconverge[,i]<-abs(geweke.diag(mcmc(tModel$Beta))$z)
+
+#post means sigma2s
+postMeansSigma2s <- colMeans(tModel$sigma2s)
+tModelSigma2Means[,i]<-postMeansSigma2s
+
+#post sds sigma2s
+postSDsSigma2s<-apply(tModel$sigma2s,2,sd)
+tModelSigma2SDs[,i]<-postSDsSigma2s
+#sigma2s converge?
+tModelSigma2Converge[,i]<-abs(geweke.diag(mcmc(tModel$sigma2s))$z)
+
+#bstar converge
+tModelbstarConverge[i]<-abs(geweke.diag(mcmc(tModel$bstar))$z)
+#mu_rho converge
+tModelMuRhoConverge[i]<-abs(geweke.diag(mcmc(tModel$mu_rho))$z)
+#psi_rho_converge 
+tModelPsiRhoConverge[i]<-abs(geweke.diag(mcmc(tModel$psi_rho))$z)
+#rho_converge
+tModelRhoConverge[i]<-abs(geweke.diag(mcmc(tModel$rho))$z)
+
+#preds on holdout set
+postMeansBetalList <- split(postMeansBetal, rep(1:ncol(postMeansBetal), each = nrow(postMeansBetal)))
+tModelPreds <- mapply(fits, postMeansBetalList,Xhold)
+tModelPredListofLists[[i]]<-tModelPreds
+
+#computing marginal likelihoods for each element in holdout sample
+tModelMarginalsListofLists[[i]] <- fn.compute.marginals.hierModelTmodel(betal, tModel$sigma2s, yhold,Xhold)
+################################################
+
     }
   )
   
-
-  
+###############################
+  #fix this - what do I need to save for each run?
   out <- list(y_hold = y_hold,
               y_open = y_open,
               y_type1 = y_type1,
@@ -485,6 +612,6 @@ for(n in ns){
               restrictedEstimatesHuber = restrictedEstimatesHuber,
               tmodelEstimates = tmodelEstimates)
   
-  write_rds(out, file.path(here::here(), paste0('pooled_reg_n', n, '.rds' )))
+  write_rds(out, file.path(here::here(), paste0('hier_reg_n', n, '.rds' )))
   
 }

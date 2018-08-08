@@ -44,3 +44,5 @@ state_slopes <-
   unlist()
 
 plot(state_slopes)
+
+
