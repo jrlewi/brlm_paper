@@ -1,6 +1,6 @@
 # Pooled regression - i.e., single regression without accounting for variation by state
 
-
+# download brlm package if needed
 # library(devtools)
 # install_github('brlm', 'jrlewi')
 library(MCMCpack)
@@ -23,9 +23,14 @@ analysis_data <- analysis_data %>%
 
 beta_0 <- parms_prior$beta_0
 se_beta_0 <- parms_prior$se_beta_0
-var_beta_0 <- se_beta_0^2 #inflating prior info
+var_beta_0 <- parms_prior$beta_var_inflate*se_beta_0^2 
 sigma2_hat_0 <- parms_prior$sigma2_hat
+#for sigma2
+a_0 <- parms_prior$a_0
+b_0 <- parms_prior$b_0
 
+b_0/(a_0-1) # prior mean for sigma^2
+b_0^2/((b_0-1)^2*(b_0-2)) #var 
 
 sigma2_hat_0
 fit_2$s^2
@@ -38,7 +43,7 @@ plot(xx, dnorm(xx, beta_0, var_beta_0^.5), type = 'l')
 nu <- 3 #df for t-model
 
 #n <- 1000  
-ns <- c(25, 100)# , 1000) #sample size for training set
+ns <- c(25, 100 , 1000) #sample size for training set
 reps <- 10 # number of training sets
 
 nburn <- 2000 #set length of mcmc chains
@@ -55,12 +60,6 @@ p <- length(beta_0)
 
 
 
-#prior parameters for sigma2 ----
-a_0 <- 5
-b_0 <- sigma2_hat_0*(a_0 - 1)
-
-b_0/(a_0-1) # prior mean for sigma^2
-b_0^2/((b_0-1)^2*(b_0-2)) #var 
 
 for(n in ns){
 
