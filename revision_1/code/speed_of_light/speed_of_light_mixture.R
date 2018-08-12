@@ -6,7 +6,8 @@ data(newcomb)
 y <- newcomb
 N <- length(y)
 # prior parameters ----
-eta <- 0; tau <- 50; a <- 5; b <- 10;
+eta <- 23.6; tau <- 2.04; a <- 5; b <- 10;
+
 
 stan_rdump(c("N", "y", 'eta', 'tau', 'a', 'b'), file="mix.data.R")
 
