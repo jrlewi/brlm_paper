@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  12 AUG 2018 15:40
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  14 AUG 2018 22:53
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -225,26 +225,7 @@ File: dvipsnam.def 2014/10/14 v3.0j Driver-dependent file (DPC,SPQR)
 \ULC@box=\box33
 Package: ulem 2012/05/18
 \ULdepth=\dimen124
-) (./paper.aux
-
-LaTeX Warning: Label `asb' multiply defined.
-
-
-LaTeX Warning: Label `as' multiply defined.
-
-
-LaTeX Warning: Label `regEq' multiply defined.
-
-
-LaTeX Warning: Label `scaleEqReg' multiply defined.
-
-
-LaTeX Warning: Label `regIn' multiply defined.
-
-
-LaTeX Warning: Label `scaleEq2Reg' multiply defined.
-
-)
+) (./paper.aux)
 \openout1 = `paper.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 162.
@@ -259,7 +240,8 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 162.
 LaTeX Font Info:    ... okay on input line 162.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 162.
 LaTeX Font Info:    ... okay on input line 162.
- (/usr/local/texlive/2015/texmf-dist/tex/context/base/supp-pdf.mkii
+
+(/usr/local/texlive/2015/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count110
 \scratchdimen=\dimen125
@@ -380,159 +362,159 @@ Package pdftex.def Info: figs/calls_predictive.png used on input line 414.
 (pdftex.def)             Requested size: 289.07999pt x 137.10168pt.
  [11] [12 <./figs/calls_predictive.png>]
 [13] [14]
-Overfull \hbox (24.02957pt too wide) in paragraph at lines 730--742
+Overfull \hbox (24.02957pt too wide) in paragraph at lines 721--726
 []\OT1/cmr/m/n/12 For a typ-i-cal model and con-di-tion-ing statis-tic, the sec
 -ond full con-di-tional $\OML/cmm/m/it/12 f\OT1/cmr/m/n/12 ([]\OMS/cmsy/m/n/12 
 j[]\OML/cmm/m/it/12 ; T\OT1/cmr/m/n/12 ([]) =
  []
 
-[15] [16] [17] [18]
-<figures/minSS3dSampleSpace.jpg, id=82, 387.69844pt x 411.78844pt>
+[15] [16] [17]
+<figures/minSS3dSampleSpace.jpg, id=84, 387.69844pt x 411.78844pt>
 File: figures/minSS3dSampleSpace.jpg Graphic file (type jpg)
 
 <use figures/minSS3dSampleSpace.jpg>
-Package pdftex.def Info: figures/minSS3dSampleSpace.jpg used on input line 868.
+Package pdftex.def Info: figures/minSS3dSampleSpace.jpg used on input line 844.
 
 (pdftex.def)             Requested size: 289.07999pt x 307.04979pt.
- [19] [20 <./figures/minSS3dSampleSpace.jpg>] [21] [22]
+ [18] [19 <./figures/minSS3dSampleSpace.jpg>]
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./figures/minSSZSpace3.pdf):
  PDF inclusion: found PDF version <1.6>, but at most version <1.4> allowed
-<figures/minSSZSpace3.pdf, id=99, 505.89pt x 505.89pt>
+<figures/minSSZSpace3.pdf, id=92, 505.89pt x 505.89pt>
 File: figures/minSSZSpace3.pdf Graphic file (type pdf)
 
 <use figures/minSSZSpace3.pdf>
-Package pdftex.def Info: figures/minSSZSpace3.pdf used on input line 979.
+Package pdftex.def Info: figures/minSSZSpace3.pdf used on input line 960.
 (pdftex.def)             Requested size: 289.07999pt x 289.08589pt.
 
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./figures/minSSZSpace5.pdf):
  PDF inclusion: found PDF version <1.6>, but at most version <1.4> allowed
-<figures/minSSZSpace5.pdf, id=100, 505.89pt x 505.89pt>
+<figures/minSSZSpace5.pdf, id=93, 505.89pt x 505.89pt>
 File: figures/minSSZSpace5.pdf Graphic file (type pdf)
 
 <use figures/minSSZSpace5.pdf>
-Package pdftex.def Info: figures/minSSZSpace5.pdf used on input line 980.
+Package pdftex.def Info: figures/minSSZSpace5.pdf used on input line 961.
 (pdftex.def)             Requested size: 289.07999pt x 289.08589pt.
- [23] [24] [25] [26]
-<figs/mse_sim2_facet_scale.png, id=114, 1793.70125pt x 1224.575pt>
+ [20] [21] [22] [23]
+<figs/mse_sim2_facet_scale.png, id=106, 1793.70125pt x 1224.575pt>
 File: figs/mse_sim2_facet_scale.png Graphic file (type png)
 
 <use figs/mse_sim2_facet_scale.png>
-Package pdftex.def Info: figs/mse_sim2_facet_scale.png used on input line 1121.
+Package pdftex.def Info: figs/mse_sim2_facet_scale.png used on input line 1102.
 
 (pdftex.def)             Requested size: 538.11453pt x 367.37534pt.
 
-Overfull \hbox (104.49454pt too wide) in paragraph at lines 1121--1122
+Overfull \hbox (104.49454pt too wide) in paragraph at lines 1102--1103
  [][] 
  []
 
-[27] <figs/mse_sim2_facet_as.png, id=118, 1793.70125pt x 1224.575pt>
+[24] <figs/mse_sim2_facet_as.png, id=110, 1793.70125pt x 1224.575pt>
 File: figs/mse_sim2_facet_as.png Graphic file (type png)
 
 <use figs/mse_sim2_facet_as.png>
-Package pdftex.def Info: figs/mse_sim2_facet_as.png used on input line 1127.
+Package pdftex.def Info: figs/mse_sim2_facet_as.png used on input line 1108.
 (pdftex.def)             Requested size: 538.11453pt x 367.37534pt.
 
-Overfull \hbox (104.49454pt too wide) in paragraph at lines 1127--1128
+Overfull \hbox (104.49454pt too wide) in paragraph at lines 1108--1109
  [][] 
  []
 
-[28 <./figs/mse_sim2_facet_scale.png>]
-<figs/kl_sim2_facet_scale.png, id=123, 1793.70125pt x 1630.09pt>
+[25 <./figs/mse_sim2_facet_scale.png>]
+<figs/kl_sim2_facet_scale.png, id=116, 1793.70125pt x 1630.09pt>
 File: figs/kl_sim2_facet_scale.png Graphic file (type png)
 
 <use figs/kl_sim2_facet_scale.png>
-Package pdftex.def Info: figs/kl_sim2_facet_scale.png used on input line 1137.
+Package pdftex.def Info: figs/kl_sim2_facet_scale.png used on input line 1118.
 (pdftex.def)             Requested size: 538.11453pt x 489.03078pt.
 
-Overfull \hbox (104.49454pt too wide) in paragraph at lines 1137--1138
+Overfull \hbox (104.49454pt too wide) in paragraph at lines 1118--1119
  [][] 
  []
 
-[29 <./figs/mse_sim2_facet_as.png>]
-<figs/kl_sim2_facet_as.png, id=128, 1793.70125pt x 1630.09pt>
+[26 <./figs/mse_sim2_facet_as.png>]
+<figs/kl_sim2_facet_as.png, id=121, 1793.70125pt x 1630.09pt>
 File: figs/kl_sim2_facet_as.png Graphic file (type png)
 
 <use figs/kl_sim2_facet_as.png>
-Package pdftex.def Info: figs/kl_sim2_facet_as.png used on input line 1143.
+Package pdftex.def Info: figs/kl_sim2_facet_as.png used on input line 1124.
 (pdftex.def)             Requested size: 538.11453pt x 489.03078pt.
 
-Overfull \hbox (104.49454pt too wide) in paragraph at lines 1143--1144
+Overfull \hbox (104.49454pt too wide) in paragraph at lines 1124--1125
  [][] 
  []
 
-[30 <./figs/kl_sim2_facet_scale.png>] [31 <./figs/kl_sim2_facet_as.png>]
-<figs/hist_sig2_ests.png, id=138, 2905.85625pt x 2178.1375pt>
+[27 <./figs/kl_sim2_facet_scale.png>] [28 <./figs/kl_sim2_facet_as.png>]
+<figs/hist_sig2_ests.png, id=130, 2905.85625pt x 2178.1375pt>
 File: figs/hist_sig2_ests.png Graphic file (type png)
 
 <use figs/hist_sig2_ests.png>
-Package pdftex.def Info: figs/hist_sig2_ests.png used on input line 1150.
+Package pdftex.def Info: figs/hist_sig2_ests.png used on input line 1131.
 (pdftex.def)             Requested size: 871.76363pt x 653.4463pt.
 
-Overfull \hbox (438.14363pt too wide) in paragraph at lines 1150--1151
+Overfull \hbox (438.14363pt too wide) in paragraph at lines 1131--1132
  [][] 
  []
 
-[32]
+[29]
 Overfull \vbox (33.0163pt too high) has occurred while \output is active []
 
 
-[33 <./figs/hist_sig2_ests.png>] [34]
-<figures/countvcount.pdf, id=149, 505.89pt x 505.89pt>
+[30 <./figs/hist_sig2_ests.png>] [31]
+<figures/countvcount.pdf, id=142, 505.89pt x 505.89pt>
 File: figures/countvcount.pdf Graphic file (type pdf)
 
 <use figures/countvcount.pdf>
-Package pdftex.def Info: figures/countvcount.pdf used on input line 1195.
+Package pdftex.def Info: figures/countvcount.pdf used on input line 1176.
 (pdftex.def)             Requested size: 289.07999pt x 289.08589pt.
- [35]
+ [32]
 
-LaTeX Warning: Reference `darwinAnalysis' on page 36 undefined on input line 12
-15.
+LaTeX Warning: Reference `darwinAnalysis' on page 33 undefined on input line 11
+96.
 
-[36] [37]
-<figures/logMargType1AgenciesBaseModelt.pdf, id=160, page=1, 578.16pt x 505.89p
+[33] [34]
+<figures/logMargType1AgenciesBaseModelt.pdf, id=152, page=1, 578.16pt x 505.89p
 t>
 File: figures/logMargType1AgenciesBaseModelt.pdf Graphic file (type pdf)
  <use figures/logMargType1AgenciesBaseModelt.pdf, page 1>
 Package pdftex.def Info: figures/logMargType1AgenciesBaseModelt.pdf, page1 used
- on input line 1272.
+ on input line 1253.
 (pdftex.def)             Requested size: 245.71033pt x 238.49393pt.
 
-<figures/logMargType1AgenciesBaseModelt.pdf, id=161, page=2, 578.16pt x 505.89p
+<figures/logMargType1AgenciesBaseModelt.pdf, id=153, page=2, 578.16pt x 505.89p
 t>
 File: figures/logMargType1AgenciesBaseModelt.pdf Graphic file (type pdf)
  <use figures/logMargType1AgenciesBaseModelt.pdf, page 2>
 Package pdftex.def Info: figures/logMargType1AgenciesBaseModelt.pdf, page2 used
- on input line 1273.
+ on input line 1254.
 (pdftex.def)             Requested size: 245.71033pt x 238.49393pt.
 
-<figures/logMargType1AgenciesBaseModelt.pdf, id=162, page=3, 578.16pt x 505.89p
+<figures/logMargType1AgenciesBaseModelt.pdf, id=154, page=3, 578.16pt x 505.89p
 t>
 File: figures/logMargType1AgenciesBaseModelt.pdf Graphic file (type pdf)
  <use figures/logMargType1AgenciesBaseModelt.pdf, page 3>
 Package pdftex.def Info: figures/logMargType1AgenciesBaseModelt.pdf, page3 used
- on input line 1274.
+ on input line 1255.
 (pdftex.def)             Requested size: 245.71033pt x 238.49393pt.
- [38] [39] [40]
-<figures/hierlogMargType1AgenciesBaseModelt.pdf, id=172, page=1, 578.16pt x 505
+ [35] [36] [37]
+<figures/hierlogMargType1AgenciesBaseModelt.pdf, id=165, page=1, 578.16pt x 505
 .89pt>
 File: figures/hierlogMargType1AgenciesBaseModelt.pdf Graphic file (type pdf)
  <use figures/hierlogMargType1AgenciesBaseModelt.pdf, page 1>
 Package pdftex.def Info: figures/hierlogMargType1AgenciesBaseModelt.pdf, page1 
-used on input line 1356.
+used on input line 1337.
 (pdftex.def)             Requested size: 289.07999pt x 252.94437pt.
 
-<figures/hierlogMargType1AgenciesBaseModelt.pdf, id=173, page=2, 578.16pt x 505
+<figures/hierlogMargType1AgenciesBaseModelt.pdf, id=166, page=2, 578.16pt x 505
 .89pt>
 File: figures/hierlogMargType1AgenciesBaseModelt.pdf Graphic file (type pdf)
  <use figures/hierlogMargType1AgenciesBaseModelt.pdf, page 2>
 Package pdftex.def Info: figures/hierlogMargType1AgenciesBaseModelt.pdf, page2 
-used on input line 1357.
+used on input line 1338.
 (pdftex.def)             Requested size: 289.07999pt x 252.94437pt.
- [41]
-[42] [43] [44]
-Overfull \hbox (5.34499pt too wide) in paragraph at lines 1460--1466
+ [38]
+[39] [40] [41]
+Overfull \hbox (5.34499pt too wide) in paragraph at lines 1441--1447
 \OT1/cmr/m/n/12 Thus, by the chain rule $\OMS/cmsy/m/n/12 r\OML/cmm/m/it/12 s\O
 T1/cmr/m/n/12 (\OML/cmm/m/it/12 X; []\OT1/cmr/m/n/12 ) = \OML/cmm/m/it/12 Q\OMS
 /cmsy/m/n/12 r\OML/cmm/m/it/12 s\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 X; Q[]\OT1/cm
@@ -542,25 +524,22 @@ cmsy/m/n/12 r\OML/cmm/m/it/12 s\OT1/cmr/m/n/12 (\OML/cmm/m/it/12 X; []\OT1/cmr/
 m/n/12 ) =
  []
 
-[45] [46] [47] [48] (./paper.bbl [49] [50] [51]) [52] [53 <./figures/minSSZSpac
-e3.pdf> <./figures/minSSZSpace5.pdf>] [54 <./figures/countvcount.pdf>] [55 <./f
+[42] [43] [44] [45] (./paper.bbl [46] [47] [48]) [49] [50 <./figures/minSSZSpac
+e3.pdf> <./figures/minSSZSpace5.pdf>] [51 <./figures/countvcount.pdf>] [52 <./f
 igures/logMargType1AgenciesBaseModelt.pdf> <./figures/logMargType1AgenciesBaseM
-odelt.pdf> <./figures/logMargType1AgenciesBaseModelt.pdf>] [56 <./figures/hierl
+odelt.pdf> <./figures/logMargType1AgenciesBaseModelt.pdf>] [53 <./figures/hierl
 ogMargType1AgenciesBaseModelt.pdf> <./figures/hierlogMargType1AgenciesBaseModel
 t.pdf>] (./paper.aux)
 
 LaTeX Warning: There were undefined references.
 
-
-LaTeX Warning: There were multiply-defined labels.
-
  ) 
 Here is how much of TeX's memory you used:
- 4673 strings out of 493089
- 69803 string characters out of 6134842
- 144015 words of memory out of 5000000
- 8038 multiletter control sequences out of 15000+600000
- 19035 words of font info for 72 fonts, out of 8000000 for 9000
+ 4676 strings out of 493089
+ 69826 string characters out of 6134842
+ 143956 words of memory out of 5000000
+ 8039 multiletter control sequences out of 15000+600000
+ 19962 words of font info for 75 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  42i,15n,40p,1531b,514s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
@@ -575,18 +554,19 @@ ocal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib8.pfb></u
 sr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr
 /local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/l
 ocal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/loc
-al/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/
-texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/t
-exlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/tex
-live/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texli
-ve/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive
-/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/
-2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2
-015/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/20
-15/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on paper.pdf (56 pages, 1732773 bytes).
+al/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/
+texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/tex
+live/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texl
+ive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texliv
+e/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/
+2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/20
+15/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/201
+5/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb></usr/local/texlive/2015
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt12.pfb></usr/local/texlive/2015/
+texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on paper.pdf (53 pages, 1732263 bytes).
 PDF statistics:
- 337 PDF objects out of 1000 (max. 8388607)
+ 331 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)
  86 words of extra memory for PDF output out of 10000 (max. 10000000)
 

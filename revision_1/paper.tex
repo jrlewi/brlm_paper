@@ -582,12 +582,8 @@ y_i  & =  & x_i^\top \bbeta + \epsilon_i , \mbox{ for } i = 1, \ldots, n
 where $x_i$ and $\bbeta \in \mathbb{R}^p$, $\sigma^2 \in \mathbb{R}^+$, 
 and the $\epsilon_i$ are independent draws from a distribution with center $0$ and scale $\sigma$. $X$ denotes the design matrix whose rows are  $x_i^\top$. 
 
-For the MCMC algorithm,  conditioning statistics are assumed to be of the form $T(\by) = (\bb(X, \by), s(X, \by)$ where $\bb(X, \by)\in \mathbb R^{p}$ is an estimator for the regression coefficients and $s(X, \by)\in \{0\} \cup {\mathbb R}^+$ is an estimator of the scale. Throughout, observed data and summary statistic is denoted by $\by_{obs}$ and $T(\by_{obs})=(\bb(X, \by_{obs}), s(X, \by_{obs}))$, respectively. 
-
+For the restricted likelihood model,  conditioning statistics are assumed to be of the form $T(\by) = (\bb(X, \by), s(X, \by))$ where $\bb(X, \by)= (b_1(X,\by), \dots,b_p(X,\by))^\top\in \mathbb R^{p}$ is an estimator for the regression coefficients and $s(X, \by)\in \{0\} \cup {\mathbb R}^+$ is an estimator of the scale. Throughout, observed data and summary statistic is denoted by $\by_{obs}$ and $T(\by_{obs})=(\bb(X, \by_{obs}), s(X, \by_{obs}))$, respectively. 
 % In particular, we demonstrate the method using simultaneous M-estimators defined by \eqref{Mest} for the one-sample setting and easily extended to the linear model in \eqref{LinearModel}. The estimator of the \green{regression} coefficients is denoted by $\bb(X, \by)\in \mathbb R^{p}$ and that of the scale by \green{\sout{$s(X, \by)\in \mathbb R$} $s(X, \by)\in \{0\} \cup {\mathbb R}^+$} . Thus, $T(\by)=(\bb(X, \by), s(X, \by))$. 
-
-
-
 Several conditions are imposed on the model and statistic to ensure validity of the MCMC algorithm:
 \begin{itemize}
 \labitem{C1}{fullRank} The $n \times p$ design matrix, $X$, whose $i^{th}$ row is $x_i^\top$, 
@@ -605,7 +601,7 @@ Properties \ref{regEq} and \ref{scaleEqReg} of $\bb$ are called
 \textit{regression} and \textit{scale equivariance},
 respectively.  Properties \ref{regIn} and \ref{scaleEq2Reg} of $s$ are called \textit{regression invariance}
 and \textit{scale equivariance}. 
-Many estimators satisfy the above properties, including simultaneous M-estimators \citep{huber2009, maronna2006} for which the R package \texttt{brlm} (\texttt{github.com/jrlewi/brlm}) is available to implement the MCMC. Further software development is required to extend the MCMC implementation beyond these M-estimators. The package also implements the direct computational methods described in \cite{lewis2014}. These methods are effective in lower dimensional problems and were used in several of the examples in Section \ref{illustrations}.
+Many estimators satisfy the above properties, including simultaneous M-estimators \citep{huber2009, maronna2006} for which the R package \texttt{brlm} (\texttt{github.com/jrlewi/brlm}) is available to implement the MCMC described here. Further software development is required to extend the MCMC implementation beyond these M-estimators. The package also implements the direct computational methods described in \cite{lewis2014}. These methods are effective in lower dimensional problems and were used in several of the examples in Section \ref{illustrations}.
 
 %The strategy described in the previous paragraph extends to full-blown regression models.  Robust regression methods lead naturally to a conditioning statistic in the form of a classical M-estimator for $\bbeta$
 %and a companion estimator for $\sigma$.  We denote the resulting estimator which involves the covariates through
@@ -683,34 +679,29 @@ Many estimators satisfy the above properties, including simultaneous M-estimator
 %complete data $\by$ given $T(\by)$. 
 %Relying on the modularity of MCMC algorithms, we construct a data augmented Gibbs sampler targeting $\pi(\bth, \by | T(\by)=T(\by_{obs}))$, the joint posterior of $\bth$ and $\by$ conditioned on the summary statistic $T(\by_{obs})$ for observed data vector $\by_{obs}$. The Gibbs sampler iteratively samples from the full conditionals written as $\pi(\bth|\by T(\by)=T(\by_{obs})$ and $f(\by|\bth, T(\by)=T(\by_{obs})$
 % \textcolor{blue}{some major changes from here to the end of the section}
-The general style of algorithm that we present is a data augmented
-MCMC algorithm targeting $f(\bth, \by |
+The general style of algorithm we present is a data augmented
+MCMC targeting $f(\bth, \by |
 T(\by)=T(\by_{obs}))$, the joint distribution of $\bth$ and the full
-data given the summary statistic $T(\by_{obs})$.  % with $\by_{obs}$  representing the observed complete data. 
+data given the summary statistic $T(\by_{obs})$. 
  The Gibbs sampler \citep{gelfand1990} iteratively samples from the
- full conditionals $\pi(\bth|\by, T(\by)=T(\by_{obs}))$ and
- $f(\by|\bth, T(\by)=T(\by_{obs}))$.  
-\green{Alternative algorithms substitute other generations for the full conditionals, such as the Metropolis-Hastings propose and accept/reject framework.  Our algorithms are based on the decomposition of the MCMC algorithm into conventional full data sampling steps where $\bth$ is generated given $\by$, and steps that allow us to complete the data set where $\by$ is generated given $\bth$ and $T(\by)$.  The latter generation relies on the conditioning set $\mathcal{A}=\{\by\in \mathbb{R}^n|T(\by)=T(\by_{obs})\}$.  The set $\mathcal{A}$ may contain more than one element (i.e., it is not degenerate) when $T(\by) : \by \rightarrow T(\by)$ is not a $1-1$ function.}
-%\red{\sout{, where the two
-%     conditioning sets are not degenerate (that is, $\by$ is such that
-%     $T(\by)=T(\by_{obs})$).}}  \red{Unless $T(\by)=\by$, the set
-%   $\mathcal{A}=\{\by\in \mathbb{R}^n|T(\by)=T(\by_{obs})\}$
-%   is not degenerate, containing more elements than $\by_{obs}$ only.}
- 
-When $\by$ has the summary statistic \sout{$T(\by)$ matching $T(\by_{obs})$,} \green{$T(\by) = T(\by_{obs})$,}
-the first full conditional, $\pi(\bth|\by, T(\by)=T(\by_{obs}))$, is
-\red{the same as} the full data posterior
-$\pi(\bth|\by)$. 
-\green{In this case, the condition $T(\by) = T(\by_{obs})$ is redundant.  This allows us to make use of conventional MCMC steps for this generation.  For} 
-\sout{In the case of} typical regression models, algorithms abound.  Details of the \green{recommended} algorithms depend on details of
-the prior distribution and sampling density.  As examples, a normal
-prior distribution and normal likelihood in the regression setting
-allow one to alternate conditional generations of $\sigma^2$ and $\bbeta$, and blocking the generation of $\bbeta$ generally
-leads to quicker convergence and mixing \citep{liu1994}; a thick-tailed scale mixture of normal distributions
-in the style of the 
-hyper-$g/n$ prior \citep{liang2008} necessitates an additional stage for the sampler where the scale 
-$g/n$ is generated; a thick-tailed sampling density such as a $t$ distribution can be handled with the addition of 
-a scale parameter for each case and an extra stage where these scale parameters are generated.  
+ full conditionals 
+ \begin{enumerate}
+ \item $\pi(\bth|\by, T(\by)=T(\by_{obs}))$ 
+ \item $f(\by|\bth, T(\by)=T(\by_{obs}))$.  
+ \end{enumerate}
+When $\by$ has the summary statistic $T(\by) = T(\by_{obs})$,
+the first full conditional is the same as the full data posterior $\pi(\bth|\by)$. In this case, the condition $T(\by) = T(\by_{obs})$ is redundant.  This allows us to make use of conventional MCMC steps for this generation.  For typical regression models, algorithms abound. Details of the recommended algorithms depend on details of
+the prior distribution and sampling density and we assume this can be done \citep[see e.g.,][]{liu1994, liang2008}.  
+
+%As examples, a normal
+%prior distribution and normal likelihood in the regression setting
+%allow one to alternate conditional generations of $\sigma^2$ and $\bbeta$, and blocking the generation of $\bbeta$ generally
+%leads to quicker convergence and mixing \citep{liu1994}; a thick-tailed scale mixture of normal distributions
+%in the style of the hyper-$g/n$ prior \citep{liang2008} necessitates an additional stage for the sampler where the scale 
+%$g/n$ is generated; a thick-tailed sampling density such as a $t$ distribution can be handled with the addition of 
+%a scale parameter for each case and an extra stage where these scale parameters are generated.  
+
+%\green{Alternative algorithms substitute other generations for the full conditionals, such as the Metropolis-Hastings propose and accept/reject framework.  Our algorithms are based on the decomposition of the MCMC algorithm into conventional full data sampling steps where $\bth$ is generated given $\by$, and steps that allow us to complete the data set where $\by$ is generated given $\bth$ and $T(\by)$.  The latter generation relies on the conditioning set $\mathcal{A}=\{\by\in \mathbb{R}^n|T(\by)=T(\by_{obs})\}$.  The set $\mathcal{A}$ may contain more than one element (i.e., it is not degenerate) when $T(\by) : \by \rightarrow T(\by)$ is not a $1-1$ function.}
 
 %The other stage in the Gibbs sampler is the generation of complete data from the full conditional  $f(\by|\bth, T(\by)=T(\by_{obs}))$. %Condition \ref{supReal} above facilitates the extension of convergence proofs for the complete data algorithm to those for the incomplete data algorithm.  
 %In this subsection, we focus exclusively this stage. 
@@ -727,29 +718,23 @@ a scale parameter for each case and an extra stage where these scale parameters 
 %is a generation of the complete data given statistic ($T(\by_{obs})$) and parameter ($\bth$).  Condition \ref{supReal} facilitates the extension of convergence proofs for the complete data algorithm to those for the incomplete data algorithm.  
 %In this subsection, we focus exclusively on the additional stage
 %where we generate $\by | \bth, T(\by)$.  
-For a typical model and conditioning statistic, the second full conditional $f(\by|\bth, T(\by)=T(\by_{obs}))\blue{ =f(\by|\bth, \by\in\mc A)}$ is not available in closed form.  
-As a consequence, we turn to Metropolis-Hastings \citep{hastings1970},
-using the strategy of proposing full data $\by$ \green{\sout{in the sample
-space of the distribution} for which $T(\by) = T(\by_{obs})$} and either accepting or rejecting the
-proposal. Let $\by_p$ and  $\by_c$ represent the proposed and current
-full data, respectively.  \green{In subsequent algorithms, we propose only from the set $\mathcal{A}$}. Denote the proposal distribution for $\by_{p}$ by $p(\by_p|\bth,T(\by_p) = T(\by_{obs})) \green{ = p(\by_p|\bth,\by_p \in \mathcal{A}) = p(\by_p | \bth)}$.  
-\green{The last equality follows from the fact that our $p(\cdot | \bth)$ assigns probability one to the event $\{ \by_p \in \mathcal{A} \}$.  These equalities still hold if the dummy argument $\by_p$ is replaced with $\by_c$.  The conditional density is
+For a typical model and conditioning statistic, the second full conditional $f(\by|\bth, T(\by)=T(\by_{obs}))$ %\blue{ =f(\by|\bth, \by\in\mc A)}$ 
+is not available in closed form.  We turn to Metropolis-Hastings \citep{hastings1970},
+using the strategy of proposing full data $\by \in \mathcal{A}:=\{\by \in \mathbb{R}^n | T(\by)=T(\by_{obs})\}$ from a well defined distribution with support $\mathcal{A}$ and either accepting or rejecting the
+proposal. Let $\by_p, \by_c \in \mathcal{A}$ represent the proposed and current
+full data, respectively. Denote the proposal distribution for $\by_{p}$ by $p(\by_p|\bth,T(\by_p) = T(\by_{obs})) = p(\by_p|\bth,\by_p \in \mathcal{A}) = p(\by_p | \bth)$.  The last equality follows from the fact that our $p(\cdot | \bth)$ assigns probability one to the event $\{ \by_p \in \mathcal{A} \}$.  These equalities still hold if the dummy argument $\by_p$ is replaced with $\by_c$.  The conditional density is
 \begin{eqnarray*}
 f(\by | \bth, \by \in \mathcal{A}) & = & \frac{f(\by | \bth) I(\by \in \mathcal{A} | \by, \bth)}{\int_\mathcal{A} f(\by | \bth) d\by} \\
      & = & \frac{f(\by | \bth)}{\int_\mathcal{A} f(\by | \bth) d\by} 
 \end{eqnarray*}
-for $\by \in \mathcal{A}$.  This includes both $\by_p$ and $\by_c$.  
-}
-
-The Metropolis-Hastings acceptance probability  is the minimum of 1 and $R$ where,
+for $\by \in \mathcal{A}$.  This includes both $\by_p$ and $\by_c$.  The Metropolis-Hastings acceptance probability  is the minimum of 1 and $R$ where,
 \begin{eqnarray}
 \label{MHRatio}
 R & = & \frac{f(\by_p|\bth,\by_p \in \mathcal{A})}{f(\by_c|\bth,\by_c \in \mathcal{A})}  
-                \green{\frac{p(\by_c|\bth, \by_c \in \mathcal{A})}{p(\by_p|\bth,\by_p \in \mathcal{A})}} \\
+                \frac{p(\by_c|\bth, \by_c \in \mathcal{A})}{p(\by_p|\bth,\by_p \in \mathcal{A})} \\
   & = & \frac{f(\by_p | \bth)}{\int_\mathcal{A} f(\by | \bth) d\by} \frac{\int_\mathcal{A} f(\by | \bth) d\by}{f(\by_c | \bth)} \frac{p(\by_c | \bth)}{p(\by_p | \bth)} \\
  & = & \frac{f(\by_p|\bth)}{f(\by_c|\bth)} \frac{p(\by_c|\bth)}{p(\by_p|\bth)} .  
 \end{eqnarray}
-\green{Note:  Above expression changed.  Check argument again.}
 %In the above expression, the second line follows from the first for
 %the following reason. The proposed \green{vector $\by$} is sampled from
 %  $\mathcal{A}$ so that
@@ -763,34 +748,26 @@ R & = & \frac{f(\by_p|\bth,\by_p \in \mathcal{A})}{f(\by_c|\bth,\by_c \in \mathc
 %\green{The expressions $\pi(\bth)$ and $\int f(\by | \bth) \pi(\bth) I(\by \in \mathcal{A})  d\bth$} are the same for $\by_{p}$ and $\by_{c}$ and cancel in the ratio. %Similar expansions can be made for the proposal distribution. 
 %\green{Further, the indicator functions can be dropped since $\by_p$ and $\by_c$ will both fall in $\mathcal{A}$.}  
 %\green{Note:  Check this argument carefully}
-
-For the models we consider, evaluation of $f(\by | \bth)$ is straightforward.  Therefore, the difficulty in implementing this Metropolis-Hastings step manifests  itself in the ability to simulate proposals that guarantee $T(\by) = T(\by_{obs})$ and on the evaluation of the proposal density derived from the method used to simulate $\by$. We now discuss such an implementation method for the linear model in \eqref{LinearModel}.
+For the models we consider, evaluation of $f(\by | \bth)$ is straightforward.  Therefore, the difficulty in implementing this Metropolis-Hastings step manifests  itself in the ability to both simulate from and evaluate $p(\by_p | \bth)$; the well defined distribution with support $\mathcal{A}$. We now discuss such an implementation method for the linear model in \eqref{LinearModel}.
 
 \subsubsection{Construction of the proposal}
 %\textcolor{blue}{some major revisions as indicated in the responseToReferees}
-Our \green{computational} strategy is easiest to envision in a location-scale setting where 
-the design matrix in model (\ref{LinearModel}) consists of a single column of ones.  Robust estimation techniques along
-with model (\ref{LinearModel}) suggest a conditioning statistic $T(\by)$ which consists of
-estimates of the scalars $\beta$ and $\sigma$, say $T(\by)=(b(X,\by),
-s(X,\by))$.  It is not a simple matter to directly sample the required
-proposal $\by$ satisfying $T(\by)=T(\by_{obs})$. However, 
-  with equivariance/invariance properties of $T(\by)$, we will see in Theorem \ref{Transformation} below
-    that it is possible to scale and shift any \sout{$\bz^{*}\in \mathbb R^{n}$} \green{$\bz^{*}$ which generates 
-a positive scale estimate} to such a
-    $\by$. Hence, to obtain $\by$ from $\mathcal A$, we proceed
-  in two steps. First, a vector $\bz^*$ is sampled from a known
-  distribution (examples of which are described later). This vector has summary statistic   
-$T(\bz^*) = (b(X,\bz^*), s(X,\bz^*))$ which may not match the observed summary
-$T(\by_{obs})$.  Second, $\bz^*$ is mapped into $\by =h(\bz^*)$
-using Theorem \ref{Transformation} so that $T(\by)=T(\by_{obs})$. To
-evaluate the proposal density $p(\by|\bth)$, we need to adjust
-the known density of $\bz^*$, $p(\bz^*)$, with the Jacobian of
-the transformation $h(\cdot)$ to $\by$. We choose the
-distribution of the \green{\sout{intermediate}} data vector $\bz^*$ to have support
-\green{on a subset of $\mathbb R^n$ so that}
-the transformation to $\by$ is one-to-one and the Jacobian,
-$\displaystyle \left|\frac{\partial h^{-1}(\by)}{\partial \by}\right|$, can be computed from first principles. It is the calculation of this Jacobian which is described in the section. We will repeatedly return to an artificial low-dimensional example in the location-scale setting to help visualize this calculation.  
-
+Our computational strategy relies on proposing $\by$ such that $T(\by) = T(\by_{obs})$ where $T(\cdot) = (\bb(X, \cdot), s(X, \cdot))$ satisfies the conditions \ref{asb}-\ref{scaleEq2Reg}. It is not a simple matter to do this directly, but with the specified conditions, it is possible to scale and shift any $\bz^{*}$ which generates 
+a positive scale estimate to such a $\by$ via the following Theorem whose proof is in the appendix. 
+\begin{theorem}
+\label{Transformation}
+Assume that conditions \ref{as}-\ref{scaleEq2Reg} hold.  Then, any vector $\bz^* \in \mathbb{R}^n$ with conditioning statistic
+$T(\bz^*)$ for which $s(X,\bz^*) > 0$ can be transformed into $\by$ with conditioning statistic $T(\by) = T(\by_{obs})$ 
+through the transformation 
+\[
+\by = h(\bz^*) := \frac{s(X,\by_{obs})}{s(X,\bz^*)} \bz^* + X\left(\bb(X,\by_{obs}) - \bb(X,\frac{s(X,\by_{obs})}{s(X,\bz^*)} \bz^*)\right) .  
+\]
+\end{theorem}
+% (details are given in Theorem \ref{Transformation} below). Hence, to obtain $\by \in\mathcal A$, we proceed in two steps:
+%\begin{enumerate}
+%\item Sample $\bz^*\in \mathbb{R}^{n}$ from a known distribution (examples of which are described later).
+%\item Transform $\bz^*$ to $\by =h(\bz^*)$ using Theorem \ref{Transformation} so that $T(\by)=T(\by_{obs})$. 
+%\end{enumerate}
 % To 
 %obtain data $\by$ for which $T(\by) = T(\by_{obs})$, we proceed in two
 %steps.  
@@ -804,64 +781,63 @@ $\displaystyle \left|\frac{\partial h^{-1}(\by)}{\partial \by}\right|$, can be c
 %To evaluate the proposal density of $\by$,
 %we need to adjust the density of $\bz^*$ with a Jacobian.  In the sequel, we use this artificially low-dimensional
 %example to illustrate the method.  
+%The strategy described in the previous paragraph extends to full-blown regression models.  Robust regression methods lead naturally to a conditioning statistic in the form of a classical M-estimator for $\bbeta$
+%and a companion estimator for $\sigma$.  We denote the resulting estimator which involves the covariates through
+%the design matrix and the response 
+%as $T(\by) = (\bb(X,\by), s(X,\by))$, with $\bb(X,\by) = (b_1(X,\by), \cdots,
+%b_p(X,\by))^\top$.  Simultaneous M-estimators have a number of standard properties \ref{asb}-\ref{scaleEq2Reg} which
+%prove useful in the sequel \citep{huber2009, maronna2006}.  
+%\begin{itemize}
+%\labitem{C3}{asb}$\bb(X,\by)$ is almost surely continuous and differentiable with respect to $\by$.  
+%\labitem{C4}{as} $s(X,\by)$ is almost surely positive, continuous, and differentiable with respect to $\by$.  
+%\labitem{C5}{regEq} $\bb(X,\by+X\bv)=\bb(X,\by)+\bv \ \ \text{for  all}\ \bv\in\mathbb{R}^p$. 
+%\labitem{C6}{scaleEqReg} $\bb(X,a\by)=a\bb(X,\by)\ \ \ \text{for all constants } a$.  
+%\labitem{C7}{regIn} $s(X,\by+X\bv)=s(X,\by) \ \ \text{for all}\ \bv\in\mathbb{R}^p$.  
+%\labitem{C8}{scaleEq2Reg} $s(X, a\by)=|a|s(X,\by) \ \ \text{for all constants } a$.  
+%\end{itemize}
+%Properties \ref{regEq} and \ref{scaleEqReg} of $\bb$ are called
+%\textit{regression} and \textit{scale equivariance},
+%respectively.  Properties \ref{regIn} and \ref{scaleEq2Reg} of $s$ are called \textit{regression invariance}
+%and \textit{scale equivariance}. 
+%Many other estimators satisfy these properties, and our subsequent results apply equally
+%well to them.  With more cumbersome statements, the upcoming results can be adjusted to handle 
+%a relaxation of \ref{as} that 
+%%$s(X,\by_{obs}) > 0$ and $P(s(X,\by)>0)>0$.  
+%To understand the Jacobian calculation, we start with the following Theorem whose proof is in the appendix. 
+%%We have stated that any vector $\bz^{*} \in \mathbb{R}^n$ can be transformed to a proposal
+%%$\by$ satisfying $T(\by) = T(\by_{obs})$.  The properties above ensure
+%%that this can be done through the mechanism presented in the following theorem.  The proof of this and other results appear in the appendix.
+%\begin{theorem}
+%\label{Transformation}
+%Assume that conditions \ref{as}-\ref{scaleEq2Reg} hold.  Then, any vector $\bz^* \in \mathbb{R}^n$ with conditioning statistic
+%$T(\bz^*)$ for which $s(X,\bz^*) > 0$ can be transformed into $\by$ with conditioning statistic $T(\by) = T(\by_{obs})$ 
+%through the transformation 
+%\[
+%\by = h(\bz^*) := \frac{s(X,\by_{obs})}{s(X,\bz^*)} \bz^* + X\left(\bb(X,\by_{obs}) - \bb(X,\frac{s(X,\by_{obs})}{s(X,\bz^*)} \bz^*)\right) .  
+%\]
+%\end{theorem}
+Using the theorem, the general idea is to first start with a sample $\bz^*$ from a known distribution, say $p(\bz^*)$, and transform via $h(\cdot)$ to $\by \in \mathcal{A}$. The proposal density $p(\by|\bth)$ is then a change-of-variables adjustment on $p(\bz^*)$ derived from $h(\cdot)$.
+%To evaluate the proposal density $p(\by|\bth)$, we need to adjust the known density of $\bz^*$, $p(\bz^*)$, with the Jacobian of the transformation $h(\cdot)$ to $\by$. We choose the
+%distribution of $\bz^*$ to have support on a subset of $\mathbb R^n$ so that
+%the transformation to $\by$ is one-to-one and the Jacobian, $\displaystyle \left|\frac{\partial h^{-1}(\by)}{\partial \by}\right|$, can be computed directly.  
+In general however, the mapping $h()$ is many-to-one: for any $\bv\in \mathbb{R}^{n}$ and any $c\in \mathbb{R}^{+}$, $c\bz^{*} + X\bv$ map to the same $\by$. This makes the change-of-variables adjustment difficult.
+%The set $\mathcal{A}$ typically does not lie in a linear space of dimension $n - p - 1$, and 
+%so we must account for both the many-to-one nature of the mapping $h(\dot)$ and
+%a Jacobian when deriving the proposal density.  
+We handle this point by first noticing that the set $\mathcal{A}$ is an $n - p - 1$ dimensional space:  there are $p$ constraints imposed by the regression coefficients and one further constraint imposed by the scale. Hence, we restrict the initial $\bz^*$ to an easily understood $n - p - 1$ dimensional space.  Specifically, this space is  the unit sphere in the orthogonal complement of the column space of the design matrix. Denote the column space and its orthogonal complement with $\mathcal{C}(X)$ and  $\mathcal{C}^{\perp}(X)$, respectively. With $\bz^{*}$ on this sphere, $c\bz^{*} + X\bv$ is clearly not (unless $c=1$ and $\bv = \mathbf{0})$ since every point on the sphere is both in  $\mathcal{C}^{\perp}(X)$ and has $||\bz^{*}|| = 1$. Thus the mapping has become one-to-one making the change of variables more feasible. 
 
-The strategy described in the previous paragraph extends to full-blown regression models.  Robust regression methods lead naturally to a conditioning statistic in the form of a classical M-estimator for $\bbeta$
-and a companion estimator for $\sigma$.  We denote the resulting estimator which involves the covariates through
-the design matrix and the response 
-as $T(\by) = (\bb(X,\by), s(X,\by))$, with $\bb(X,\by) = (b_1(X,\by), \cdots,
-b_p(X,\by))^\top$.  Simultaneous M-estimators have a number of standard properties \ref{asb}-\ref{scaleEq2Reg} which
-prove useful in the sequel \citep{huber2009, maronna2006}.  
-\begin{itemize}
-\labitem{C3}{asb}$\bb(X,\by)$ is almost surely continuous and differentiable with respect to $\by$.  
-\labitem{C4}{as} $s(X,\by)$ is almost surely positive, continuous, and differentiable with respect to $\by$.  
-\labitem{C5}{regEq} $\bb(X,\by+X\bv)=\bb(X,\by)+\bv \ \ \text{for  all}\ \bv\in\mathbb{R}^p$. 
-\labitem{C6}{scaleEqReg} $\bb(X,a\by)=a\bb(X,\by)\ \ \ \text{for all constants } a$.  
-\labitem{C7}{regIn} $s(X,\by+X\bv)=s(X,\by) \ \ \text{for all}\ \bv\in\mathbb{R}^p$.  
-\labitem{C8}{scaleEq2Reg} $s(X, a\by)=|a|s(X,\by) \ \ \text{for all constants } a$.  
-\end{itemize}
-Properties \ref{regEq} and \ref{scaleEqReg} of $\bb$ are called
-\textit{regression} and \textit{scale equivariance},
-respectively.  Properties \ref{regIn} and \ref{scaleEq2Reg} of $s$ are called \textit{regression invariance}
-and \textit{scale equivariance}. 
-Many other estimators satisfy these properties, and our subsequent results apply equally
-well to them.  With more cumbersome statements, the upcoming results can be adjusted to handle 
-a relaxation of \ref{as} that 
-$s(X,\by_{obs}) > 0$ and $P(s(X,\by)>0)>0$.  
+With the domain of $h(\dot)$ restricted to the unit sphere in $\mathcal{C}^{\perp}(X)$, the range is still the entirety of $\mathcal{A}$. This is important so that the support of the proposal distribution (i.e. the $h(\dot)$) contains the support of the target  $f(\by | \theta, y\in \mathcal{A})$; a necessary condition for convergence of the Metroplis-Hastings algorithm (in this case the supports are both $\mathcal{A}$). To see that the range of $h(\dot)$ is $\mathcal{A}$, consider any $\by \in \mathcal{A}$ and its projection onto $\mathcal{C}^{\perp}(X)$: $Q\by$ where $Q = I - XX^{\top}$ \footnote{We have used condition \ref{fullRank} to assume  without loss of generality  that the columns of $X$ form an orthonormal basis for $\mc{C}(X)$ (i.e., $X^\top X=I$).}. It is easy to show that $\bz^{*} = Q\by/||Q\by||$ is on the unit sphere and $h(\bz^{*}) = \by$.
 
-We have stated that any vector $\bz^{*} \in \mathbb{R}^n$ can be transformed to a proposal
-$\by$ satisfying $T(\by) = T(\by_{obs})$.  The properties above ensure
-that this can be done through the mechanism presented in the following theorem.  The proof of this and other results appear in the appendix.
-\begin{theorem}
-\label{Transformation}
-Assume that conditions \ref{as}-\ref{scaleEq2Reg} hold.  Then, any vector $\bz^* \in \mathbb{R}^n$ with conditioning statistic
-$T(\bz^*)$ \green{for which $s(X,\bz^*) > 0$} can be transformed into $\by$ with conditioning statistic $T(\by) = T(\by_{obs})$ 
-through the transformation 
-\[
-\by = \frac{s(X,\by_{obs})}{s(X,\bz^*)} \bz^* + X\left(\bb(X,\by_{obs}) - \bb(X,\frac{s(X,\by_{obs})}{s(X,\bz^*)} \bz^*)\right) .  
-\]
-\end{theorem}
-The mapping described in the theorem is many-to-one in general.
-Its range is the collection of data sets which match
-the observed summary statistic:
-\begin{equation}
-\label{sampleSpace}
- \mathcal{A}=\{\by\in \mathbb{R}^n | T(\by)=T(\by_{obs})\}.
-\end{equation}
-To see this, note that the theorem shows that any $\by$ expressed as in the theorem is an element of $\mc A$. Further, any $\by \in \mc A$ can be expressed as in the theorem by simply replacing $\bz^{*}$ with $\by$. That is, any vector already in $\mc A$ requires no shifting or scaling. The set $\mathcal{A}$ is an $n - p - 1$ dimensional space: 
-there are $p$ constraints imposed by the regression coefficients and one further constraint imposed by the scale.  
-The form of the set is determined by the statistic $T(\cdot)$.  Figure~\ref{fig:sampSpace} 
-provides an artificial low-dimensional
-visualization of such a set $\mathcal{A}$ with a location-scale
-  model.  In the figure, $n = 3$, and the conditioning
-statistic is $T(\by)=(\min(\by), \sum (y_i - \min(\by))^2)$. The
-set $\mathcal{A}$ is depicted  for $T(\by_{obs})=(0,1)$ and is a
-``warped triangle'' in light blue, with each side
-corresponding to a particular coordinate of $\by$ being the minimum
-value \green{of} zero. The other two coordinates are restricted by the scale
-statistic to lie on the quarter circle of radius one in the positive
-orthant. In general, this set may be compact and given by a closed
-curve, as in the figure, or it may be unbounded, depending on the
-  choice of $T(\by)$.  The other sets labeled in the figure will be described shortly.
+Given the one-to-one and onto mapping from the sphere to $\mathcal{A}$, the general proposal strategy is summarized as follows:
+\begin{enumerate}
+\item Sample $\bz^*$ from a distribution with known density on the unit sphere in $\mc{C}^\perp(X)$.
+\item Set $\by = h(\bz^*)$ and calculate the Jacobian of this transformation in two steps.
+\begin{enumerate}
+\item Scale from unit sphere to the set $\Pi(\mathcal{A}):= \{\bz\in \mathbb{R}^n |\ \exists\ \by\in \mathcal{A}\ s.t.\ \bz=Q \by \}$. This is the projection of $\mathcal{A}$ onto $\mathcal{C}^{\perp}(X)$ and, by condition \ref{regIn}, every element of this set has $s(X, \bz) = s(X, \by_{obs})$. Specifically, set $\bz=\frac{s(X,\boldsymbol{y}_{obs})}{s(X, \boldsymbol{z}^{*})}\bz^{*}$. There are two pieces of this Jacobian: one for the scaling and one for the mapping of the sphere onto $\Pi(\mathcal{A})$. The latter piece is given in equation \eqref{cosine}.
+\item Shift  from $\Pi(\mathcal{A})$ to $\mathcal{A}$: $\by=\bz+X\left(\bb(X, \by_{obs})-\bb(X, \bz)\right)$. This shift is along the column space of $X$ to the unique element in $\mathcal{A}$. The Jacobian of this transformation is given by equation \eqref{eq:volume}.
+\end{enumerate}
+\end{enumerate}
+The final proposal distribution including the complete Jacobian is given in equation \eqref{dens:ystst} with details in the next section. Before giving these details we provide a visualization of each of the sets described above to aid in the understanding of the strategy we are taking. Figure~\ref{fig:sampSpace} depicts an artificial low-dimensional location-scale example.  In the figure, $n = 3$, $p=1$, and the conditioning statistic is $T(\by)=(\min(\by), \sum (y_i - \min(\by))^2)$. The set $\mathcal{A}$ is depicted for $T(\by_{obs})=(0,1)$ which we describe as a ``warped triangle'' in light blue, with each side corresponding to a particular coordinate of $\by$ being the minimum value of zero. The other two coordinates are restricted by the scale statistic to lie on the quarter circle of radius one in the positive orthant. In this example, the column vector $X=\bf{1}$ (shown as a reference) spans $\mc{C}(X)$  and the unit sphere in $\mathcal{C}^{\perp}(X)$ is a unit circle on the orthogonal plane (shown in red). This is the sphere from which the initial sample $\bz^{*}$ is taken. $\Pi(\mathcal{A})$, the projection of $\mc A$ onto the orthogonal plane is depicted as the bowed triangle in dark blue. We will come back to this artificial example in the next section in an attempt to visualize the Jacobian calculations 
 
 \begin{figure}[t]
 \centering
@@ -873,73 +849,78 @@ $\mathcal{A}$ is the combination of three quarter circles, one
   on each plane defined by $y_i=0$. The projection of this manifold
   onto the deviation space is depicted by the bowed triangular shape
   in the plane defined by $\sum y_i=0$. The circle in this plane
-  represents the sample space for the intermediate sample \green{$\bz^*$}. Also
+  represents the sample space for the intermediate sample $\bz^*$. Also
   depicted is the vector $\mathbf{1}$, the design matrix for the
   location and scale setting.}
 \label{fig:sampSpace}
 \end{figure}
 
-The set $\mathcal{A}$ typically does not lie in a linear space of dimension $n - p - 1$, and 
-so we must account for both the many-to-one nature of the mapping and
-a Jacobian when deriving the proposal density.  We handle the first
-point by sampling the initial $\bz^*$ from
- a reduced $n - p - 1$ dimensional space which, through the scaling and
-shifting of the above theorem, maps uniquely to a point 
-in $\mathcal{A}$. This reduced space is chosen so that the range of the map is the
-entirety of $\mathcal{A}$.  The Jacobian does not cancel in
-\eqref{MHRatio}, since the scaling depends on the initial proposal. 
 
-The reduced space from which the initial sample is taken is simply the
-unit sphere \green{\sout{restricted to} in} the orthogonal complement of the column space of the design matrix (i.e., the least squares residual space). To help understand the density of the proposal derived from the transformation of this initial sample we introduce the following notation. Denote the column space of the design matrix $X$ by $\mathcal{C}(X)$ and its orthogonal complement by $\mc{C}^\perp(X)$. 
-\green{\sout{This} The latter} is the least squares residual space which we will often refer to as the `deviation space'.  The projection of the set $\mathcal{A}$ onto the deviation space is 
-\begin{equation}
-\label{sampleSpacePerp}
-\Pi(\mathcal{A})=\{\bz\in \mathbb{R}^n |\ \exists\ \by\in \mathcal{A}\
-s.t.\ \bz=Q \by \}
-\end{equation} 
-where $Q$ is the projection matrix onto  $\mc{C}^\perp(X)$. Explicitly, $Q=I-H$ with $H=XX^\top$ where we assume, without
-loss of generality following condition \ref{fullRank},  that the
-columns of $X$ form an orthonormal basis for $\mc{C}(X)$
-(i.e., $X^\top X=I$). It will also be helpful at times to write $Q=WW^{\top}$ where the columns of $W$ form an orthonormal basis for $\mc{C}^\perp(X)$. This set has been introduced because we will first transform the initial distribution on the sphere to the distribution on this set. Then we will transform to the \green{\sout{sample space} set} $\mc A$.
+%The \green{unit} sphere from
+%which the initial sample is taken is depicted as the red circle in this plane.  In general, this is the unit sphere in the $n-p$ dimensional space $\mc{C}^\perp(X)$.  
+%With the domain of $h(\dot)$ restricted to the unit sphere in $\mathcal{C}^{\perp}(X)$, the range is still the entirety of $\mathcal{A}$. This is important so that the support of the proposal distribution (i.e. the $h(\dot)$) is at least as large as the support of the target  $f(\by | \theta, y\in \mathcal{A})$, which is  $\mathcal{A}$; a necessary condition for convergence of the Metroplis-Hastings algorithm. To see that the range of $h(\dot)$ is $\mathcal{A}$, consider the any $\by \in \mathcal{A}$ and its projection onto $\mathcal{C}^{\perp}(X)$: $Q\by$ where $Q = I - XX^{\top}$ \footnote{We have used condition \ref{fullRank} to assume  without loss of generality  that the columns of $X$ form an orthonormal basis for $\mc{C}(X)$ (i.e., $X^\top X=I$).}. It is easy to show that $\bz^{*} = Q\by/||Q\by||$ is on the unit sphere and $h(\bz^{*}) = \by$.
+%
+%
+%
+%To see this, note that the theorem shows that any $\by$ expressed as in the theorem is an element of $\mc A$. Further, any $\by \in \mc A$ can be expressed as in the theorem by simply replacing $\bz^{*}$ with $\by$. The set $\mathcal{A}$ is an $n - p - 1$ dimensional space:  there are $p$ constraints imposed by the regression coefficients and one further constraint imposed by the scale.  The form of the set is determined by the statistic $T(\cdot)$.  
 
-Returning to the artificial example, Figure~\ref{fig:sampSpace}
-depicts $\Pi(\mathcal{A})$ as well as the sphere from which we obtain
-the initial sample. The column vector $X=\bf{1}$ spans $\mc{C}(X)$ and
-is shown as a reference. The triangle with bowed sides in dark
-  blue is  $\Pi(\mathcal{A})$, the projection of $\mc A$ onto the
-plane orthogonal to $\mb 1$ (i.e., $\mc{C}^\perp(X)$). The \green{unit} sphere from
-which the initial sample is taken is depicted as the red circle in this plane.  In general, this is the unit sphere in the $n-p$ dimensional space $\mc{C}^\perp(X)$.  
+%As an example, Figure~\ref{fig:sampSpace} provides an artificial low-dimensional visualization of such a set for a location-scale model.  In the figure, $n = 3$, and the conditioning statistic is $T(\by)=(\min(\by), \sum (y_i - \min(\by))^2)$. The set $\mathcal{A}$ is depicted for $T(\by_{obs})=(0,1)$ which we describe as a ``warped triangle'' in light blue, with each side corresponding to a particular coordinate of $\by$ being the minimum
+%value of zero. The other two coordinates are restricted by the scale statistic to lie on the quarter circle of radius one in the positive orthant. In general, this set may be compact and given by a closed
+%curve, as in the figure, or it may be unbounded, depending on the choice of $T(\by)$.  The other sets labeled in the figure will be described shortly.
+%
 
-For the transformation of the initial proposal $\bz^*$ on the surface of the sphere to $\by\in \mc A$ , we first move to a point on $\Pi(\mathcal{A})$ through a 
-simple scaling of $\bz^*$.  This is followed by undoing the projection with a move from 
-$\Pi(\mathcal{A})$ to its (unique) preimage on $\mathcal{A}$. Together, these two steps correspond to the
-transformation in Theorem~\ref{Transformation}.  The introduction of
-the sphere in $\mc {C}^\perp (X)$ as the initial proposal surface
-along with properties \ref{regEq}-\ref{scaleEq2Reg} ensure that the mapping is
-1-1. In particular, property
-\ref{scaleEq2Reg} ensures the scaling to be unique and \ref{regIn}
-implies that the scale statistic is unchanged when undoing the
-projection. Property \ref{regEq} ensures the uniqueness of undoing the
-projection.  The general proposal strategy is summarized as follows:
-\begin{enumerate}
-\item Sample $\bz^*$ from a distribution with known density on the unit sphere in $\mc{C}^\perp(X)$.
-\item Calculate the Jacobian of \green{the} transformation in Theorem \ref{Transformation} in two steps.
-\begin{enumerate}
-\item Scale from unit sphere to $\Pi(\mathcal{A})$: $\bz=\frac{s(X,\boldsymbol{y}_{obs})}{s(X, \boldsymbol{z}^{*})}\bz^{*}$
-\item Shift  from $\Pi(\mathcal{A})$ to $\mathcal{A}$: $\by=\bz+X\left(\bb(X, \by_{obs})-\bb(X, \bz)\right)$
-\end{enumerate}
-\end{enumerate}
+%Further, this reduced space is chosen so that the range of the map is the entirety of $\mathcal{A}$.  %The Jacobian does not cancel in \eqref{MHRatio}, since the scaling depends on the initial proposal. 
 
+%The reduced space from which the initial sample is taken is simply the
+%unit sphere \green{\sout{restricted to} in} the orthogonal complement of the column space of the design matrix (i.e., the least squares residual space). To help understand the density of the proposal derived from the transformation of this initial sample we introduce the following notation. Denote the column space of the design matrix $X$ by $\mathcal{C}(X)$ and its orthogonal complement by $\mc{C}^\perp(X)$. 
+%\green{\sout{This} The latter} is the least squares residual space which we will often refer to as the `deviation space'.  The projection of the set $\mathcal{A}$ onto the deviation space is 
+%\begin{equation}
+%\label{sampleSpacePerp}
+%\Pi(\mathcal{A})=\{\bz\in \mathbb{R}^n |\ \exists\ \by\in \mathcal{A}\
+%s.t.\ \bz=Q \by \}
+%\end{equation} 
+%where $Q$ is the projection matrix onto  $\mc{C}^\perp(X)$. Explicitly, $Q=I-H$ with $H=XX^\top$ where we assume, without
+%loss of generality following condition \ref{fullRank},  that the
+%columns of $X$ form an orthonormal basis for $\mc{C}(X)$
+%(i.e., $X^\top X=I$). It will also be helpful at times to write $Q=WW^{\top}$ where the columns of $W$ form an orthonormal basis for $\mc{C}^\perp(X)$. This set has been introduced because we will first transform the initial distribution on the sphere to the distribution on this set. Then we will transform to the \green{\sout{sample space} set} $\mc A$.
+
+%Returning to the artificial example, Figure~\ref{fig:sampSpace}
+%depicts $\Pi(\mathcal{A})$ as well as the sphere from which we obtain
+%the initial sample. The column vector $X=\bf{1}$ spans $\mc{C}(X)$ and
+%is shown as a reference. The triangle with bowed sides in dark
+%  blue is  $\Pi(\mathcal{A})$, the projection of $\mc A$ onto the
+%plane orthogonal to $\mb 1$ (i.e., $\mc{C}^\perp(X)$). The \green{unit} sphere from
+%which the initial sample is taken is depicted as the red circle in this plane.  In general, this is the unit sphere in the $n-p$ dimensional space $\mc{C}^\perp(X)$.  
+%
+%For the transformation of the initial proposal $\bz^*$ on the surface of the sphere to $\by\in \mc A$ , we first move to a point on $\Pi(\mathcal{A})$ through a 
+%simple scaling of $\bz^*$.  This is followed by undoing the projection with a move from 
+%$\Pi(\mathcal{A})$ to its (unique) preimage on $\mathcal{A}$. Together, these two steps correspond to the
+%transformation in Theorem~\ref{Transformation}.  The introduction of
+%the sphere in $\mc {C}^\perp (X)$ as the initial proposal surface
+%along with properties \ref{regEq}-\ref{scaleEq2Reg} ensure that the mapping is
+%1-1. In particular, property
+%\ref{scaleEq2Reg} ensures the scaling to be unique and \ref{regIn}
+%implies that the scale statistic is unchanged when undoing the
+%projection. Property \ref{regEq} ensures the uniqueness of undoing the
+%projection.  The general proposal strategy is summarized as follows:
+%\begin{enumerate}
+%\item Sample $\bz^*$ from a distribution with known density on the unit sphere in $\mc{C}^\perp(X)$.
+%\item Calculate the Jacobian of \green{the} transformation in Theorem \ref{Transformation} in two steps.
+%\begin{enumerate}
+%\item Scale from unit sphere to $\Pi(\mathcal{A})$: $\bz=\frac{s(X,\boldsymbol{y}_{obs})}{s(X, \boldsymbol{z}^{*})}\bz^{*}$
+%\item Shift  from $\Pi(\mathcal{A})$ to $\mathcal{A}$: $\by=\bz+X\left(\bb(X, \by_{obs})-\bb(X, \bz)\right)$
+%\end{enumerate}
+%\end{enumerate}
+%
 \subsubsection{Evaluation of the proposal density} 
-Calculation of the appropriate Jacobian of the transformation is absolutely vital and also non-trivial. Writing the transformation from the unit sphere in deviation space to $\mathcal{A}$ in 
-two steps facilitates calculation of the Jacobian in two steps as written above. % \textcolor{blue}{added the following sentence, hopefully it helps}
-We now explain each step, keeping in mind that the Jacobian of a transformation is simply the ratio of infinitesimal volumes along the tangents of the domain and range of the transformation. 
-
+%Calculation of the appropriate Jacobian of the transformation is absolutely vital and also non-trivial. Writing the transformation from the unit sphere in deviation space to $\mathcal{A}$ in 
+%two steps facilitates calculation of the Jacobian in two steps as written above. % \textcolor{blue}{added the following sentence, hopefully it helps}
+We now explain each step in computing the Jacobian described above.
+%the scale transformation from the unit sphere to $\Pi(\mathcal{A})$, {keeping in mind that the Jacobian of a transformation is simply the ratio of infinitesimal volumes along the tangents of the domain and range of the transformation. 
 \vskip 0.05 in
 \noindent
 {\bf Scale from unit sphere to $\Pi(\mathcal{A})$} \\
-The first step is constrained to $\mc{C}^\perp(X)$ where the unit sphere is transformed to $\Pi(\mathcal{A})$. We further break this \green{\sout{piece} step into \sout{in two steps} into two substeps}: first, the distribution on the unit sphere is transformed to that along a sphere of radius $r=\|\bz\|={s(X,\boldsymbol{y}_{obs})}/{s(X, \boldsymbol{z}^{*})}$. This contributes \green{a factor of} $r^{-(n-p-1)}$ to the Jacobian. Second, the new sphere is then deformed to $\Pi(\mathcal{A})$.  This deformation contributes an attenuation to the Jacobian equal to the
-ratio of infinitesimal volumes in the
+The first step is constrained to $\mc{C}^\perp(X)$ where the unit sphere is transformed to $\Pi(\mathcal{A})$. We further break this step into into two substeps: first, the distribution on the unit sphere is transformed to that along a sphere of radius $r=\|\bz\|={s(X,\boldsymbol{y}_{obs})}/{s(X, \boldsymbol{z}^{*})}$. This contributes a factor of $r^{-(n-p-1)}$ to the Jacobian. Second, the new sphere is then deformed to $\Pi(\mathcal{A})$.  This deformation contributes an attenuation to the Jacobian equal to the ratio of infinitesimal volumes in the
 tangent spaces of the sphere and $\Pi(\mathcal{A})$ at $\bz$.  
 Restricting ourselves to the $n-p$ dimensional space $\mc{C}^\perp(X)$, this
 ratio is the cosine of the angle between the normal 
@@ -963,8 +944,8 @@ As a result of the lemma, the contribution to the  Jacobian of this attenuation 
 s(X,\by)\| \|\bz\|},
 \end{equation}
 where $\gamma$ is the angle between the two normal vectors.
-This step is illustrated in Figure~\ref{fig:stretchDeform} for the toy
-location-scale example.  The figure \green{\sout{only}} pictures \green{only} the deviation space
+This step is visualized in Figure~\ref{fig:stretchDeform} for the artificial
+location-scale example.  The figure pictures only the $\mathcal{C}^{\perp}(X)$,
 which in this case is a plane. The original unit  sphere (here, the
 solid circle) is first stretched to the dashed sphere contributing
 $r^{-(n-p-1)}$ to the Jacobian as seen in panel (a). In panel (b), the
