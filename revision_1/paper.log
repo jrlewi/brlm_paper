@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  14 AUG 2018 22:53
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  14 AUG 2018 23:16
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -533,11 +533,14 @@ t.pdf>] (./paper.aux)
 
 LaTeX Warning: There were undefined references.
 
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
  ) 
 Here is how much of TeX's memory you used:
  4676 strings out of 493089
  69826 string characters out of 6134842
- 143956 words of memory out of 5000000
+ 143953 words of memory out of 5000000
  8039 multiletter control sequences out of 15000+600000
  19962 words of font info for 75 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
