@@ -753,7 +753,7 @@ For the models we consider, evaluation of $f(\by | \bth)$ is straightforward.  T
 \subsubsection{Construction of the proposal}
 %\textcolor{blue}{some major revisions as indicated in the responseToReferees}
 Our computational strategy relies on proposing $\by$ such that $T(\by) = T(\by_{obs})$ where $T(\cdot) = (\bb(X, \cdot), s(X, \cdot))$ satisfies the conditions \ref{asb}-\ref{scaleEq2Reg}. It is not a simple matter to do this directly, but with the specified conditions, it is possible to scale and shift any $\bz^{*}$ which generates 
-a positive scale estimate to such a $\by$ via the following Theorem whose proof is in the appendix. 
+a positive scale estimate to such a $\by$ via the following Theorem, whose proof is in the appendix. 
 \begin{theorem}
 \label{Transformation}
 Assume that conditions \ref{as}-\ref{scaleEq2Reg} hold.  Then, any vector $\bz^* \in \mathbb{R}^n$ with conditioning statistic
@@ -762,8 +762,7 @@ through the transformation
 \[
 \by = h(\bz^*) := \frac{s(X,\by_{obs})}{s(X,\bz^*)} \bz^* + X\left(\bb(X,\by_{obs}) - \bb(X,\frac{s(X,\by_{obs})}{s(X,\bz^*)} \bz^*)\right) .  
 \]
-\end{theorem}
-% (details are given in Theorem \ref{Transformation} below). Hence, to obtain $\by \in\mathcal A$, we proceed in two steps:
+\end{theorem}% (details are given in Theorem \ref{Transformation} below). Hence, to obtain $\by \in\mathcal A$, we proceed in two steps:
 %\begin{enumerate}
 %\item Sample $\bz^*\in \mathbb{R}^{n}$ from a known distribution (examples of which are described later).
 %\item Transform $\bz^*$ to $\by =h(\bz^*)$ using Theorem \ref{Transformation} so that $T(\by)=T(\by_{obs})$. 
@@ -816,28 +815,28 @@ through the transformation
 %\by = h(\bz^*) := \frac{s(X,\by_{obs})}{s(X,\bz^*)} \bz^* + X\left(\bb(X,\by_{obs}) - \bb(X,\frac{s(X,\by_{obs})}{s(X,\bz^*)} \bz^*)\right) .  
 %\]
 %\end{theorem}
-Using the theorem, the general idea is to first start with a sample $\bz^*$ from a known distribution, say $p(\bz^*)$, and transform via $h(\cdot)$ to $\by \in \mathcal{A}$. The proposal density $p(\by|\bth)$ is then a change-of-variables adjustment on $p(\bz^*)$ derived from $h(\cdot)$.
+Using the theorem, the general idea is to first start with an initial vector $\bz^*$ drawn from a known distribution, say $p(\bz^*)$, and transform via $h(\cdot)$ to $\by \in \mathcal{A}$. The proposal density $p(\by|\bth)$ is then a change-of-variables adjustment on $p(\bz^*)$ derived from $h(\cdot)$.
 %To evaluate the proposal density $p(\by|\bth)$, we need to adjust the known density of $\bz^*$, $p(\bz^*)$, with the Jacobian of the transformation $h(\cdot)$ to $\by$. We choose the
 %distribution of $\bz^*$ to have support on a subset of $\mathbb R^n$ so that
 %the transformation to $\by$ is one-to-one and the Jacobian, $\displaystyle \left|\frac{\partial h^{-1}(\by)}{\partial \by}\right|$, can be computed directly.  
-In general however, the mapping $h()$ is many-to-one: for any $\bv\in \mathbb{R}^{n}$ and any $c\in \mathbb{R}^{+}$, $c\bz^{*} + X\bv$ map to the same $\by$. This makes the change-of-variables adjustment difficult.
+In general however, the mapping $h(\cdot)$ is many-to-one: for any $\bv\in \mathbb{R}^{n}$ and any $c\in \mathbb{R}^{+}$, $c\bz^{*} + X\bv$ map to the same $\by$. This makes the change-of-variables adjustment difficult.
 %The set $\mathcal{A}$ typically does not lie in a linear space of dimension $n - p - 1$, and 
 %so we must account for both the many-to-one nature of the mapping $h(\dot)$ and
 %a Jacobian when deriving the proposal density.  
-We handle this point by first noticing that the set $\mathcal{A}$ is an $n - p - 1$ dimensional space:  there are $p$ constraints imposed by the regression coefficients and one further constraint imposed by the scale. Hence, we restrict the initial $\bz^*$ to an easily understood $n - p - 1$ dimensional space.  Specifically, this space is  the unit sphere in the orthogonal complement of the column space of the design matrix. Denote the column space and its orthogonal complement with $\mathcal{C}(X)$ and  $\mathcal{C}^{\perp}(X)$, respectively. With $\bz^{*}$ on this sphere, $c\bz^{*} + X\bv$ is clearly not (unless $c=1$ and $\bv = \mathbf{0})$ since every point on the sphere is both in  $\mathcal{C}^{\perp}(X)$ and has $||\bz^{*}|| = 1$. Thus the mapping has become one-to-one making the change of variables more feasible. 
+We handle this point by first noticing that the set $\mathcal{A}$ is an $n - p - 1$ dimensional space:  there are $p$ constraints imposed by the regression coefficients and one further constraint imposed by the scale. Hence, we restrict the initial $\bz^*$ to an easily understood $n - p - 1$ dimensional space.  Specifically, this space is  the unit sphere in the orthogonal complement of the column space of the design matrix: $\mathbb{S} := \{\bz^* \in \mathcal{C}^{\perp}(X)\  |\  ||\bz^*|| = 1\}$, where $\mathcal{C}(X)$ and  $\mathcal{C}^{\perp}(X)$ are the column space of $X$ and its orthogonal complement, respectively. With $\bz^{*}\in \mathbb{S}$, $c\bz^{*} + X\bv$ is not (unless $c=1$ and $\bv = \mathbf{0})$; the scaling by $c$ and/or the affine transformation in the direction of $\mathcal{C}(X)$ takes the point off $\mathbb{S}$. The mapping $h: \mathbb{S} \rightarrow \mathcal{A}$ is one-to-one making the change of variables more feasible. 
 
-With the domain of $h(\dot)$ restricted to the unit sphere in $\mathcal{C}^{\perp}(X)$, the range is still the entirety of $\mathcal{A}$. This is important so that the support of the proposal distribution (i.e. the $h(\dot)$) contains the support of the target  $f(\by | \theta, y\in \mathcal{A})$; a necessary condition for convergence of the Metroplis-Hastings algorithm (in this case the supports are both $\mathcal{A}$). To see that the range of $h(\dot)$ is $\mathcal{A}$, consider any $\by \in \mathcal{A}$ and its projection onto $\mathcal{C}^{\perp}(X)$: $Q\by$ where $Q = I - XX^{\top}$ \footnote{We have used condition \ref{fullRank} to assume  without loss of generality  that the columns of $X$ form an orthonormal basis for $\mc{C}(X)$ (i.e., $X^\top X=I$).}. It is easy to show that $\bz^{*} = Q\by/||Q\by||$ is on the unit sphere and $h(\bz^{*}) = \by$.
+With the domain of $h(\cdot)$ restricted to  $\mathbb{S}$, the range is still the entirety of $\mathcal{A}$. This is important so that the support of the proposal distribution (which is the range of $h(\cdot)$) contains the support of the target  $f(\by | \theta, y\in \mathcal{A})$; a necessary condition for convergence of the Metroplis-Hastings algorithm (in this case the supports are both $\mathcal{A}$). To see that the range of $h(\cdot)$ is $\mathcal{A}$, consider any $\by \in \mathcal{A}$ and its projection onto $\mathcal{C}^{\perp}(X)$: $Q\by$ where $Q = I - XX^{\top}$. \footnote{We have used condition \ref{fullRank} to assume  without loss of generality  that the columns of $X$ form an orthonormal basis for $\mc{C}(X)$ (i.e., $X^\top X=I$).} It is easy to show that $\bz^{*} = Q\by/||Q\by|| \in \mathbb{S}$ and $h(\bz^{*}) = \by$.
 
-Given the one-to-one and onto mapping from the sphere to $\mathcal{A}$, the general proposal strategy is summarized as follows:
+Given the one-to-one and onto mapping $h: \mathbb{S} \rightarrow \mathcal{A}$, the general proposal strategy is summarized as follows:
 \begin{enumerate}
-\item Sample $\bz^*$ from a distribution with known density on the unit sphere in $\mc{C}^\perp(X)$.
+\item Sample $\bz^*$ from a distribution with known density on $\mathbb{S}$.
 \item Set $\by = h(\bz^*)$ and calculate the Jacobian of this transformation in two steps.
 \begin{enumerate}
-\item Scale from unit sphere to the set $\Pi(\mathcal{A}):= \{\bz\in \mathbb{R}^n |\ \exists\ \by\in \mathcal{A}\ s.t.\ \bz=Q \by \}$. This is the projection of $\mathcal{A}$ onto $\mathcal{C}^{\perp}(X)$ and, by condition \ref{regIn}, every element of this set has $s(X, \bz) = s(X, \by_{obs})$. Specifically, set $\bz=\frac{s(X,\boldsymbol{y}_{obs})}{s(X, \boldsymbol{z}^{*})}\bz^{*}$. There are two pieces of this Jacobian: one for the scaling and one for the mapping of the sphere onto $\Pi(\mathcal{A})$. The latter piece is given in equation \eqref{cosine}.
+\item Scale from $\mathbb{S}$ to the set $\Pi(\mathcal{A}):= \{\bz\in \mathbb{R}^n |\ \exists\ \by\in \mathcal{A}\ s.t.\ \bz=Q \by \}$. $\Pi(\mathcal{A})$ is the projection of $\mathcal{A}$ onto $\mathcal{C}^{\perp}(X)$ and, by condition \ref{regIn}, every element of this set has $s(X, \bz) = s(X, \by_{obs})$. Specifically, set $\bz=\frac{s(X,\boldsymbol{y}_{obs})}{s(X, \boldsymbol{z}^{*})}\bz^{*}$. There are two pieces of this Jacobian: one for the scaling and one for the mapping of the sphere onto $\Pi(\mathcal{A})$. The latter piece is given in equation \eqref{cosine}.
 \item Shift  from $\Pi(\mathcal{A})$ to $\mathcal{A}$: $\by=\bz+X\left(\bb(X, \by_{obs})-\bb(X, \bz)\right)$. This shift is along the column space of $X$ to the unique element in $\mathcal{A}$. The Jacobian of this transformation is given by equation \eqref{eq:volume}.
 \end{enumerate}
 \end{enumerate}
-The final proposal distribution including the complete Jacobian is given in equation \eqref{dens:ystst} with details in the next section. Before giving these details we provide a visualization of each of the sets described above to aid in the understanding of the strategy we are taking. Figure~\ref{fig:sampSpace} depicts an artificial low-dimensional location-scale example.  In the figure, $n = 3$, $p=1$, and the conditioning statistic is $T(\by)=(\min(\by), \sum (y_i - \min(\by))^2)$. The set $\mathcal{A}$ is depicted for $T(\by_{obs})=(0,1)$ which we describe as a ``warped triangle'' in light blue, with each side corresponding to a particular coordinate of $\by$ being the minimum value of zero. The other two coordinates are restricted by the scale statistic to lie on the quarter circle of radius one in the positive orthant. In this example, the column vector $X=\bf{1}$ (shown as a reference) spans $\mc{C}(X)$  and the unit sphere in $\mathcal{C}^{\perp}(X)$ is a unit circle on the orthogonal plane (shown in red). This is the sphere from which the initial sample $\bz^{*}$ is taken. $\Pi(\mathcal{A})$, the projection of $\mc A$ onto the orthogonal plane is depicted as the bowed triangle in dark blue. We will come back to this artificial example in the next section in an attempt to visualize the Jacobian calculations 
+The final proposal distribution including the complete Jacobian is given in equation \eqref{dens:ystst} with details in the next section. Before giving these details we provide a visualization  in Figure~\ref{fig:sampSpace} of each of the sets described above to aid in the understanding of the strategy we are taking. In the figure, $n = 3$, $p=1$, and the conditioning statistic is $T(\by)=(\min(\by), \sum (y_i - \min(\by))^2)$. The set $\mathcal{A}$ is depicted for $T(\by_{obs})=(0,1)$ which we describe as a ``warped triangle'' in light blue, with each side corresponding to a particular coordinate of $\by$ being the minimum value of zero. The other two coordinates are restricted by the scale statistic to lie on the quarter circle of radius one in the positive orthant. In this example, the column vector $X=\bf{1}$ (shown as a reference) spans $\mc{C}(X)$  and $\mathbb{S}$ is a unit circle on the orthogonal plane (shown in red). $\Pi(\mathcal{A})$ is depicted as the bowed triangle in dark blue. We will come back to this artificial example in the next section in an attempt to visualize the Jacobian calculations.
 
 \begin{figure}[t]
 \centering
@@ -919,24 +918,19 @@ We now explain each step in computing the Jacobian described above.
 %the scale transformation from the unit sphere to $\Pi(\mathcal{A})$, {keeping in mind that the Jacobian of a transformation is simply the ratio of infinitesimal volumes along the tangents of the domain and range of the transformation. 
 \vskip 0.05 in
 \noindent
-{\bf Scale from unit sphere to $\Pi(\mathcal{A})$} \\
-The first step is constrained to $\mc{C}^\perp(X)$ where the unit sphere is transformed to $\Pi(\mathcal{A})$. We further break this step into into two substeps: first, the distribution on the unit sphere is transformed to that along a sphere of radius $r=\|\bz\|={s(X,\boldsymbol{y}_{obs})}/{s(X, \boldsymbol{z}^{*})}$. This contributes a factor of $r^{-(n-p-1)}$ to the Jacobian. Second, the new sphere is then deformed to $\Pi(\mathcal{A})$.  This deformation contributes an attenuation to the Jacobian equal to the ratio of infinitesimal volumes in the
-tangent spaces of the sphere and $\Pi(\mathcal{A})$ at $\bz$.  
-Restricting ourselves to the $n-p$ dimensional space $\mc{C}^\perp(X)$, this
-ratio is the cosine of the angle between the normal 
+{\bf Scale from $\mathbb{S}$ to $\Pi(\mathcal{A})$} \\
+The first step is constrained to $\mc{C}^\perp(X)$  and scales the initial $\bz^{*}$ to $\bz=\frac{s(X,\boldsymbol{y}_{obs})}{s(X, \boldsymbol{z}^{*})}\bz^{*}$. For the Jacobian, we consider two substeps: first, the distribution on  $\mathbb{S}$ is transformed to that along a sphere of radius $r=\|\bz\|={s(X,\boldsymbol{y}_{obs})}/{s(X, \boldsymbol{z}^{*})}$. By comparison of the volumes of these spheres, this transformation contributes a factor of $r^{-(n-p-1)}$ to the Jacobian. For the second substep, the sphere of radius $r$ is deformed onto $\Pi(\mathcal{A})$.  This deformation contributes an attenuation to the Jacobian equal to the ratio of infinitesimal volumes in the tangent spaces of the sphere and $\Pi(\mathcal{A})$ at $\bz$.  
+Restricting to $\mc{C}^\perp(X)$, this ratio is the cosine of the angle between the normal 
 vectors of the two sets at $\bz$.  The normal to the sphere is its radius vector $\bz$. The normal to
 $\Pi(\mathcal{A})$ is given in the following lemma.  
-
 \begin{lemma}
 \label{gradSTheoremReg}
-Assume that conditions \ref{fullRank}-\ref{supReal}, \ref{as}, and \ref{regIn} hold.  
-Let $\by\in \mathcal{A}$. Let 
+Assume that conditions \ref{fullRank}-\ref{supReal}, \ref{as}, and \ref{regIn} hold and $\by\in \mathcal{A}$. Let 
 $\nabla s(X,\by)$ denote the
 gradient of the scale statistic with respect to the data vector evaluated at
 $\by$.  Then $\nabla s(X,\by)\in \mc{C}^\perp(X)$ and is 
 normal to $\Pi(\mathcal{A})$ at $\bz=Q\by$  in $\mc{C}^\perp(X)$.
 \end{lemma}
-
 As a result of the lemma, the contribution to the  Jacobian of this attenuation is 
 \begin{equation}
 \label{cosine}
@@ -946,13 +940,12 @@ s(X,\by)\| \|\bz\|},
 where $\gamma$ is the angle between the two normal vectors.
 This step is visualized in Figure~\ref{fig:stretchDeform} for the artificial
 location-scale example.  The figure pictures only the $\mathcal{C}^{\perp}(X)$,
-which in this case is a plane. The original unit  sphere (here, the
-solid circle) is first stretched to the dashed sphere contributing
+which in this case is a plane. The unit sphere (here, the
+solid circle) is stretched to the dashed sphere contributing
 $r^{-(n-p-1)}$ to the Jacobian as seen in panel (a). In panel (b), the
 dashed circle is transformed onto $\Pi(\mc A)$ contributing
 $\cos(\gamma)$ to the Jacobian. The normal vectors in panel (b) are
-orthogonal to the tangent vectors of $\Pi(\mc A)$ and the circle. As
-stated above, the Jacobian is the ratio of infinitesimal lengths along these tangent vectors. This is the same as the ratio of the infinitesimal lengths of the normal vectors (i.e., $\cos(\gamma)$). This generalization extends to higher dimensions where the `lengths' along the tangent vectors become volumes along the tangent spaces. 
+orthogonal to the tangent vectors of $\Pi(\mc A)$ and the circle. %As stated above, the Jacobian is the ratio of infinitesimal lengths along these tangent vectors. This is the same as the ratio of the infinitesimal lengths of the normal vectors (i.e., $\cos(\gamma)$). This generalization extends to higher dimensions where the `lengths' along the tangent vectors become volumes along the tangent spaces. 
 
 \begin{sidewaysfigure}[t]
 \centering
@@ -979,7 +972,7 @@ $\bz$ to $\by$ along the column space of $X$. Since the shift depends on
 $\bz$, the density on the set 
 $\Pi(\mathcal{A})$ is deformed by the shift. The
 contribution of this deformation to the Jacobian is, again,
-the ratio of the infinitesimal volume along $\Pi(\mathcal{A})$ at $\bz$ to the
+the ratio of the infinitesimal volumes along $\Pi(\mathcal{A})$ at $\bz$ to the
 corresponding volume along $\mathcal{A}$ at $\by$. 
 The ratio is calculated by considering the volume of the
 projection of a unit hypercube in the tangent space of $\mathcal{A}$
@@ -987,8 +980,7 @@ at $\by$ onto $\mc{C}^\perp(X)$.
 Computational details are
 given in the following lemmas and subsequent theorem. Throughout, let
 $\mc T_{y}(\mc A)$ and $\mc T_{y}^{\perp}(\mc A)$ denote the tangent
-space to $\mc A$ at $\by$ and its orthogonal complement respectively. 
-
+space to $\mc A$ at $\by$ and its orthogonal complement respectively. All gradients denote with $\nabla$ are with respect to the data vector.
 \begin{lemma}
 \label{lem:basis}
 Assume that conditions \ref{fullRank}-\ref{regEq} and \ref{regIn}-\ref{scaleEq2Reg} hold.  Then the $p+1$ gradient vectors 
@@ -996,7 +988,7 @@ $\nabla s(X,\by), \nabla b_1(X,\by),\dots, \nabla b_p(X,\by)$ form a
 basis for $\mc T_{y}^\perp(\mc A)$ with probability one.
 \end{lemma}
 
-The lemma describes construction of a basis for $\mc T_{y}^\perp(\mc A)$.  This leads to a 
+The lemma describes construction of a basis for $\mc T_{y}^\perp(\mc A)$, leading to a 
 basis for $\mc T_{y}(\mc A)$.  Both of these bases can be orthonormalized.  
 Let $A=[a_{1},\dots,a_{n-p-1}]$  and $B=[b_1,\dots,b_{p+1}]$ denote the 
 matrices whose columns contain the orthonormal bases for  $\mc T_{y}(\mc A)$ and  $\mc T^{\perp}_{y}(\mc A)$, respectively.  
@@ -1043,22 +1035,26 @@ where $r={s(X,\boldsymbol{y}_{obs})}/{s(X,  \boldsymbol{z}^{*})}$,
 and $\cos(\gamma)$ and $\text{Vol} (P)$ are as in equations \eqref{cosine} and \eqref{eq:volume}, respectively. 
 \end{theorem} 
 
-In practice, computing $A$ directly to find $P$ and $\text{Vol} (P)$ is computationally intensive as it involves orthogonalization of $n$ vectors in $n$-dimensional space. 
-To find a matrix $A$, supplement $B$ with a set of $n$ linearly independent columns on the right, and apply Gram-Schmidt 
-orthonormalization to the matrix.  This algorithm is infeasibly slow when $n$ is large because it is $\mc O(n^3)$ and must be repeated at each
-iterate of the MCMC when a complete data set is drawn.  
-Fortunately, we can make use of results related to \textit{principal angles} found in \cite{miao1992} to compute the volume in \eqref{eq:volume} using $B$ and an orthonormal basis for $\mc C (X)$ (The definition of principal angles can be found in the cited text). Recall, $B$ is constructed by orthogonalization of a basis for $\mc T_{y}^\perp(\mc A)$. Since this space is of dimension $p+1$, applying Gram-Schmidt to find the orthonormal basis is much faster, the algorithm is $\mc O(np^2)$, and there is a 
+%In practice, computing $A$ directly to find $P$ and $\text{Vol} (P)$ is computationally intensive as it involves orthogonalization of $n$ vectors in $n$-dimensional space. 
+A few details for computingthe needed quantities are worth further explanation. Computing $\text{Vol} (P)$ involves finding an orthornormal matrix $A$ whose columns span $\mc T_{y}(\mc A)$. This matrix can be found by supplementing $B$ with a set of $n$ linearly independent columns on the right, and apply Gram-Schmidt orthonormalization.  This is $\mc O(n^3)$ and is infeasibly slow when $n$ is large because it must be repeated at each iterate of the MCMC when a complete data set is drawn.  However, using results related to \textit{principal angles} found in \cite{miao1992} the volume \eqref{eq:volume} can be computed using only $B$. $B$ is constructed by Gram-Schmidt orthogonalization of $\nabla s(X,\by), \nabla b_1(X,\by),\dots, \nabla b_p(X,\by)$, which is  $\mc O(np^2)$;  a 
 considerable reduction in computational burden when $n \gg p$. 
-Further, the singular values of $P=QA$ are also the singular values of
-$W^\top A$ (recall, $Q=WW^{\top}$), which can be easily obtained through $B$.
+%Further, the singular values of $P=QA$ are also the singular values of
+%$W^\top A$ where $Q=WW^{\top}$, which can be easily obtained through $B$.
 The following corollary formally states how computation of $A$ can be circumvented. 
 \begin{corollary}
 \label{theorem:sings}
-Let $U$ be a matrix whose columns
-form an orthonormal basis for $\mc C (X)$. Then the non-unit singular
-values of $U^\top B$ are the same as the non-unit singular values of $W^\top A$.  
+Let $U$ be a matrix whose columns form an orthonormal basis for $\mc C (X)$ and set $Q=WW^{\top}$ where the columns of $W$ form an orthonormal basis for $\mc{C}^\perp(X)$. Then the non-unit singular values of $U^\top B$ are the same as the non-unit singular values of $W^\top A$.
 \end{corollary} 
-\noindent Thus, we can compute $\text{Vol} (P)$ by finding the singular values of $U^\top B$, reducing the computational burden substantially. 
+\noindent The lemma implies the $\text{Vol} (P)$ is the product of the singular values of $U^\top B$. 
+
+Second, the gradients of $\nabla s(X,\by), \nabla b_1(X,\by),\dots, \nabla b_p(X,\by)$ are easily computed. For example, below we consider M-estimators defined by the estimating equations:
+\begin{eqnarray}
+\label{Mest}
+ \sum_{i=1}^n \psi\left(\frac{y_i - x_{i}^{\top}\bb(\by,X)}{s(\by,X)}\right)= & 0 \\
+ \sum_{i=1}^n \chi\left(\frac{y_i - x_{i}^{\top}\bb(\by,X)}{s(\by,X)}\right)= & 0, \nonumber 
+\end{eqnarray} 
+where $\psi$ and $\chi$ are almost surely differentiable. Differentiating this system of equations with respect to each $y_{i}$ can be used to find the gradients. In theory, finite differences could also be used. 
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -1066,10 +1062,7 @@ values of $U^\top B$ are the same as the non-unit singular values of $W^\top A$.
 % Simulations
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Simulations}
-\subsection{Simulation 1}
-
-\subsection{Simulation 2}
+\section{Simulation}
 Data generating model:
 \begin{equation}
 \label{gensim2}
