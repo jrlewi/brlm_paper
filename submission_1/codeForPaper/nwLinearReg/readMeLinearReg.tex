@@ -1,0 +1,68 @@
+Read me
+nwLinearReg Folder
+
+
+
+NOTE: Some workspaces referenced contain proprietary data which is not masked. Hence they cannot be shared. However the masked data is available in workSpaces/nwdataPaper1PriorConstructionWorkSpace.RData.
+
+
+#Description of how to reproduce results from paper.
+#Code should run if wd is set to the code folder#
+
+To reproduce the paper results from scratch, run the nwAnalysisSimulation.R file in the code folder. This file splits the data into training and holdoutset and runs each model. For n  (training set size) of less than 1000, I ran the code once with reps set to 100. For n greater than or equal to 1000, we ran the file four times (run=1,2,3,4) with reps set to 25, to save on computation time by running each in parallel. We used n=25,50,100,200,500,1000, 2000, but only a subset of these are in the paper. Runs should preferably be done as background jobs as they take some time to run. 
+
+
+After running, the results are saved in workspaces with names 
+wsNwAnalysis_n# (if just one run)
+wsNwAnalysis_n#run# (if multiple runs)
+
+where the # in n# is the training set size
+the # run# is the run number (1,2,3,4)
+
+Then run nwConsolidateAndSummarizeSims.R to consolidate the results from all workspaces to one workspace consolidatedOutputForPlots.RData
+
+Finally, nwAnalyzeOutput.R loads nwdataPaper1PriorConstructionWorkSpace.RData and consolidatedOutputForPlots.RData and summarizes results and creates plots.
+
+Note: nwdataPrepPaper1DataClean.R, nwdataPaper1PriorConstruction.R do data cleaning and set prior parameters from proprietary data. Code provided for documentation, but proprietary data can't be shared. 
+
+#--------
+#Code Folder: 
+#---------
+%Not included
+%nwdataPrepPaper1DataClean.R: 
+%	Loads original data from nwdataPrepPaper1Workspace.RData, strips identifiers, renames variables. Does this for both the prior data and fitting data. Data in nwdataPrepPaper1Workspace.RData is proprietary. Data saved to nwdataPrepPaper1DataCleanWorkspace.RData is also proprietary. These .RData files unfortunately cannot be provided.
+
+## 
+nwdataPaper1PriorConstruction.R
+	Centers and scales original (cleaned) data from nwdataPrepPaper1DataCleanWorkspace.RData (contains unsharable data). Also uses the prior data to choose the prior parameters of the model. Creates nwdataPaper1PriorConstructionWorkSpace.RData (sharable) in workspaces folder. 
+
+## 
+nwAnalysisSimulation.R:   
+	Contains the code to repeatedly split the data into a training and holdout set, fit each model, and record the needed results. Loads data from nwdataPaper1PriorConstructionWorkSpace.RData. For each run, it creates the 'wsNwAnalysis' workspaces used by nwConsolidateAndSummarizeSims.R.
+
+## 
+nwConsolidateAndSummarizeSims.R: 
+	Combines results from training/holdout fits for multiple training sample sizes and saves to consolidatedOutputForPlots.RData.
+	The 'wsNwAnalysis' workspaces created by each run of nwAnalysisSimulation.R must be available. These have names of the form wsNwAnalysis_n#run#.RData where 	the # after n is the training set size and the # after run is the run number (I used 4 runs for larger values of n to cut down on computation time)
+## 
+nwAnalyzeOutput.R: 
+	Loads nwdataPaper1PriorConstructionWorkSpace.RData and consolidatedOutputForPlots.RData, analyzes the results, and creates plots.
+## 
+	
+	
+
+#--------
+#Workspace Folder: 
+#---------
+
+##
+consolidatedOutputForPlots.RData ---- This must be produced by following the steps above. It is not included because of its size. 
+	results consolidated and ready for plotting (see nwConsolidateAndSummarizeSims.R above)
+  	
+##
+nwdataPaper1PriorConstructionWorkSpace.RData
+	Has the sharable dataset along with the prior parameters.  (see nwdataPaper1PriorConstruction.R above)
+
+
+
+	

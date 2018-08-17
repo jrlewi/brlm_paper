@@ -1,0 +1,18 @@
+ReadMe: newcomb/mcmc
+
+
+##
+locAndScaleHuberAndProposal2 and locAndScaleTukeyAndProposal2
+
+These are source files containing functions used to sample from the restricted posterior using the M-estimators used in the paper. They are sourced by newcombHuberAndProposal2Analysis.R and  newcombTukeyAndProposal2Analysis.R, respectively
+
+*Note: These are specific to the location and scale setting. Functions have since been updated to allow for covariates and provided in linearRegressionHuberAndProposal2.
+
+##
+newcombFullNormalModel.R
+Fits the full normal theory model. Saves results in workspace WorkSpaceNewcombFullNormalModel2.RData
+
+##
+newcombHuberAndProposal2Analysis.R and  newcombTukeyAndProposal2Analysis.R
+
+Uses mcmc to fit the restricted models. Also includes analysis done where the outliers are deleted (not discussed in the paper). Workspaces are saved in WorkSpaceNewcombHuberAndProposal2AnalysisWithDelAnalysis2.RData and WorkSpaceNewcombTukeyAndProposal2AnalysisWithDelAnalysis2.RData.

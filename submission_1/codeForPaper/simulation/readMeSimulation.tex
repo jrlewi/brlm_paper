@@ -1,0 +1,22 @@
+readMe: Simulation
+
+
+##
+simulation.R: code for simulation described in paper. Saves results in simulationWorkspace.RData or simulationWorkSpace_concTau2Near1.RData. The latter uses a prior that concentrates around the true value for tau^{2} of 1. These are not provided as they are large workspaces. 
+
+##
+simulationSourceCode.R: code sourced by simulation.R. This defines functions necessary to fit each model. Also defines a function to simulation data (fn.gen.data)
+
+
+##
+postProcessingSimulation.R
+post-processes simulation results and computes evaluation metrics. Saves results in simPostProcessed.RData or simPostProcessed_concTau2Near1.RData.
+
+##
+summarizeSimulations.R
+summarizes the evaluation metrics computed in postProcessingSimulation.R and creates some plots
+
+
+##
+testSimulationSourceCode.R
+some code to informally check that the functions in simulationSourceCode.R are giving reasonable results. 

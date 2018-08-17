@@ -1,0 +1,34 @@
+ReadMe: codeForPaper
+
+
+##
+linearRegressionHuberAndProposal2.R
+  description: contains functions for the MH algorithm for sampling from the full conditional [Y|T(Y)=T(y_obs), theta] for the Bayesian linear model. This is perhaps the most important piece of code.
+  
+NOTE: the original file was named as such because it was originally written to only handle Huber's estimators. It has morphed into slightly more than that since.
+
+##
+bayesLM.R
+	description: contains functions for MCMC algorithms for various linear models
+	bayesLm: standard normal theory regression. See file for full description of model. 
+	restrictedBayesLm: linear model conditioning on summary statistics.
+	bayesTdistLm: linear model using Student's t-distribution. 
+	bayesTdistLm2: second version of MCMC for the t model. Same stationary distribution just different sampling method.
+
+##Folders##
+	
+
+##	
+nwLinearReg
+	See readMeLinearReg in folder
+##	
+nwHierLinearReg
+	See readMeHierLinearReg in folder
+	
+## 
+newcomb
+	See readMeNewcomb in folder
+  
+##
+simulation
+  See readMeNewcomb in folder

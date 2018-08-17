@@ -1,0 +1,29 @@
+%latex.default(tab, title = "$f$", label = "tlmTable", rgroup = c("Tukey ($n=1000$)",     "Tukey ($n=2000$) ", "Huber  ($n=1000$)", "Huber ($n=2000$)"),     n.rgroup = c(2, 2, 2, 2), caption.loc = "bottom", math.col.names = TRUE,     rgroupTexCmd = "mdseries", size = "small", file = "tlmTable2.tex",     caption = "Mean (standard deviation) of TLM for `Type 1' agencies for the restricted non-hierarchical and hierarchical models for $n=1000$ and $2000$. The table is used for comparision of the two methods and a summary appears in the text.")%
+\begin{table}[!tbp]
+{\small
+\begin{center}
+\begin{tabular}{lllll}
+\hline\hline
+\multicolumn{1}{l}{$f$}&\multicolumn{1}{c}{$0.15$}&\multicolumn{1}{c}{$0.2$}&\multicolumn{1}{c}{$0.25$}&\multicolumn{1}{c}{$0.3$}\tabularnewline
+\hline
+{\mdseries Tukey ($n=1000$)}&&&&\tabularnewline
+~~Non-Hier.&1.072 (0.014)&1.179 (0.022)&1.226 (0.029)&1.255 (0.033)\tabularnewline
+~~Hier.&1.022 (0.063)&1.111 (0.070)&1.157 (0.067)&1.188 (0.065)\tabularnewline
+\hline
+{\mdseries Tukey ($n=2000$) }&&&&\tabularnewline
+~~Non-Hier.&1.068 (0.029)&1.178 (0.007)&1.225 (0.011)&1.254 (0.014)\tabularnewline
+~~Hier.&1.094 (0.041)&1.189 (0.036)&1.221 (0.033)&1.242 (0.028)\tabularnewline
+\hline
+{\mdseries Huber  ($n=1000$)}&&&&\tabularnewline
+~~Non-Hier.&1.020 (0.020)&1.114 (0.035)&1.157 (0.041)&1.184 (0.045)\tabularnewline
+~~Hier.&0.860 (0.073)&0.936 (0.079)&1.000 (0.074)&1.062 (0.064)\tabularnewline
+\hline
+{\mdseries Huber ($n=2000$)}&&&&\tabularnewline
+~~Non-Hier.&1.015 (0.021)&1.112 (0.014)&1.154 (0.019)&1.181 (0.023)\tabularnewline
+~~Hier.&0.929 (0.041)&1.013 (0.043)&1.080 (0.035)&1.147 (0.027)\tabularnewline
+\hline
+\end{tabular}
+
+\caption{Mean (standard deviation) of TLM for `Type 1' agencies for the restricted non-hierarchical and hierarchical models for $n=1000$ and $2000$. The table is used for comparision of the two methods and a summary appears in the text.\label{tlmTable}}\end{center}}
+
+\end{table}

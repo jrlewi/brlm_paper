@@ -1,0 +1,88 @@
+Read me
+nwHierLinearReg Folder
+
+
+#Description of how to reproduce results from paper.
+#setwd to the code folder#
+
+To reproduce the paper results from scratch run the 'ÉAnalysis.R' files in the code folder after running code in nwLinearReg. For n=1000, 2000, run each of the three '...Analysis.R'  files 4 times with run=1,2,3,4 and reps=25. For the new method  do this for both regEst<-'Huber' and regEst<-'Tukey' which is defined at the top of the  nwRestrictedHierAnalysis.R file. Each run fits the model to 25 splits of training/holdout. These runs should preferably be done as background jobs as they take some time to run. 
+
+After running, the results are saved in workspaces with names 
+wsNwNormalHierarchAnalysis_n#run#.RData
+wsNwRestrictedHierarchAnalysisHuber_n#run#.RData
+wsNwRestrictedHierarchAnalysisTukey_n#run#.RData
+wsNwTModelHierarchAnalysis_n#run#.RData 
+
+where n# is either n1000 or n2000 for training sets of size 1000 and 2000
+run# is run1, run2, run3, run4, to identify which 'run'. This results is a total 32 workspaces. 
+
+Then run consolidateOutputFromHierAnalyses.R to consolidate the results from all workspaces to one workspace consolidateOutputFromHierAnalysesFIX.RData
+
+Finally, nwAnalyzeHierOutputWithin.R summarizes results, creates plots. Comparing the hierarchical and nonhierarchical models is done in compareHierVNonHier.R
+
+#--------------
+## Code Folder
+#-------------
+
+compareHierVNonHier.R
+	compares hierarchical and nonhierarchical models using consolidated results from nonhier fits (consolidatedOutputForPlots.RData) and hierarchical fits (consolidateOutputFromHierAnalysesFIX.RData).
+
+consolidateOutputFromHierAnalyses.R
+	consolidates the workspaces 
+		wsNwNormalHierarchAnalysis_n#run#.RData
+		wsNwRestrictedHierarchAnalysisHuber_n#run#.RData
+		wsNwRestrictedHierarchAnalysisTukey_n#run#.RData
+		wsNwTModelHierarchAnalysis_n#run#.RData 
+	created by each anlaysis.R file run into one workspace consolidateOutputFromHierAnalysesFIX.RData
+
+nwAnalyzeHierOutputWithin.R
+	Summarizes results and creates plots using the consolidated results created by consolidateOutputFromHierAnalyses.R contained in consolidateOutputFromHierAnalysesFIX.RData
+
+
+nwHierNormalModelFittingFunction.R
+	loads nwHierNormalModelSamplingFunctions.R for the sample functions. Defines 
+	fn.hier.one.rep: one rep of MH algorithm for the hier. model
+	heirNormTheoryLm: full MCMC function
+	
+nwHierNormalModelSamplingFunctions.R
+	sampling functions for the normal theory hierarchical model. 
+		
+
+nwHierRestrictedModelFittingFunction.R
+	fits the hierarchical model conditioning on separate robust estimators in each group
+	same sampling functions for the parameters from normal theory model are used.
+	within each group, the update of the data vector is the same as before. (from linearRegressionHuberAndProposal2.R) 
+	hierNormTheoryRestLm2: Full MCMC for hier. model.
+
+
+nwNormalHierAnalysis.R:
+	Analysis using the normal theory model, creates the wsNwNormalHierarchAnalysis_n#run#.RData workspaces with the results for each t	raining set size and run (runs 1-4 each 	containing 25 reps set by sourceCodeForAnalysis.R)
+	
+nwRestrictedHierAnalysis.R
+	Analysis using the normal theory model but conditioning on robust regressions in each group, creates the 	wsNwRestrictedHierarchAnalysisRegEst_n#run#.RData workspaces with the results for each training set size and run (runs 1-4 each 	containing 25 reps set by 	sourceCodeForAnalysis.R). The RegEst is either Huber or Tukey.
+	
+	
+nwTdistHierModelFittingFunction.R 
+	sampling functions for the hierarchical model using t-distribution. Note only a couple of the sampling functions defined in 	nwHierNormalModelSamplingFunctions.R need to be adjusted. 
+	Full MCMC function is heirTTheoryLm.
+
+nwTHierAnalysis:
+	Analysis using the t-model. Creates the wsNwTModelHierarchAnalysis_n#run#.RData workspaces with the results for each training set 	size and run (runs 1-4 each containing 25 reps set by sourceCodeForAnalysis.R)
+
+
+settingHyperParameters.R
+	use prior data set to set reasonable values for the fixed hyperparameters. Creates the wsnwdataHierPriorConstruction.RData 	workspace which has the values of the resulting hyperparemters. Unfortunately it cannot be run without access the proprietary dataset in 	nwdataPrepPaper1DataCleanWorkspace.RData (this cannot be provided unfortunately) 
+
+
+sourceCodeForAnalysis.R
+	loaded by each '...Analysis.R' function. It loads the workspaces created by the standard linear regression fits. This is done to get the same 	training/holdout splits as used for the standard linear regression model. It also loads the functions needed to fit each model and defines 	some other functions such as fn.compute.marginals.hierModelNormal and fn.compute.marginals.hierModelTmodel to compute marginal 	distributions. 
+
+
+
+#--------------
+## Workspaces Folder
+#-------------
+wsnwdataHierPriorConstruction.RData: Contains the values of the hyper parameters. created by running settingHyperParameters.R
+
+consolidateOutputFromHierAnalysesFIX.RData --- This must be produced using the steps above. Not included because of its size. 
+Consolidated results for summarizing results. 

@@ -1,0 +1,33 @@
+ReadMe: Newcomb
+
+
+Code to analyze the speed of light data in several ways
+
+
+##
+
+newcombAnalyzeOutput.R
+description: Creates plots used in paper. Must have access to the workspaces created by code in the directSampling and mcmc folders. 
+
+
+##
+
+newcombFixedParameters1.R and newcombFixedParameters2.R
+description: defines hyper parameters. Two different versions. Values in newcombFixedParameters2.R were ultimately used in the paper. 
+
+##
+Folders
+
+##
+directSampling: 
+Uses 'direct sampling' techniques to sample from the restricted posterior under Huber, LTS, and LMS. See read me file in the folder
+
+
+
+##
+fittingTdist
+uses MCMC and grid techniques to fit the t-distribution model.  See read me file in the folder
+
+##
+mcmc
+uses MCMC techniques to sample from the full posterior and restricted posterior under Huber/huber prop2 and Tukey/Huber prop2 estimators. See read me file in the folder
