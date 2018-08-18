@@ -411,7 +411,7 @@ The data and  $95\%$ credible bands of the posterior predictive distribution und
 
 \begin{figure}
 \centering
-{\includegraphics[width = 4in]{figs/calls_predictive.png}}
+{\includegraphics[width = 6in]{figs/calls_predictive.png}}
 \caption{Predictive distribution of log(calls) under the Normal theory model fit to the non-outliers, the restricted likelihood model with  Tukey's M-estimator for the slope and intercept with Huber's `proposal 2'  for scale, and a heavy-tailed t-distribution model. The first three data points were used to specify the prior with the remaining points used in the posterior fits. See details in the Appendix.}
 \label{fig:calls_predictive}
 \end{figure}
@@ -1059,19 +1059,19 @@ where $\psi$ and $\chi$ are almost surely differentiable. Differentiating this s
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% Simulations
+% Applications
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Applications}
-In this section we apply the restricted likelihood to both simulated and real data. 
+%\section{Applications}
+%In this section we apply the restricted likelihood to both simulated and real data. 
 
-\subsection{Simulation}
-For this simulation, the true data comes from the following hierarchical data generating model:
+\section{Simulated Data}
+For this study, the simulated data comes from the following hierarchical data generating model:
 \begin{align}
 \label{gensim2}
 \begin{split}
 & \theta_{i}  \sim   N(\mu, \tau^{2}),  \ i = 1, 2, \dots, 90  \\ 
-& y_{ij} \sim (1-p_{i})N(\theta_{i}, \sigma^{2}) + p_{i}N(\theta_{i}, m_{i}\sigma^{2}), j = 1, 2,..., n_{i}
+& y_{ij} \sim (1-p_{i})N(\theta_{i}, \sigma^{2}) + p_{i}N(\theta_{i}, m_{i}\sigma^{2}),\  j = 1, 2,..., n_{i}
 \end{split}
 \end{align}
 with $\mu = 0, \tau^{2} = 1, \sigma^{2} = 4$. The values of $p_{i}, m_{i}$, and $n_{i}$ depend on the group and are formed using 5 replicates of the full factorial design over factors $p_{i},m_{i},n_{i}$ with levels $p_{i} = .1, .2, .3$, $m_{i} = 9, 25$, and $n_{i} = 25, 50, 100$. Thus, the 90 groups have a varying level of outlier contamination and sample size. We wish to build models that offer good prediction for the good portion of data within each group. The full model for fitting is a corresponding normal model without contamination:
@@ -1108,7 +1108,7 @@ Figure \ref{} displays the results for each $a_{s} = 1.25,  5, 10,$ and $c_{s} =
 %\includegraphics[scale = .3]{kl_sim2_facet_as.png}
 %\end{figure}
 
-One explaination for the idea that 'shrinking towards smaller values' may do slightly better than shrinking toward the true value is the fact that we used default tuning parameters to define M-Estimators. For the amount of contaimination in each group, the expected value of the variance estimate (Huber's proposal 2) is larger that $\sigma^{2} = 4$. The histogram below demonstrates a sample of variaince estimates for data generated from one of the contamination groups....the estimates are consitently above 4. Thus it appears the prior mean must be smaller than the true value to get the `correct' amount of shrinkage. There is a suggestion that if the prior is too strong (large $a_{s}$), at some point, shrinking to too small a value degrades performance....which would be expected. 
+%One explaination for the idea that 'shrinking towards smaller values' may do slightly better than shrinking toward the true value is the fact that we used default tuning parameters to define M-Estimators. For the amount of contaimination in each group, the expected value of the variance estimate (Huber's proposal 2) is larger that $\sigma^{2} = 4$. The histogram below demonstrates a sample of variaince estimates for data generated from one of the contamination groups....the estimates are consitently above 4. Thus it appears the prior mean must be smaller than the true value to get the `correct' amount of shrinkage. There is a suggestion that if the prior is too strong (large $a_{s}$), at some point, shrinking to too small a value degrades performance....which would be expected. 
 
 %\begin{figure}[H]
 %\centering
@@ -1123,59 +1123,65 @@ One explaination for the idea that 'shrinking towards smaller values' may do sli
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-% Applications
+% Real data
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Applications}
-\label{Applications}
-We illustrate the methods developed in Sections~\ref{restrictedlikelihood} and \ref{BayesLinMod} with a pair of regression models for 
-data from Nationwide Insurance Company, which concern prediction of
-the performance of insurance agencies.
-The data contain outliers and are subject to model misspecification.  
-In particular, a group of the data do not follow the same generative process as the data of interest.  It would be 
-extremely challenging to model some features of the data.  
-In our analysis, we follow the standard practice when demonstrating the benefits of robust 
-methods.  We work with a naive model for the data which ignores certain features of the problem.  We
-do this both to create a situation where all can agree that the model for the full data $\by$ is imperfect
-and to preserve the confidentiality of selected aspects of modelling done by Nationwide.  
-We wish to provide inference for the `good' portion of the data.  The two models we fit either treat the analysis
-as a single regression or as a collection of related regressions.  Details of the models, prior distributions, 
-and conditioning statistics are given in the next two subsections.  
+\section{Real Data}
+\label{Real Data}
+We illustrate our methods with a pair of regression models for data from Nationwide Insurance Company, which concern prediction of the performance of insurance agencies.
+%The data contain many outliers and are subject to model misspecification.  
+%In particular, a group of the data do not follow the same generative process as the data of interest.  It would be 
+%extremely challenging to model some features of the data.  
+%In our analysis, we follow the standard practice when demonstrating the benefits of robust 
+%methods.  We work with a naive model for the data which ignores certain features of the problem.  We
+%do this both to create a situation where all can agree that the model for the full data $\by$ is imperfect
+%and to preserve the confidentiality of selected aspects of modeling done by Nationwide.  
+%We wish to provide inference for the `good' portion of the data.  %The two models we fit either treat the analysis
+%as a single regression or as a collection of related regressions.  % Details of the models, prior distributions, 
+%and conditioning statistics are given in the next two subsections.  
+%%%%%%%%%%%%%%%%%%%%%%%%
+%%NW data
+%%%%%%%%%%%%%%%%%%%%%%%%
+%
+%\subsection{Nationwide Data}
+Nationwide sells many of its insurance policies through agencies which provide direct service to policy holders.  
+The contractual agreements between Nationwide and these agencies vary.  Our interest is the prediction of future performance of agencies where  performance is measured by the total number of households an agency services (`household count'). 
+%A serviced household is one in which at least one person living at that residence has at least one policy written through the agency. 
+We used data from previous years to build a model to forecast future household count. In particular, we use household count  as measured during a single month in $2010$, to predict household counts in the corresponding month in $2012$.  
+%In particular, we use agency characteristics, as measured during a single month in $2010$, to predict household counts in the corresponding month in $2012$. The characteristics used are household count and two measurements of agency size/experience. The two measurements of agency size/experience are, roughly, the number of employed persons at the agency and the length of time the agency has been affiliated with Nationwide. 
+%The household counts (response and predictor) have been square rooted to stabilize variance. 
+The data a grouped by states with a varying number of agencies by state. Identifiers such as agency/agent names are removed. State labels and agency types (identifying the varying contractual agreements) have been made generic to protect the proprietary nature of the data.
+%The data are proprietary, and to mask them all variables have been individually centered and scaled and identifiers (agency/agent names and state labels) have been removed.All subsequent analysis is done on this scale.  
+As an exploratory view, a plot of the square root of household count in 2012, against that in 2010 
+is shown in Figure \ref{fig:ctVct} for three states. Each state has a varying number of agencies and  the different colors represent the varying contractual agreements as they stood in 2010.  Among the open agencies, linear correlations exists with strength depending on agency type and state.  `Type 1' agencies are of special interest and one could easily subset the analysis to only these agencies, removing the others. Additionally, a large number of agencies closed sometime before 2012, as represented by the many $0$ counts for 2012. The other agency types and the zero counts are `outliers' and could arguably just be removed prior to analysis. However,  we leave them and us the data as a test bed for our techniques by fitting models that do not account for agency closures or contract type.  Our expectation is that the restricting likelihood will facilitate prediction for the `good' part of the data (i.e. open, `type 1' agencies). 
 
-%%%%%%%%%%%%%%%%%%%%%%%
-%NW data
-%%%%%%%%%%%%%%%%%%%%%%%
-
-\subsection{Nationwide Data}
-The Nationwide Insurance Company sells many of its insurance policies through agencies which provide direct service to policy holders.  
-The contractual agreements between Nationwide and these agencies vary.  Of major interest to Nationwide is the prediction of future performance of agencies where, for our purposes,  performance is measured by the total number of households an agency services (`household count'). A serviced household is one in which at least one person living at that residence has at least one policy written through the agency. We used data from previous years to build a model to forecast future household count. In particular, we use agency characteristics, as measured during a single month in $2010$, to predict household counts in the corresponding month in $2012$. The characteristics used are household count and two measurements of agency size/experience. The two measurements of agency size/experience are, roughly, the number of employed persons at the agency and the length of time the agency has been affiliated with Nationwide. The household counts (response and predictor) have been square rooted to stabilize variance. The data are 
-proprietary, and to mask them all variables have been individually centered and scaled and identifiers (agency/agent names and state
-labels) have been removed. 
-All subsequent analysis is done on this scale.  As an exploratory view, a plot of the square root of count in 2012, against that in 2010 
-is shown in Figure \ref{fig:ctVct}.  The different colors represent the varying contractual agreements as they stood in 2010. `Type 1' agencies are of special interest.  Among the open agencies, a strong linear correlation exists.  The specific linear relationship
-depends on agency type. The data are characterized by a large number of agencies which were open in 2010 but closed sometime before 2012, as represented by the horizontal band at $0$. We use these data as a test bed for our techniques, fitting models that do not account for agency closures or contract type.  Our expectation is that \green{\sout{the incomplete} restricting the} likelihood will facilitate prediction for the good part of the data.  
-
-\begin{figure}[t]
+\begin{figure}[H]
 \centering
-\includegraphics[width=4in]{countvcount.pdf}
+\includegraphics[width=6in]{scatter_by_state.png}
 \caption{The square root of count in 2012 versus that in 2010 (after centering and scaling). The colors represent the varying contractual agreements as they stood in 2010.  Agencies that closed during the 2010-2012 period are represented by the zero counts for 2012. Scalings on the axes are purposely left off for proprietary reasons.}
 \label{fig:ctVct}
 \end{figure}
 
 \subsection{Regression model}
 \label{regModelNW}
-The first analysis that we consider is based on a single regression.  We use 
-the following standard normal theory regression model 
+The first analysis considered is based on individual regressions fit separately within a state.  The following normal theory regression model is used as the full model 
 \begin{equation}
 \label{eq:regModel}
-\bbeta\sim N_p(\bmu_0, \Sigma_0);\ \ \sigma^2\sim IG(a_0,b_0);\ \  
-y_{i}=\bx_{i}^\top\bbeta+\epsilon_{i},\ \ \epsilon_{i}\iid N(0, \sigma^2),\ i=1,\dots, n, 
+\beta\sim N(\mu_0, \sigma^{2}_0);\ \ \sigma^2\sim IG(a_0,b_0);\ \  
+y_{i}=\beta x_{i} +\epsilon_{i},\ \ \epsilon_{i}\iid N(0, \sigma^2),\ i=1,\dots, n, 
 \end{equation}
-where $\bbeta$ is a four dimensional vector ($p=4$) of regression coefficients for the intercept, square root of count in 2010, and the two size/experience measures, and $y_{i}$ is the square rooted household count in 2012 for the $i^{th}$ agency with covariate vector $\bx_{i}$.  Although the mean of covariates and response have been removed, we include the intercept as fitting is done on a holdout set to evaluate predictive performance.  
-The hyper-parameters $a_0, b_0, \bmu_0$ and $\Sigma_0$ are all fixed and set from a 
-robust regression fit to the data from the time period two years
-before. Letting $\hat\bbeta$ represent the estimate of the coefficients from this fit we  set $\bmu_0=\hat\bbeta$ and $ \Sigma_0=n\cdot \mbox{var}(\hat\bbeta)$ where here $n$ is the sample size of the prior data set.  %corresponding to  a unit information prior for $\bbeta$. 
-The hyperparameters for $\sigma^2$ are set so that the prior mean is $s^2$, the estimated variance from the robust regression, and the spread of the prior covers the range of plausible values with high probability. All values are then transformed appropriately to match the current scale of the data. In the end we take $\bmu_0=(0.18,  0.81,0.01,-0.02)^\top$ and set the mean of $\sigma^2$ to $0.014$ and standard deviation to  $0.033$. 
+%where $\beta$ is a four dimensional vector ($p=4$) of regression coefficients for the intercept, square root of count in 2010, and the two size/experience measures, and 
+where $y_{i}$ and $x_{i}$ are the square rooted household count in 2012 and 2010 for the $i^{th}$ agency, respectively. 
+%with covariate vector $\bx_{i}$.  Although the mean of covariates and response have been removed, we include the intercept as fitting is done on a holdout set to evaluate predictive performance.  
+The hyper-parameters $a_0, b_0, \mu_0$ and $\sigma^{2}_0$ are all fixed and set from a 
+robust regression fit to the corresponding state's data from the time period two years
+before. Specifically, Let $\hat\beta$ and $\hat\sigma^{2}$ be estimates from the robust linear regression of 2010 counts on 2012 counts.  We fix $a_0 = 5$ and set $b_0 = \hat\sigma^{2}(a_0 - 1)$. We set $\mu_0 = \hat\beta$ and $\sigma^{2}_0 =  fn_{p}se(\hat\beta)^{2}$ where $n_{p}$ is the number of agencies in the prior data set and $se(\hat\beta)$ is the standard error of $\hat\beta$ derived from the robust regression. The value of $f$ is varied, controlling the prior certainty on $\beta$, with smaller values corresponding to a more certain prior.  We take $f = 0.05, 0.1, 0.5, 1$ and note the prior is in the spirit of the Zellner's $g$-prior \citep{zellner1986, liang2008}; scaling the prior variance $se(\hat\beta)^{2}$ by a factor $g = fn_{p}$. $f = 1$ is analogous to the unit-information prior \citep{kass1995reference}.  %We fit the models separately for each $g^{*} = 0.05, 0.1, 0.5, 1$  %represent the estimate of the coefficients from this fit we  set $\bmu_0=\hat\bbeta$ and $ \Sigma_0=n\cdot \mbox{var}(\hat\bbeta)$ where here $n$ is the sample size of the prior data set.  %corresponding to  a unit information prior for $\bbeta$. 
+%The hyperparameters for $\sigma^2$ are set so that the prior mean is $s^2$, the estimated variance from the robust regression, and the spread of the prior covers the range of plausible values with high probability. All values are then transformed appropriately to match the current scale of the data. In the end we take $\bmu_0=(0.18,  0.81,0.01,-0.02)^\top$ and set the mean of $\sigma^2$ to $0.014$ and standard deviation to  $0.033$. 
+
+
+
+
+
 
 We compare four Bayesian models: the standard Bayesian normal theory model, two restricted likelihood models, both with simultaneous M-estimators, and a heavy-tailed model.  For the restricted likelihood methods we use the same simultaneous M-estimators as in Section \ref{darwinAnalysis} adapted to linear regression.  The heavy-tailed model replaces the normal sampling density in \eqref{eq:regModel} with a $t$-distribution with $\nu = 3$ degrees of freedom. %We have used the default tuning parameter settings for the {\tt rlm} function in the R package {\tt MASS} \citep{venables2002}.  Both use Huber's scale estimator as in the {\tt rlm} implementation.  
 We also fit the corresponding classical robust regressions and a least squares regression.  

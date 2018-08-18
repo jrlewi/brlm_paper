@@ -15,14 +15,15 @@ ns <- c(10, 25, 50) #percent sample size for training set
 states <- c(2,3,27)
 v_inflate <- c(5, 10, 50, 100)
 
-reps <- 20 # number of training sets
+sims <-1:20
+reps <-  length(sims)# number of training sets
 
 nburn <- 1000 #set length of mcmc chains
 nkeep <- 1000
 nkeept <- 1000 #for the t-model.
 nu <- 3
 #set seed 
-set.seed(123)
+set.seed(min(sims))
 
 for(State_keep in states){
 #prior -----
@@ -65,7 +66,7 @@ analysis_data <- analysis_data %>%
 N <- nrow(analysis_data)
 p <- length(coef(prior_fit))
 
-for(n_percent in ns){
+for(n_percent in ns){ # percent to use as training set. 
   n <- floor(n_percent*N/100)
   # Set storing objects -----
   
@@ -130,7 +131,7 @@ for(n_percent in ns){
   
   # simulation -----
   system.time(  
-    for(i in 1:reps){
+    for(i in sims){
       
       trainIndices <- sort(sample(1:N, n))
       holdIndices <- c(1:N)[-trainIndices]

@@ -5,7 +5,7 @@ library(tidyverse)
 
 
 
-sims <- 1:10
+sims <- c(1)
 
 ass.vec <- c(1.25, 5, 10) #c(1.25, 2.5,5,10,20) 
 scale_vec <- c(0.5,1, 2) #round(c(0.5, 1/sqrt(2),1, sqrt(2), 2),2)

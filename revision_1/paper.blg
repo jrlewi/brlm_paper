@@ -5,45 +5,45 @@ The style file: apalike.bst
 Database file #1: refPaper1.bib
 Warning--I didn't find a database entry for ""
 Warning--empty journal in jung2014
-You've used 32 entries,
+You've used 34 entries,
             1935 wiz_defined-function locations,
-            686 strings with 8808 characters,
-and the built_in function-call counts, 12676 in all, are:
-= -- 1273
-> -- 471
-< -- 21
-+ -- 158
-- -- 154
-* -- 1071
-:= -- 2216
-add.period$ -- 99
-call.type$ -- 32
-change.case$ -- 234
-chr.to.int$ -- 32
-cite$ -- 33
-duplicate$ -- 459
-empty$ -- 904
-format.name$ -- 206
-if$ -- 2475
+            700 strings with 9266 characters,
+and the built_in function-call counts, 13439 in all, are:
+= -- 1351
+> -- 491
+< -- 24
++ -- 166
+- -- 160
+* -- 1128
+:= -- 2342
+add.period$ -- 105
+call.type$ -- 34
+change.case$ -- 247
+chr.to.int$ -- 34
+cite$ -- 35
+duplicate$ -- 494
+empty$ -- 960
+format.name$ -- 216
+if$ -- 2631
 int.to.chr$ -- 1
 int.to.str$ -- 0
-missing$ -- 34
-newline$ -- 164
-num.names$ -- 96
-pop$ -- 168
+missing$ -- 36
+newline$ -- 174
+num.names$ -- 102
+pop$ -- 178
 preamble$ -- 2
-purify$ -- 237
+purify$ -- 250
 quote$ -- 0
-skip$ -- 352
+skip$ -- 382
 stack$ -- 0
-substring$ -- 1025
-swap$ -- 42
-text.length$ -- 1
+substring$ -- 1082
+swap$ -- 51
+text.length$ -- 2
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 186
+type$ -- 198
 warning$ -- 1
-while$ -- 107
+while$ -- 114
 width$ -- 0
-write$ -- 422
+write$ -- 448
 (There were 2 warnings)

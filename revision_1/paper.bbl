@@ -77,6 +77,13 @@ Kass, R.~E. and Raftery, A.~E. (1995).
 \newblock {B}ayes factors.
 \newblock {\em Journal of the American Statistical Association}, 90:773--795.
 
+\bibitem[Kass and Wasserman, 1995]{kass1995reference}
+Kass, R.~E. and Wasserman, L. (1995).
+\newblock A reference bayesian test for nested hypotheses and its relationship
+  to the schwarz criterion.
+\newblock {\em Journal of the american statistical association},
+  90(431):928--934.
+
 \bibitem[Lee and MacEachern, 2014]{lee2014}
 Lee, J. and MacEachern, S.~N. (2014).
 \newblock Inference functions in high dimensional bayesian inference.
@@ -177,5 +184,12 @@ Tavar{\'e}, S., Balding, D.~J., Griffiths, R., and Donnelly, P. (1997).
 Yuan, A. and Clarke, B. (2004).
 \newblock Asymptotic normality of the posterior given a statistic.
 \newblock {\em The Canadian Journal of Statistics}, 32:119--137.
+
+\bibitem[Zellner, 1986]{zellner1986}
+Zellner, A. (1986).
+\newblock On assessing prior distributions and {B}ayesian regression analysis
+  with g-prior distributions.
+\newblock {\em {In} {B}ayesian Inference and Decision Techniques: Essays in
+  Honor of Bruno de Finetti}, page 233.
 
 \end{thebibliography}

@@ -7,6 +7,33 @@ ns <- c(10, 25, 50) #sample size for training set
 states <- c(2,3,27)
 v_inflate <- c(5, 10, 50, 100)
 
+# plots ---- 
+analysis_data <- read_rds(file.path(here::here(), 'data', 'analysis_data.rds'))
+
+analysis_data <- analysis_data %>% 
+  mutate(sqrt_count_2010 = sqrt(Count_2010), sqrt_count_2012 = sqrt(Count_2012)) %>% filter(State %in% states)
+
+
+ggplot(analysis_data) + geom_point(aes(x = sqrt_count_2010, y = sqrt_count_2012, col = Type), size = 1, alpha = .5) +
+  theme_bw() + 
+  labs(x = 'square root of 2010 houshold count', y = 'square root of 2012 houshold count') +
+  theme(text = element_text(family = 'Times'))
+ggsave(file.path(getwd(), "..", "..", "figs", 'scatter_all.png'), width = 6, height = 4)
+
+
+
+analysis_data %>% group_by(State) %>% 
+  summarise(n = n())
+
+ggplot(analysis_data) + geom_point(aes(x = sqrt_count_2010, y = sqrt_count_2012, col = Type), size = 1, alpha = .25) +
+  facet_wrap(~State, labeller = label_bquote(State ~ .(State)))+ 
+  theme_bw() + 
+  labs(x = 'square root of 2010 houshold count', y = 'square root of 2012 houshold count') +
+  theme(text = element_text(family = 'Times'))
+ggsave(file.path(getwd(), "..", "..", "figs", 'scatter_by_state.png'), width = 6, height = 4)
+
+
+
 
 logical_ytibble <- function(y_open, colname){
   #works on y_open, y_type1 logical matrices
