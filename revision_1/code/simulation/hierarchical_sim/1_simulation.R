@@ -4,37 +4,34 @@
 
 # 'Complete' represents full data posteriors
 # 'Incomplete' represents our restricted versions
+library(parallel)
+
+
 
 date() # SteveMod
 
 # rm(list=ls())
 # source('//trad/profs$/maceachern.1/Desktop/LEWIS.LEE/codeForPaper/codeForPaper/simulation/StevesimulationSourceCode.R')
 source('SimulationSourceCode.R')
-st<-Sys.time()
-set.seed(123) # for reproducible results
+st <- Sys.time()
 
-#concTau2Near1<-0 #1: then concentrate tau^2 prior near 1. 0: then don't and a=b=0
+a<-0; b<-0
 
-# if(concTau2Near1){
-#   mu<-1
-#   v<-.00001
-#   a<-mu^2/v-2 #most prob between .99 and 1.01
-#   b<-mu*(a-1)
-# } else {
-  a<-0; b<-0
-# }
 
 
 sigma2True<- 4 #true values of sigma2 to try for #the generation of data
 #sigma2True <- 4  # SteveMod
 #ass <- 1.25 # SteveMod
-ass.vec <- c(1.25, 2.5,5,10,20) #values of shape parameter (alpha) on sigma_i^2 to use.
-scale_vec <- c(0.5, 1/sqrt(2),1, sqrt(2), 2) #values of scale to use to define the scale parameter on sigma_i^2 where  beta_ss = alpha_ss * sig2True * scale. A value of 1 shrinks to the correct value of sigma2.  
+ass.vec <- c(1.25, 5 , 10) #values of shape parameter (alpha) on sigma_i^2 to use. #c(1.25, 2.5, 5 , 10, 20)
+scale_vec <- c(0.5,1, 2) #c(0.5, 1/sqrt(2),1, sqrt(2), 2) #values of scale to use to define the scale parameter on sigma_i^2 where  beta_ss = alpha_ss * sig2True * scale. A value of 1 shrinks to the correct value of sigma2.  
 
 #size of MCMC chain
-nburn <- 1000
-nkeep <- 1000
-  
+nburn <- 1500
+nkeep <- 1500
+
+sims <- 21:30
+set.seed(min(sims)) # for reproducible results
+
 #print progess after printEach interations
 printEach <- floor(nkeep/2)
 #max number of iterations for the rlm fit
@@ -47,12 +44,14 @@ for(sig2True in sigma2True){
 #sigma2True <- 4  # SteveMod
 #sig2True <- 4    # SteveMod
 
-# Generate the data ----
+
 dir_to_save_data <- file.path(getwd(), paste0('data_', "sig2_", sig2True))
 dir.create(dir_to_save_data, showWarnings = FALSE)
-  
-YList<-fn.gen.data(sig2True)
-saveRDS(YList, file.path(dir_to_save_data,  'data.rds'))
+
+for(data_sim in sims){
+# Generate the data ----  
+YList <- fn.gen.data(sig2True)
+saveRDS(YList, file.path(dir_to_save_data,  paste0('data_',data_sim,'.rds')))
   factorsList<-YList$factorsList
   factorsMat<-matrix(unlist(factorsList), nrow=90, ncol=3, byrow = TRUE)
   p<-factorsMat[,1]
@@ -62,7 +61,9 @@ saveRDS(YList, file.path(dir_to_save_data,  'data.rds'))
   YList<-YList$yList
 
 for(scale_a_ss in scale_vec){  
-  for (ass in ass.vec){    # SteveMod
+# cl <- makeCluster(detectCores(), type="FORK")
+# registerDoParallel(cl) 
+for(ass in ass.vec){    # SteveMod
 # SteveMod 
 
 # dir_to_save_in <- file.path(getwd(), paste0("a_s_", ass,'__', "scale_a_s_", round(scale_a_ss,2), '__', "sig2_", sig2True))
@@ -82,7 +83,7 @@ thetaInt <- rnorm(90, sapply(YList, mean))
 
 muInt <- rnorm(1, mean(thetaInt))
 
-print(paste('Begin normal theory fit: a_s set to', ass, ' scale_a_ss set to', scale_a_ss, ' and sigma2 set to', sig2True))
+print(paste('Begin normal theory fit ', data_sim, ': a_s set to', ass, ' scale_a_ss set to', scale_a_ss, ' and sigma2 set to', sig2True))
 
 completeFit <- fn.complete.MCMC(YList, 
                               nkeep=nkeep, 
@@ -96,9 +97,9 @@ completeFit <- fn.complete.MCMC(YList,
                               b=b, ass=ass, bss=bss) # SteveMod
 
 
-print(paste('End normal theory fit: a_s set to', ass, ' scale_a_ss set to', scale_a_ss, ' and sigma2 set to', sig2True))
+# print(paste('End normal theory fit ', data_sim, ': a_s set to', ass, ' scale_a_ss set to', scale_a_ss, ' and sigma2 set to', sig2True))
 
-saveRDS(completeFit, file = file.path(results_dir, paste0('normal',"__as_", ass,'__', "scale_as_", round(scale_a_ss,2), '__', "sig2_", sig2True, '.rds')))
+saveRDS(completeFit, file = file.path(results_dir, paste0('normal_', data_sim, '__as_', ass,'__', "scale_as_", round(scale_a_ss,2), '__', "sig2_", sig2True, '.rds')))
 
 #
 # Fit Incomplete method with Huber/Huber----
@@ -108,7 +109,7 @@ saveRDS(completeFit, file = file.path(results_dir, paste0('normal',"__as_", ass,
 thetaInt<-rnorm(90, sapply(YList, mean))
 muInt<-rnorm(1, mean(thetaInt))
 
-print(paste('Begin restricted Huber fit: a_s set to', ass, ' scale_a_ss set to', scale_a_ss, ' and sigma2 set to', sig2True))
+print(paste('Begin restricted Huber fit ', data_sim, ': a_s set to', ass, ' scale_a_ss set to', scale_a_ss, ' and sigma2 set to', sig2True))
 
 incompleteFitHuber<-fn.Incomplete.MCMC(YList,
                                    regEst='Huber',
@@ -124,12 +125,10 @@ incompleteFitHuber<-fn.Incomplete.MCMC(YList,
                                    a=a, 
                                    b=b, ass=ass, bss=bss) # SteveMod
 
-print(paste('End restricted Huber fit: a_s set to', ass, ' scale_a_ss set to', scale_a_ss, ' and sigma2 set to', sig2True))
-
-saveRDS(incompleteFitHuber, file = file.path(results_dir, paste0('huber',"__as_", ass,'__', "scale_as_", round(scale_a_ss,2), '__', "sig2_", sig2True, '.rds')))
+# print(paste('End restricted Huber fit ', data_sim, ': a_s set to', ass, ' scale_a_ss set to', scale_a_ss, ' and sigma2 set to', sig2True))
 
 
-
+saveRDS(incompleteFitHuber, file = file.path(results_dir, paste0('huber_', data_sim, '__as_', ass,'__', "scale_as_", round(scale_a_ss,2), '__', "sig2_", sig2True, '.rds')))
 
 
 #
@@ -141,9 +140,11 @@ saveRDS(incompleteFitHuber, file = file.path(results_dir, paste0('huber',"__as_"
 thetaInt<-rnorm(90, sapply(YList, mean))
 muInt<-rnorm(1, mean(thetaInt))
 
-print(paste('Begin restricted Tukey fit: a_s set to', ass, ' scale_a_ss set to', scale_a_ss, ' and sigma2 set to', sig2True))
+print(paste('Begin restricted Tukey fit ', data_sim, ': a_s set to', ass, ' scale_a_ss set to', scale_a_ss, ' and sigma2 set to', sig2True))
 
-incompleteFitTukey<-fn.Incomplete.MCMC(YList,
+
+
+incompleteFitTukey <- fn.Incomplete.MCMC(YList,
                                        regEst='Tukey',
                                        scaleEst='Huber',
                                        nkeep=nkeep, 
@@ -156,11 +157,15 @@ incompleteFitTukey<-fn.Incomplete.MCMC(YList,
                                        maxit=maxit,
                                        a=a,
                                        b=b, ass=ass, bss=bss) # SteveMod
-print(paste('End restricted Tukey fit: a_s set to', ass, ' scale_a_ss set to', scale_a_ss, ' and sigma2 set to', sig2True))
 
-saveRDS(incompleteFitTukey, file = file.path(results_dir, paste0('tukey',"__as_", ass,'__', "scale_as_", round(scale_a_ss,2), '__', "sig2_", sig2True, '.rds')))
-    } 
+# print(paste('End restricted Tukey fit ', data_sim, ': a_s set to', ass, ' scale_a_ss set to', scale_a_ss, ' and sigma2 set to', sig2True))
+
+saveRDS(incompleteFitTukey, file = file.path(results_dir, paste0('tukey_', data_sim, '__as_', ass,'__', "scale_as_", round(scale_a_ss,2), '__', "sig2_", sig2True, '.rds')))
+
+}
+# stopCluster(cl)
   }
+}
 }
 
 

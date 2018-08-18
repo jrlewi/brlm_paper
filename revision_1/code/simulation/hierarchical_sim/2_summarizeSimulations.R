@@ -3,15 +3,16 @@
 #
 library('tidyverse')
 
-
+sims <- 1:10
+dfs_all <- vector('list', length(sims))
+for(data_sim in sims){
 # load the data, along with the factor levels, and true values of theta
-data <- read_rds(file.path(getwd(),'data_sig2_4', 'data.rds'))
+data <- read_rds(file.path(getwd(),'data_sig2_4', paste0('data_', data_sim, '.rds')))
 n_groups <- length(data$theta)
 results_df <- file.path(getwd(), 'results')
 
-ass.vec <- c(1.25, 2.5,5,10,20) 
-scale_vec <- round(c(0.5, 1/sqrt(2),1, sqrt(2), 2),2)
-
+ass.vec <- c(1.25, 5, 10) #c(1.25, 2.5,5,10,20) 
+scale_vec <- c(0.5,1, 2) #round(c(0.5, 1/sqrt(2),1, sqrt(2), 2),2)
 sig2 <- 4
 
 
@@ -22,7 +23,7 @@ i <- 1
 for(ss in sig2){
   for(as in ass.vec){
     for(sc in scale_vec){
-      rds_name <- paste0("__as_", as,"__scale_as_", sc, "__sig2_", ss, ".rds")
+      rds_name <- paste0("_",data_sim, "__as_", as,"__scale_as_", sc, "__sig2_", ss, ".rds")
     
     huber <- read_rds(file.path(results_df, paste0("huber", rds_name)))
     
@@ -77,31 +78,45 @@ for(ss in sig2){
   }
 }
 
-df_estimates <- bind_rows(dfs)
+dfs_all[[data_sim]] <- bind_rows(dfs)
 
+}
 
+df_estimates <- bind_rows(dfs_all, .id = 'simulation')
 
 df_mse <- df_estimates %>% 
+  group_by(simulation, statistic, method, a_s, scale_as, sigma2) %>% 
+  summarise(MSE = mean((theta - theta_hat)^2)) %>% 
+  ungroup() %>% 
   group_by(statistic, method, a_s, scale_as, sigma2) %>% 
-  summarise(MSE = mean((theta - theta_hat)^2))
+  summarise(mean_MSE = mean(MSE), sd_MSE = sd(MSE)) %>% ungroup() %>% 
+  mutate(a_s = as.character(a_s), scale_as = as.character(scale_as))
 
+labels_vals <- scale_color_discrete(name="Method/Statistic",
+                                   breaks= c("restricted.Huber","rlm.Huber","restricted.Tukey","rlm.Tukey"),
+                                   labels=c("Restricted/Huber", "Rlm/Huber", "Restricted/Tukey", "Rlm/Tukey"))  
 
-
-ggplot(df_mse, aes(x = as.factor(a_s), y = MSE, col = interaction(method,statistic), group = interaction(method,statistic))) +
-  geom_line() + geom_point() +
-  facet_wrap(~scale_as) + theme_bw()
+theme_set(theme_bw())
+ggplot(df_mse %>%  filter(method != 'Normal' & statistic != 'Normal'), aes(x = as.factor(a_s), y = mean_MSE, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_MSE - sd_MSE/sqrt(length(sims)), ymax = mean_MSE + sd_MSE/sqrt(length(sims))), linetype = 2, width = .1, position = position_dodge(width = .5)) + geom_point(position = position_dodge(width = .5)) +
+  facet_wrap(~scale_as,  labeller = label_bquote(c == .(scale_as))) +
+  labs(x = expression(a[s]), y = 'Average MSE') + labels_vals + theme(text = element_text(family = 'Times')) 
+  
+#  theme(text = element_text(family = 'Times')) + guides(col = guide_legend(title="Method/Statistic")) +
+#+  guides(fill=guide_legend(title="Method/Statistic"))
 ggsave(file.path(getwd(), "..", "..", "..", "figs", 'mse_sim2_facet_scale.png'))
 
 
-ggplot(df_mse, aes(x = as.factor(scale_as), y = MSE, col = interaction(method,statistic), group = interaction(method,statistic))) +
-  geom_line() + geom_point() +
-  facet_wrap(~a_s) + theme_bw()
+
+ggplot(df_mse, aes(x = as.factor(scale_as), y = mean_MSE, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_MSE - sd_MSE/sqrt(length(sims)), ymax = mean_MSE + sd_MSE/sqrt(length(sims))), linetype = 2, width = .1, position = position_dodge(width = .5)) +
+  geom_point(position = position_dodge(width = .5)) +
+  facet_wrap(~a_s,   labeller = label_bquote(a[s] == .(a_s))) +
+  labs(x = expression(c),  y = 'Average MSE') + labels_vals + theme(text = element_text(family = 'Times')) 
+
 ggsave(file.path(getwd(), "..", "..", "..", "figs", 'mse_sim2_facet_as.png'))
 
 
 
 # K - L divergence evaluation metric -----
-
 # K-L Divergence E[log f(y_good_i|theta_i, sig2True)/ f(y_good_i) ], expected value taken with respect to  f(y_good_i|theta_i, sig2True)
 
 
@@ -185,13 +200,16 @@ ngridpts <- 100
 factor_list <- as.data.frame(do.call(rbind, data$factorsList))  
 names(factor_list) <- c('p', 'n','m')
 
+
+dfs_all <- vector('list', length(sims))
+for(data_sim in sims){
 dfs <- vector('list', length(ass.vec)*length(scale_vec)*length(sig2))
 i <- 1
 for(ss in sig2){
   for(as in ass.vec){
     for(sc in scale_vec){
       
-      rds_name <- paste0("__as_", as,"__scale_as_", sc, "__sig2_", ss, ".rds")
+      rds_name <- paste0("_",data_sim, "__as_", as,"__scale_as_", sc, "__sig2_", ss, ".rds")
       #huber
       fit <- read_rds(file.path(results_df, paste0("huber", rds_name)))
       #compute KL 
@@ -207,7 +225,7 @@ for(ss in sig2){
     huber_kl_rlm <-  as_tibble(cbind(factor_list, KL = kl, statistic = 'Huber', method = 'rlm', a_s = as,
                          scale_as = sc,
                          sigma2 = ss))
-      
+      #tukey
       fit <- read_rds(file.path(results_df, paste0("tukey", rds_name)))
       #compute KL 
       kl <- compute_KL_each_group(ngridpts, thetaTrueVect = data$theta, sig2True = sig2,thetaSamplesMat = fit$theta, sigma2SamplesMat = fit$sigma2)
@@ -223,7 +241,7 @@ for(ss in sig2){
                                            scale_as = sc,
                                            sigma2 = ss))
       
-      
+      #normal
      fit <- read_rds(file.path(results_df, paste0("normal", rds_name)))
       #compute KL 
       kl <- compute_KL_each_group(ngridpts, thetaTrueVect = data$theta, sig2True = sig2,thetaSamplesMat = fit$theta, sigma2SamplesMat = fit$sigma2)
@@ -238,50 +256,91 @@ for(ss in sig2){
     }
   }
 }
+dfs_all[[data_sim]] <- bind_rows(dfs)
+print(data_sim)
+}
+
+df_kl <- bind_rows(dfs_all, .id = 'simulation')
+
 
 #Note - warnings are just coercion rules - variables treated as factors wihtout the same levels coerced to characters...no big deal here. 
 
-df_kl <- bind_rows(dfs)
-
-fctrs <- c('p', 'n', 'm', 'statistic', 'method', 'a_s', 'scale_as')
-df_kl <- df_kl %>% mutate_at(fctrs, funs(factor))
+#fctrs <- c('p', 'n', 'm', 'statistic', 'method', 'a_s', 'scale_as')
+#df_kl <- df_kl %>% mutate_at(fctrs, funs(factor))
 
 df_kl_mean <- df_kl %>% 
+  group_by(simulation, statistic, method, a_s, scale_as, sigma2) %>% 
+  summarise(KL = mean(KL)) %>% 
+  ungroup() %>% 
   group_by(statistic, method, a_s, scale_as, sigma2) %>% 
-  summarise(KL = mean(KL))
+  summarise(mean_KL = mean(KL), sd_KL = sd(KL))
 
 
 
-ggplot(df_kl_mean , aes(x = as.factor(a_s), y = KL, col = interaction(method,statistic), group = interaction(method,statistic))) +
-  geom_line() + geom_point() +
-  facet_wrap(~scale_as) + theme_bw()
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_facet_scale.png'))
 
+ggplot(df_kl_mean %>% filter(method != 'Normal', statistic != 'Normal') , aes(x = as.factor(a_s), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(length(sims)), ymax = mean_KL + sd_KL/sqrt(length(sims))), linetype = 1, width = 0, position = position_dodge(width = .5)) +
+  geom_point(position = position_dodge(width = .5)) +
+  facet_wrap(~scale_as,   labeller = label_bquote(c == .(scale_as))) +
+  labs(x = expression(a[s]),  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
 
-ggplot(df_kl_mean, aes(x = as.factor(scale_as), y = KL, col = interaction(method,statistic), group = interaction(method,statistic))) +
-  geom_line() + geom_point() +
-  facet_wrap(~a_s) + theme_bw()
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_facet_as.png'))
+ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_facet_scale.png'), width = 6, height = 4)
 
 
 
+ggplot(df_kl_mean %>% filter(method != 'Normal', statistic != 'Normal'), aes(x = as.factor(scale_as), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(length(sims)), ymax = mean_KL + sd_KL/sqrt(length(sims))), linetype = 1, width = 0, position = position_dodge(width = .5)) +
+  geom_point(position = position_dodge(width = .5)) +
+  facet_wrap(~a_s,   labeller = label_bquote(a[s] == .(a_s))) +
+  labs(x = expression(c),  y = 'Average KL') +  theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
+
+ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_facet_as.png'), width = 6, height = 4)
+
+saveRDS(list(df_kl, df_estimates), file = 'summarize_data_frames.rds')
 # investigate convergence of variance estimators in mixture model ---
 
-gen_data <- function(m,n,p){
-  ps <- rbinom(n,1,p)
-  vars<-ifelse(ps, m, 1)*sig2
-  rnorm(n, 0, sqrt(vars))
-}
-m <- 25; n <- 100; p <- .3
-n_sims <- 100
-s2_ests <- sapply(1:n_sims, function(sim){
-  y <- gen_data(m,n,p)
-  fit <- MASS::rlm(y~1, scale.est = "Huber")
-  fit$s^2
-})
-
-s2_ests <- tibble(var_estimates = s2_ests, m = rep(m, n_sims), n = rep(n, n_sims), p = rep(p, n_sims))
 
 
-ggplot(s2_ests, aes(x = var_estimates, col = factor(m), fill = factor(n), alpha = factor(p))) + geom_histogram() + geom_vline(xintercept = sig2)
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'hist_sig2_ests.png'))
+# gen_data <- function(m,n,p){
+#   ps <- rbinom(n,1,p)
+#   vars<-ifelse(ps, m, 1)*sig2
+#   rnorm(n, 0, sqrt(vars))
+# }
+# m <- 25; n <- 100; p <- .3
+# n_sims <- 100
+# s2_ests <- sapply(1:n_sims, function(sim){
+#   y <- gen_data(m,n,p)
+#   fit <- MASS::rlm(y~1, scale.est = "Huber")
+#   fit$s^2
+# })
+# 
+# s2_ests <- tibble(var_estimates = s2_ests, m = rep(m, n_sims), n = rep(n, n_sims), p = rep(p, n_sims))
+# 
+# 
+# ggplot(s2_ests, aes(x = var_estimates, col = factor(m), fill = factor(n), alpha = factor(p))) + geom_histogram() + geom_vline(xintercept = sig2)
+# ggsave(file.path(getwd(), "..", "..", "..", "figs", 'hist_sig2_ests.png'))
+# 
+# 
+# 
+# # look at individual simualtions....
+# tmp <- df_kl %>% 
+#   group_by(simulation, statistic, method, a_s, scale_as, sigma2) %>% 
+#   summarise(KL = mean(KL)) 
+# 
+# #View(tmp %>% ungroup() %>% group_by(simulation) %>%  
+# #  summarise(min = min(KL)))
+# #unique(tmp$simulation)
+# 
+# 
+# tmp <- tmp %>% filter(simulation == '10')
+# # ggplot(tmp , aes(x = as.factor(scale_as), y = KL, col = interaction(method,statistic), group = interaction(method,statistic))) +
+# #   geom_point(position = position_dodge(width = .5)) + geom_line(position = position_dodge(width = .5)) +
+# #   facet_wrap(~a_s) + theme_bw()
+# 
+# 
+# ggplot(tmp , aes(x = as.factor(a_s), y = KL, col = interaction(method,statistic), group = interaction(method,statistic))) +
+#   geom_point(position = position_dodge(width = .5)) + geom_line(position = position_dodge(width = .5)) +
+#   facet_wrap(~scale_as) + theme_bw()
+
+
+
+
+
