@@ -3,7 +3,7 @@
 #
 library('tidyverse')
 
-sims <- 1:10
+sims <- 1:30
 dfs_all <- vector('list', length(sims))
 for(data_sim in sims){
 # load the data, along with the factor levels, and true values of theta
@@ -297,7 +297,81 @@ ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_facet_as.png'), wid
 saveRDS(list(df_kl, df_estimates), file = 'summarize_data_frames.rds')
 # investigate convergence of variance estimators in mixture model ---
 
+# Effects of n, p, or m
 
+#note the rlm results are simply repeated for each a_s and scale_as - when grouping by n (or p, or m) - the averages for each simulation are computed over the repeated results too - but these averages are the same as if one result was used. The SE are computed as the sd of these averages - so it doesn't change the calculation if I subset the rlm results to get rid of the repeats
+# n ----
+df_kl %>% filter(method == 'rlm', statistic == 'Huber', simulation == '1')
+df_kl %>% filter(method == 'restricted', statistic == 'Huber', simulation == '1')
+
+
+df_kl_mean_n <- df_kl %>% #filter(method != 'rlm') %>% 
+  group_by(simulation, n, statistic, method, sigma2) %>% 
+  summarise(KL = mean(KL)) %>% 
+  ungroup() %>% 
+  group_by(n, statistic, method, sigma2) %>% 
+  summarise(mean_KL = mean(KL), sd_KL = sd(KL), num = n())
+
+# df_kl_mean_n_rlm  <- df_kl %>% filter(method == 'rlm', a_s == '5', scale_as == '2') %>% group_by(simulation, n, statistic, method, sigma2) %>%
+#   summarise(KL = mean(KL)) %>%
+#   ungroup() %>%
+#   group_by(n, statistic, method, sigma2) %>%
+#   summarise(mean_KL = mean(KL), sd_KL = sd(KL), num = n())
+
+
+#bind_rows(df_kl_mean_n, df_kl_mean_n_rlm)
+ggplot(df_kl_mean_n %>% filter(method != 'Normal', statistic != 'Normal') , aes(x = as.factor(n), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + 
+  geom_point(position = position_dodge(width = .5)) +
+  geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(num), ymax = mean_KL + sd_KL/sqrt(num)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
+  # facet_wrap(~ n,   labeller = label_bquote(n == .(n))) +
+  labs(x = "n",  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
+ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_n.png'), width = 6, height = 4)
+
+
+# m----
+df_kl_mean_m <- df_kl %>% 
+  group_by(simulation, m, statistic, method, sigma2) %>% 
+  summarise(KL = mean(KL)) %>% 
+  ungroup() %>% 
+  group_by(m, statistic, method, sigma2) %>% 
+  summarise(mean_KL = mean(KL), sd_KL = sd(KL), num = n())
+
+
+ggplot(df_kl_mean_m %>% filter(method != 'Normal', statistic != 'Normal') , aes(x = as.factor(m), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + 
+  geom_point(position = position_dodge(width = .5)) +
+  geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(num), ymax = mean_KL + sd_KL/sqrt(num)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
+  # facet_wrap(~ n,   labeller = label_bquote(n == .(n))) +
+  labs(x = "m",  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
+ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_m.png'), width = 6, height = 4)
+
+# p -----
+df_kl_mean_p <- df_kl %>% 
+  group_by(simulation, p, statistic, method, sigma2) %>% 
+  summarise(KL = mean(KL)) %>% 
+  ungroup() %>% 
+  group_by(p, statistic, method, sigma2) %>% 
+  summarise(mean_KL = mean(KL), sd_KL = sd(KL), num = n())
+
+
+ggplot(df_kl_mean_p %>% filter(method != 'Normal', statistic != 'Normal') , aes(x = as.factor(p), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + 
+  geom_point(position = position_dodge(width = .5)) +
+  geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(num), ymax = mean_KL + sd_KL/sqrt(num)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
+  # facet_wrap(~ n,   labeller = label_bquote(n == .(n))) +
+  labs(x = "p",  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
+ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_p.png'), width = 6, height = 4)
+
+
+# attempt at using facet wrap...
+df_nmp <- (bind_rows(df_kl_mean_n,df_kl_mean_m,df_kl_mean_p))
+df_nmp <- (df_nmp %>% gather(variable, value, n,m,p, na.rm = TRUE))
+
+
+ggplot(df_nmp %>% filter(method != 'Normal', statistic != 'Normal') , aes(x = as.factor(value), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) +
+  geom_point(position = position_dodge(width = .5)) +
+  geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(num), ymax = mean_KL + sd_KL/sqrt(num)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
+  facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") +
+  labs(x = "Value",  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
+ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_mnp.png'), width = 6, height = 4)
 
 # gen_data <- function(m,n,p){
 #   ps <- rbinom(n,1,p)
