@@ -1,16 +1,41 @@
-\documentclass[12pt]{article}
-%\documentclass[ba]{imsart}
+\RequirePackage{etoolbox}
+\csdef{input@path}{%
+ {sty/}% cls, sty files
+ {img/}% eps files
+}%
+\csgdef{bibdir}{bib/}% bst, bib files
 
-\usepackage{fullpage,amsmath}% mathtools}
-\usepackage{setspace}
+\documentclass[ba]{imsart}
+%
+\pubyear{0000}
+\volume{00}
+\issue{0}
+\doi{0000}
+\firstpage{1}
+\lastpage{1}
+
+%
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{natbib}
+\usepackage[colorlinks,citecolor=blue,urlcolor=blue,filecolor=blue,backref=page]{hyperref}
+\usepackage{graphicx}
+
+\startlocaldefs
+
+\endlocaldefs
+
+
+%\usepackage{fullpage,amsmath}% mathtools}
+%\usepackage{setspace}
 \usepackage{graphicx, psfrag, amsfonts, float}
 \usepackage{natbib}
 \usepackage{amsthm}
 \usepackage{multirow}
 \usepackage{hhline}
 %\usepackage{color}
-\usepackage[position=t,singlelinecheck=off]{subcaption}
-\usepackage{caption, setspace}
+%\usepackage[position=t,singlelinecheck=off]{subcaption}
+%\usepackage{caption, setspace}
 %\usepackage[position=t,singlelinecheck=off]{subfigure}
  \pdfminorversion=4
 \usepackage{rotating}
@@ -154,14 +179,30 @@
 %  been stated in the Corollary).  Once more details are in place, proof reading and adjustment.  
 
 %\newpage
-\title{Bayesian Restricted Likelihood Methods: Conditioning on Insufficient Statistics in Bayesian Regression}
-\author{John R. Lewis, Steven N. MacEachern and  Yoonkyung Lee \\
-{\small \it Department of Statistics, The Ohio State University, Columbus, Ohio 43210}\\
-{\small lewis.865@osu.edu, snm@stat.osu.edu and yklee@stat.osu.edu}
-\thanks{This research has been supported by Nationwide Insurance Company and by the NSF under grant numbers DMS-1007682 and DMS-1209194.  The views in this paper are not necessarily those of Nationwide Insurance or the NSF.}} 
+
 \begin{document}
-\date{}
-\maketitle
+
+\begin{frontmatter}
+\title{Bayesian Restricted Likelihood Methods: Conditioning on Insufficient Statistics in Bayesian Regression\thanksref{T1}}
+\runtitle{Bayesian Restricted Likelihood Methods}
+\thankstext{T1}{This research has been supported by Nationwide Insurance Company and by the NSF under grant numbers DMS-1007682 and DMS-1209194.  The views in this paper are not necessarily those of Nationwide Insurance or the NSF.} 
+
+\begin{aug}
+\author{\fnms{John R.} \snm{Lewis}\thanksref{addr1,m1}\ead[label=e1]{lewis.865@osu.edu}}, 
+\author{\fnms{Steven N.} \snm{MacEachern}\thanksref{addr1,m1}\ead[label=e2]{snm@stat.osu.edu}}, 
+\and  
+\author{\fnms{Yoonkyung} \snm{Lee}\thanksref{addr1,m1}\ead[label=e3]{yklee@stat.osu.edu}} \\
+%{\small \it Department of Statistics, The Ohio State University, Columbus, Ohio 43210}\\
+%{\small lewis.865@osu.edu, snm@stat.osu.edu and yklee@stat.osu.edu}
+\runauthor{J. Lewis et al}
+
+\address[addr1]{Department of Statistics, The Ohio State University, Columbus, Ohio 43210 
+    \printead{e1}, % print email address of "e1"
+    \printead*{e2},
+    \printead*{e3}
+}
+\end{aug}
+
 
 \begin{abstract}
 Bayesian methods have proven themselves to be successful across a wide
@@ -181,9 +222,7 @@ sensitivity of the analysis to features of the data not captured by
 the conditioning statistics. For reducing sensitivity to outliers,
 classical robust estimators (e.g., M-estimators) are natural choices
 for conditioning statistics. With these choices, the method can be thought of as a
-blend of classical robust estimation and Bayesian methods. 
-
-A major contribution of this work is the development of a data 
+blend of classical robust estimation and Bayesian methods. A major contribution of this work is the development of a data 
 augmented Markov chain Monte Carlo (MCMC) algorithm
 for the linear model and a wide range of choices for
 summary statistics. We demonstrate the method on an
@@ -191,12 +230,24 @@ insurance agency data set containing many outliers and subject to model
 misspecification. Success is manifested in better predictive
 performance for data points of interest as compared to competing
 methods.
-
-\noindent KEYWORDS: Approximate Bayesian computation, Markov chain
-Monte Carlo, M-estimation, Robust regression.
-
-
 \end{abstract}
+%\noindent KEYWORDS: Approximate Bayesian computation, Markov chain
+%Monte Carlo, M-estimation, Robust regression.
+
+%\begin{keyword}[class=MSC]
+%\kwd[Primary ]{60K35}
+%\kwd{60K35}
+%\kwd[; secondary ]{60K35}
+%\end{keyword}
+
+\begin{keyword}
+\kwd{Approximate Bayesian computation}
+\kwd{Markov chain Monte Carlo}
+\kwd{M-estimation}
+\kwd{Robust regression}
+\end{keyword}
+
+\end{frontmatter}
 
 \section{Introduction}
 Bayesian methods have provided successful solutions to a wide range of scientific problems, with their value
@@ -377,42 +428,41 @@ The first example is an analysis of Simon Necomb's 66 measurements of the speed 
 \beta\sim N(23.6, 2.04^{2}),\  \sigma^{2}\sim IG(5, 10), \ y_{i}\iid N (\beta, \sigma^{2}), i=1,2,\dots, n=66,
 \end{equation}
 where $y_{i}$ denotes the $i^{th}$ measurement of the passage time of light. $\beta$ is interpreted as the passage time of light with $\sigma^{2}$ representing measurement error.
-Four versions of the restricted likelihood are fit with conditioning statistics: 1) Huber's M-estimator for location with Huber's `proposal 2'  for scale 2)  Tukey's M-estimator for location with Huber's `proposal 2'  for scale 3) LMS (least median squares) for location with associated estimator of scale and 4) LTS (least trimmed squares)  for location with associated estimator of scale. Associated tuning parameters for the M-estimators are chosen to achieve $95\%$ efficiency under normality \cite{huber1964} and for comparability, roughly $5\%$ of the residuals are trimmed for LTS.  Additionally, two other common approaches to outlier handling are fit: 1) replacing the normal distribution with a t-distribution and, 2) replacing the normal distribution with a mixture of two normals. The t-model assumes $y_{i}\iid t_{\nu} (\beta, \sigma^{2})$ with $\nu=5$. The prior on $\sigma^{2}$ is $IG(5, \frac{\nu-2}{\nu}10)$ so the prior on the variance is the same as the other models. The mixture takes the form: $y_{i}\iid pN (\beta, \sigma^{2}) + (1-p)N(\beta, 10\sigma^{2})$ assuming the prior $p \sim beta(20,1)$ on the probability of belonging to the `good' component.  
+Four versions of the restricted likelihood are fit with conditioning statistics: 1) Huber's M-estimator for location with Huber's `proposal 2'  for scale 2)  Tukey's M-estimator for location with Huber's `proposal 2'  for scale 3) LMS (least median squares) for location with associated estimator of scale and 4) LTS (least trimmed squares)  for location with associated estimator of scale. Associated tuning parameters for the M-estimators are chosen to achieve $95\%$ efficiency under normality \citep{huber2009} and for comparability, roughly $5\%$ of the residuals are trimmed for LTS.  Additionally, two other common approaches to outlier handling are fit: 1) replacing the normal distribution with a t-distribution and, 2) replacing the normal distribution with a mixture of two normals. The t-model assumes $y_{i}\iid t_{\nu} (\beta, \sigma^{2})$ with $\nu=5$. The prior on $\sigma^{2}$ is $IG(5, \frac{\nu-2}{\nu}10)$ so the prior on the variance is the same as the other models. The mixture takes the form: $y_{i}\iid pN (\beta, \sigma^{2}) + (1-p)N(\beta, 10\sigma^{2})$ assuming the prior $p \sim \beta(20,1)$ on the probability of belonging to the `good' component.  
 
-The posteriors of $\beta$ under each model appear in top of Figure \ref{fig:newcomb_post}. As expected, the posterior under the normal model is pulled downward by the two outliers while the heavy tailed model provides robustness against them. The restricted likelihood methods using the M-estimators and LTS statistics also achieve robustness against the outliers. Conditioning on LMS however, results in a posterior similar to the one under the normal model. The M-estimators provide the most precise posteriors in this case. This is reflected in more precise predictions than the heavy-tailed and mixture model as illustrated by the predictive distributions displayed in the bottom of Figure \ref{fig:newcomb_post}.
-
-\begin{figure}
+The posteriors of $\beta$ under each model appear in Figure \ref{fig:newcomb_post}. As expected, the posterior under the normal model is pulled downward by the two outliers while the heavy tailed model provides robustness against them. The restricted likelihood methods using the M-estimators and LTS statistics also achieve robustness against the outliers. Conditioning on LMS however, results in a posterior similar to the one under the normal model. The M-estimators provide the most precise posteriors in this case. This is reflected in more precise predictions than the heavy-tailed and mixture model as illustrated by the predictive distributions displayed in  Figure \ref{fig:newcomb_predictive}.
+\begin{figure}[t]
 \centering
-\begin{subfigure}{\textwidth}
-{\includegraphics[width = 6in]{figs/speed_of_light_beta.png}}
-%\caption{}
-%\label{fig:newcomb_beta}
-\end{subfigure}
-\centering
-\begin{subfigure}{\textwidth}
-{\includegraphics[width = 6in]{figs/speed_of_light_predictive.png}}
-%\caption{}
-%\label{fig:newcomb_predictive}
-\end{subfigure}
-\caption{Top: Posteriors of the location parameter $\beta$ under the normal theory model, the t-model, and four restricted likelihood models for Newcomb's speed of light measurements. Bottom: Posterior predictive distribution of the speed of light under the normal theory model, the t-model, and four restricted likelihood models.}
+{\includegraphics[width = 4in]{figs/speed_of_light_beta.png}}
+{\includegraphics[width = 4in]{figs/speed_of_light_predictive.png}}
+\caption{asdfdfa}
 \label{fig:newcomb_post}
 \end{figure}
+
+%\begin{figure}[t]
+%\centering
+%{\includegraphics[width = 4in]{figs/speed_of_light_predictive.png}}
+%\caption{dfsfsa}
+%\label{fig:newcomb_predictive}
+%\end{figure}
+%\caption{Top: Posteriors of the location parameter $\beta$ under the normal theory model, the t-model, and four restricted likelihood models for Newcomb's speed of light measurements. Bottom: Posterior predictive distribution of the speed of light under the normal theory model, the t-model, and four restricted likelihood models.}
+%\label{fig:newcomb_post}
+%\end{figure}
 
 As a second example, a data set measuring the number of telephone calls in Belgium from 1950-1973 is analyzed. The outliers in this case are due to a change in units on which calls were recorded for part of the dataset. The full model is a standard normal Bayesian linear regression:
 
 \begin{equation}
 {\boldsymbol{\beta}}\sim N_{2}(\boldsymbol{\mu}_{0}, \boldsymbol{\Sigma}_{0}),\  \sigma^{2} \sim IG(a, b), \by \sim N(X\boldsymbol{\beta}, \sigma^{2} I),
 \end{equation}
-where $\bbeta = (\beta_{0}, \beta_{1})^{\top}$, $\by$ is the vector of the logarithm of the number of calls, and X is the $n\times 2$ design matrix.  Prior parameters are fixed via a fit to the first 3 data points. In particular, $\Sigma_{0} = g\sigma_{0}^2 (X^{\top}X)^{-1}$, with $\sigma_{0} = 0.03$ and $\mu_{0} = (1.87,  0.03)^{\top}$; the MLEs fit to the first three data points. There are $n=21$ remaining data points and the parameter $g$ is set to $21$ reflecting a unit information prior \cite{}. Finally $a = 2$ and $b =1$ for the normal theory and restricted likelihood models. 
+where $\bbeta = (\beta_{0}, \beta_{1})^{\top}$, $\by$ is the vector of the logarithm of the number of calls, and X is the $n\times 2$ design matrix.  Prior parameters are fixed via a fit to the first 3 data points. In particular, $\Sigma_{0} = g\sigma_{0}^2 (X^{\top}X)^{-1}$, with $\sigma_{0} = 0.03$ and $\mu_{0} = (1.87,  0.03)^{\top}$; the MLEs fit to the first three data points. There are $n=21$ remaining data points and the parameter $g$ is set to $21$ reflecting a unit information prior \citep{kass1995reference}. Finally $a = 2$ and $b =1$ for the normal theory and restricted likelihood models. 
 
-Four models are compared: 1) the normal theory base model 2) A two component normal mixture model, 3) a t-model, and 4) a restricted likelihood model conditioning on Tukey's M-estimator for the slope and intercept with Huber's `proposal 2'  for scale. The mixture model assumes different mean regression functions and variances for each component, but keeps the same, relatively non-informative priors. The probability of belonging to the first component is given a $beta(5,1)$ prior. The heavy-tailed model fixes the degrees of freedom to 5 with the same adjustment to the prior on $\sigma^{2}$ as above. 
+Four models are compared: 1) the normal theory base model 2) A two component normal mixture model, 3) a t-model, and 4) a restricted likelihood model conditioning on Tukey's M-estimator for the slope and intercept with Huber's `proposal 2'  for scale. The mixture model assumes different mean regression functions and variances for each component, but keeps the same, relatively non-informative priors. The probability of belonging to the first component is given a $\beta(5,1)$ prior. The heavy-tailed model fixes the degrees of freedom to 5 with the same adjustment to the prior on $\sigma^{2}$ as above. 
 
 The data and  $95\%$ credible bands of the posterior predictive distribution under each model are displayed in Figure \ref{fig:calls_predictive}. The normal theory model is only fit to the obvious non-outlying points. Since the t-model assumes the data are heavy-tailed, the posterior predictive distribution is much wider. On the other hand, the predictive distribution under the restricted likelihood approach is much more precise and is close to that of the normal theory fit that discards the outliers. It is also close to the two component mixture results where the predictive distribution is formulated using only the good component. The mixture model involves explicitly modeling the outlier generating mechanism. In more more complex situations where the outlier generating mechanism is transient (i.e. ever changing and more complex than just a unit error in the recording), modeling the outliers becomes more difficult. Like classical robust estimation, the restricted likelihood approach avoids explicitly modeling the outliers. 
-
-\begin{figure}
+\begin{figure}[t]
 \centering
-{\includegraphics[width = 6in]{figs/calls_predictive.png}}
-\caption{Predictive distribution of log(calls) under the Normal theory model fit to the non-outliers, the restricted likelihood model with  Tukey's M-estimator for the slope and intercept with Huber's `proposal 2'  for scale, and a heavy-tailed t-distribution model. The first three data points were used to specify the prior with the remaining points used in the posterior fits. See details in the Appendix.}
+{\includegraphics[width = 4in]{figs/calls_predictive.png}}
+\caption{Predictive distribution of log(calls) under the Normal theory model fit to the non-outliers, the restricted likelihood model with Tukey's M-estimator for the slope and intercept with Huber's `proposal 2'  for scale, and a heavy-tailed t-distribution model. The first three data points were used to specify the prior with the remaining points used in the posterior fits. See details in the Appendix.}
 \label{fig:calls_predictive}
 \end{figure}
 
@@ -684,12 +734,7 @@ MCMC targeting $f(\bth, \by |
 T(\by)=T(\by_{obs}))$, the joint distribution of $\bth$ and the full
 data given the summary statistic $T(\by_{obs})$. 
  The Gibbs sampler \citep{gelfand1990} iteratively samples from the
- full conditionals 
- \begin{enumerate}
- \item $\pi(\bth|\by, T(\by)=T(\by_{obs}))$ 
- \item $f(\by|\bth, T(\by)=T(\by_{obs}))$.  
- \end{enumerate}
-When $\by$ has the summary statistic $T(\by) = T(\by_{obs})$,
+ full conditionals 1) $\pi(\bth|\by, T(\by)=T(\by_{obs}))$ and 2) $f(\by|\bth, T(\by)=T(\by_{obs}))$.  When $\by$ has the summary statistic $T(\by) = T(\by_{obs})$,
 the first full conditional is the same as the full data posterior $\pi(\bth|\by)$. In this case, the condition $T(\by) = T(\by_{obs})$ is redundant.  This allows us to make use of conventional MCMC steps for this generation.  For typical regression models, algorithms abound. Details of the recommended algorithms depend on details of
 the prior distribution and sampling density and we assume this can be done \citep[see e.g.,][]{liu1994, liang2008}.  
 
@@ -724,8 +769,8 @@ using the strategy of proposing full data $\by \in \mathcal{A}:=\{\by \in \mathb
 proposal. Let $\by_p, \by_c \in \mathcal{A}$ represent the proposed and current
 full data, respectively. Denote the proposal distribution for $\by_{p}$ by $p(\by_p|\bth,T(\by_p) = T(\by_{obs})) = p(\by_p|\bth,\by_p \in \mathcal{A}) = p(\by_p | \bth)$.  The last equality follows from the fact that our $p(\cdot | \bth)$ assigns probability one to the event $\{ \by_p \in \mathcal{A} \}$.  These equalities still hold if the dummy argument $\by_p$ is replaced with $\by_c$.  The conditional density is
 \begin{eqnarray*}
-f(\by | \bth, \by \in \mathcal{A}) & = & \frac{f(\by | \bth) I(\by \in \mathcal{A} | \by, \bth)}{\int_\mathcal{A} f(\by | \bth) d\by} \\
-     & = & \frac{f(\by | \bth)}{\int_\mathcal{A} f(\by | \bth) d\by} 
+f(\by | \bth, \by \in \mathcal{A}) =  \frac{f(\by | \bth) I(\by \in \mathcal{A} | \by, \bth)}{\int_\mathcal{A} f(\by | \bth) d\by} 
+      = \frac{f(\by | \bth)}{\int_\mathcal{A} f(\by | \bth) d\by} 
 \end{eqnarray*}
 for $\by \in \mathcal{A}$.  This includes both $\by_p$ and $\by_c$.  The Metropolis-Hastings acceptance probability  is the minimum of 1 and $R$ where,
 \begin{eqnarray}
@@ -840,7 +885,7 @@ The final proposal distribution including the complete Jacobian is given in equa
 
 \begin{figure}[t]
 \centering
-\includegraphics[width=4in]{minSS3dSampleSpace.jpg}
+\includegraphics[width=2.75in]{minSS3dSampleSpace.jpg}
 \caption{A depiction of $\mathcal{A}$, $\Pi(\mathcal{A})$, and the
   unit circle for the illustrative example where $b_{1}(\mathbf{1},\by)=\min(\by)=0$ and
   $s(\mathbf{1},\by)=\sum (y_i -b_{1}(\mathbf{1},\by))^2 =1$.
@@ -947,20 +992,48 @@ dashed circle is transformed onto $\Pi(\mc A)$ contributing
 $\cos(\gamma)$ to the Jacobian. The normal vectors in panel (b) are
 orthogonal to the tangent vectors of $\Pi(\mc A)$ and the circle. %As stated above, the Jacobian is the ratio of infinitesimal lengths along these tangent vectors. This is the same as the ratio of the infinitesimal lengths of the normal vectors (i.e., $\cos(\gamma)$). This generalization extends to higher dimensions where the `lengths' along the tangent vectors become volumes along the tangent spaces. 
 
-\begin{sidewaysfigure}[t]
+%\begin{sidewaysfigure}[t]
+%\centering
+%\captionsetup{justification=centering}
+%\subcaptionbox{}{\includegraphics[width=4in]{minSSZSpace3.pdf}}\quad
+%\subcaptionbox{}{\includegraphics[width=4in]{minSSZSpace5.pdf}}
+%\caption{Panel (a) contains a depiction of the stretch from $\bz^{*}$
+%  to $\bz$. The adjustment for the stretch transforms the density
+%  along the unit circle to the density along the circle of radius
+%  $\|\bz\|$ (dashed circle).  Panel (b) contains a depiction of the
+%  deformation from the distribution along the circle to the
+%  distribution along $\Pi(\mathcal{A})$. The adjustment can be seen to
+%  be the cosine of the angle between the normals to each manifold.}
+%\label{fig:stretchDeform}
+%\end{sidewaysfigure}
+
+\begin{figure}[t]
 \centering
-\captionsetup{justification=centering}
-\subcaptionbox{}{\includegraphics[width=4in]{minSSZSpace3.pdf}}\quad
-\subcaptionbox{}{\includegraphics[width=4in]{minSSZSpace5.pdf}}
-\caption{Panel (a) contains a depiction of the stretch from $\bz^{*}$
-  to $\bz$. The adjustment for the stretch transforms the density
-  along the unit circle to the density along the circle of radius
-  $\|\bz\|$ (dashed circle).  Panel (b) contains a depiction of the
-  deformation from the distribution along the circle to the
-  distribution along $\Pi(\mathcal{A})$. The adjustment can be seen to
-  be the cosine of the angle between the normals to each manifold.}
+{\includegraphics[width=2.9in]{minSSZSpace3.pdf}}
+{\includegraphics[width=2.9in]{minSSZSpace5.pdf}}
 \label{fig:stretchDeform}
-\end{sidewaysfigure}
+\caption{sdasfda}
+\end{figure}
+
+%\begin{figure}[t]
+%\centering
+%{\includegraphics[width=2in]{minSSZSpace5.pdf}}
+%\label{fig:stretchDeform}
+%\caption{sdassfsadfda}
+%\end{figure}
+%%
+%\subcaptionbox{}{\includegraphics[width=4in]{minSSZSpace5.pdf}}
+%\caption{Panel (a) contains a depiction of the stretch from $\bz^{*}$
+%  to $\bz$. The adjustment for the stretch transforms the density
+%  along the unit circle to the density along the circle of radius
+%  $\|\bz\|$ (dashed circle).  Panel (b) contains a depiction of the
+%  deformation from the distribution along the circle to the
+%  distribution along $\Pi(\mathcal{A})$. The adjustment can be seen to
+%  be the cosine of the angle between the normals to each manifold.}
+%\label{fig:stretchDeform}
+%\end{sidewaysfigure}
+
+
 
 \vskip 0.05 in
 \noindent
@@ -1083,32 +1156,51 @@ with $\mu = 0, \tau^{2} = 1, \sigma^{2} = 4$. The values of $p_{i}, m_{i}$, and 
 & y_{ij}\sim  N(\theta_{i},\sigma^{2}_{i}), \ j = 1, 2, \dots, n_{i}.
 \end{split}
 \end{equation}
-For the restricted likelihood versions we condition on robust M-estimators of location and scale in each group: $T_{i}(\by_{i}) = (\hat\theta_{i}, \hat\sigma^{2}_{i}), i = 1, 2, ..., 90$. The two versions use Huber's and Tukey's $\psi$ function, while both versions use Huber's $\chi$ function in $\eqref{Mest}$. These estimators are implemented in the R function \texttt{MASS::rlm} and \ref{huber2009} provides further details on them. 
+For the restricted likelihood versions we condition on robust M-estimators (see,$\eqref{Mest}$) of location and scale in each group: $T_{i}(y_{i1}, \dots, y_{in_{i}}) = (\hat\theta_{i}, \hat\sigma^{2}_{i}), i = 1, 2, ..., 90$. The two versions use Huber's and Tukey's $\psi$ function, while both versions use Huber's $\chi$ function in $\eqref{Mest}$. The tuning parameters are chosen so that the estimators are $95\%$ efficient under normally distributed data \citep{huber2009}. %We will see that his choice has some interesting effects on the results. %These estimators are implemented in the R function \texttt{MASS::rlm} with \cite{huber2009} providing further details. 
 
-To complete the specification of model \eqref{fullsim2} we must specify $a_{s}$ and $b_{s}$. For this we use a variety of values representing different levels of prior knowledge. For each we set $b_{s} = 4a_{s}c_{s}$ resulting in a prior mean for each $\sigma^{2}_{i}$ of $\frac{4c_{s}a_{s}}{a_{s}-1}, \ a_{s} >1$. The precision is $\frac{(a_{s} -1)^{2}(a_{s}-2)}{(4c_{s}a_{s})^{2}}$; meaning the larger $a_{s}$, the more informative the prior. With $c_{s} = 1$ the shrinkage (for large $a_{s}$) is to the true value of $\sigma^{2} = 4$ of the variance of the good component of data in the data generating model. We consider $a_{s} = 1.25,  5, 10$ and $c_{s} = 1/2, 1, 2$. %Values of $c_{s} \neq 1$ will result in shrinkage towards the wrong value of $\sigma^{2}$.
+To complete the specification of model \eqref{fullsim2},  $a_{s}$ and $b_{s}$ are fixed to a variety of values representing different levels of prior knowledge. For each we set $b_{s} = 4a_{s}c$ resulting in a prior mean for each $\sigma^{2}_{i}$ of $\frac{4ca_{s}}{a_{s}-1}, \ a_{s} >1$. The precision is $\frac{(a_{s} -1)^{2}(a_{s}-2)}{(4ca_{s})^{2}}$; meaning the larger $a_{s}$, the more informative the prior. With $c = 1$ the shrinkage (for large $a_{s}$) is to the true value of $\sigma^{2} = 4$. We consider $a_{s} = 1.25,  5, 10$ and $c = 0.5, 1, 2$. %Values of $c \neq 1$ will result in shrinkage towards the wrong value of $\sigma^{2}$.
 
-For each simulated data set, the Bayesian models are fit using MCMC. The MCMC for the restricted likelihood version requires no further computational details other than those described for the traditional Bayesian model in Section \ref{BayesLinMod}. This is because there are conditioning statistics for each group and the model's conditional independence between the groups allows the data augmentation described earlier to be performed independently within each group. That is, there is a separate Gibbs step for each group  generating group level data matching the statistics for that group. 
+$K = 30$ data sets are generated from \eqref{gensim2}. For each data set and each pair $(a_{s}, c)$, the Bayesian models are fit using MCMC. The MCMC for the restricted likelihood version requires no further computational details other than those described for the traditional Bayesian model in Section \ref{BayesLinMod}. This is because there are conditioning statistics for each group and the model's conditional independence between the groups allows the data augmentation described earlier to be performed independently within each group. That is, there is a separate Gibbs step for each group  generating group level data matching the statistics for that group. 
 
-The models are compared using Kullback-Leibler (KL) divergence from the distribution of good data to the posterior predictive distribution in order to assess the predictive capability of the models for the good part of the data. Specifically, for the $i^{th}$ group of the $k^{th}$ simulated data set $\by_{k}$ compute:
+To assess the predictive capability, the models are compared using Kullback-Leibler (KL) divergence from the distribution of good data to the posterior predictive distribution. Specifically, for the $i^{th}$ group of the $k^{th}$ simulated data set $\by_{k}$ compute:
 \begin{equation}
 \label{kl}
 KL^{(M)}_{ik} = \int \log \frac{f(\tilde y | \theta_{i}, \sigma^{2})}{f_{i}(\tilde y | M, \by_{k})}  f(\tilde y | \theta_{i}, \sigma^{2}) \ dy
 \end{equation}
-where $M$ indexes the fitting model, $f(\tilde y | \theta_{i}, \sigma^{2})$ is the pdf of a $N(\theta_{i}, \sigma^{2})$ at $\tilde y$ with $\sigma^{2} = 4$. For the Bayesian models ${f_{i}(\tilde y | M, \by_{k})} = \int f(\tilde y |\theta_{i}, \sigma_{i}^{2}) \pi(\theta_{i}, \sigma^{2}_{i} | M, \by_{k})$ where $ f(\tilde y |\theta_{i}, \sigma_{i}^{2})$ is  $N(\theta_{i}, \sigma_{i}^{2})$ pdf and  $\pi(\theta_{i}, \sigma^{2}_{i} | M, \by_{k})$ is the posterior for the $i^{th}$ group model parameters under model $M$ for the $k^{th}$ data set. $M$ denotes either the full normal theory model \eqref{fullsim2} or one of the two restricted likelihood versions discussed above, where conditioning is only on the summary statistics (not the complete $\by_{k}$). $M$ also specifies the hyperparameter values $a_{s}$ and $c_{s}$. For the classical robust fits, we set $f_{i}(\tilde y | M, \by_{k})$ to a $N(\hat\theta_{i}, \hat\sigma^{2}_{i})$ at  $\tilde y$ as a groupwise plug-in estimator for the predictive distribution. Thus the classical fits are done separately for each group - with no consideration of the hierarchical structure between the groups. The overall mean $\overline{KL}^{(M)}_{{\cdot}{\cdot}} = \frac{1}{90K} \sum_{k = 1}^{K} \sum_{i=1}^{90} KL^{(M)}_{ik}$ is used to compare the models. Sampling variation is summarized with $SE(\overline{KL}^{(M)}_{{\cdot} k}) = \sqrt{\frac{1}{K(K-1)}\sum_{k = 1}^{K} (\overline{KL}^{(M)}_{{\cdot} k} - \overline{KL}^{(M)}_{{\cdot}{\cdot}})^{2}}$ where $\overline{KL}^{(M)}_{{\cdot} k} = \frac{1}{90}\sum_{i = 1}^{90} KL^{(M)}_{ik}$.
+where $M$ indexes the fitting model, $f(\tilde y | \theta_{i}, \sigma^{2}) = N(\tilde y | \theta_{i}, \sigma^{2})$; the mean $\theta_{i}$, variance $\sigma^{2}$ normal pdf evaluated at $\tilde y$. For the Bayesian models ${f_{i}(\tilde y | M, \by_{k})} = \int f(\tilde y |\theta_{i}, \sigma_{i}^{2}) \pi(\theta_{i}, \sigma^{2}_{i} | M, \by_{k})d\theta_{i}d\sigma^{2}_{i}$ where $\pi(\theta_{i}, \sigma^{2}_{i} | M, \by_{k})$ is the posterior for the $i^{th}$ group model parameters under model $M$ for the $k^{th}$ data set. $M$ denotes either the full normal theory model \eqref{fullsim2} or one of the two restricted likelihood versions, along with $a_{s}$ and $c$. For the classical robust fits, we set $f_{i}(\tilde y | M, \by_{k}) = N(\tilde y|\hat\theta_{i}, \hat\sigma^{2}_{i})$ as a groupwise plug-in estimator for the predictive distribution. The classical fits are done separately for each group with no consideration of the hierarchical structure between the groups. The overall mean $\overline{KL}^{(M)}_{{\cdot}{\cdot}} = \frac{1}{90K} \sum_{k = 1}^{K} \sum_{i=1}^{90} KL^{(M)}_{ik}$ is used to compare the models. Sampling variation is summarized with the standard error $SE(\overline{KL}^{(M)}_{{\cdot} k}) = \sqrt{\frac{1}{K(K-1)}\sum_{k = 1}^{K} (\overline{KL}^{(M)}_{{\cdot} k} - \overline{KL}^{(M)}_{{\cdot}{\cdot}})^{2}}$ where $\overline{KL}^{(M)}_{{\cdot} k} = \frac{1}{90}\sum_{i = 1}^{90} KL^{(M)}_{ik}$.
  
-Figure \ref{kl_sim} displays the results for each $a_{s} = 1.25,  5, 10$ and $c_{s} = 1/2, 1, 2$ over $K = 30$ data sets. The panels are for $c_{s} = 1/2, 1, 2$ with $a_{s} = 1.25,  5, 10$ on the abscissa. For each panel, the KL results for the classical robust linear model fits are the same since the priors have no effect on these fits. The normal theory model results are left out as they perform poorly. Overall, the results are strikingly in favor of the restricted likelihood methods for the range of hyper-parameter values studied. Undoubtably, the most precise and accurate prior studied is  $c_{s} = 1$ and $a_{s} = 10$ and this results in the lowest (and best) average KL for both the Tukey and Huber restricted likelihood versions. $c_{s} = 0.5$ performs the worst, but still better than the classical fits. There is evidence that performance starts to degrade as $a_{s} = 10$ as reflected in a larger average KL for $a_{s} = 10$. Here, the prior mean and precision are $2.22$ and $1.62$ and we suspect this is starting to put too much mass on $\sigma^{2}_{i}$ values much smaller than $\sigma^{2}=4$. For $c_{s} = 2$, the performance still improves from $a_{s} = 5$ to $a_{s} = 10$. Here the mean is $8.89$ and precision is only $0.1$; not yet large enough to degrade the performance due to an incorrect mean.   
+Figure \ref{kl_sim} displays $\overline{KL}^{(M)}_{{\cdot}{\cdot}}$  with errors-bars plus/minus one $SE(\overline{KL}^{(M)}_{{\cdot} k})$ for each $a_{s} = 1.25,  5, 10$ and $c = 0.5, 1, 2$. %The panels are for $c = 0.5, 1, 2$ with $a_{s} = 1.25,  5, 10$ on the abscissa. 
+The values of $a_{s}$ and $c$, do not effect the classical robust linear models. The normal theory model results are left out as they perform significant worse. Overall, the results are strikingly in favor of the restricted likelihood methods for the range of hyper-parameter values studied. Undoubtably, the most precise and accurate prior studied is  $c = 1$ and $a_{s} = 10$  and this results in the lowest (and best) average KL for both the Tukey and Huber restricted likelihood versions ((shown in the middle panel). $c = 0.5$ performs the worst, but still better than the classical fits. There is evidence that performance starts to degrade as $a_{s} = 10$ as reflected in a larger average KL for $a_{s} = 10$. Here, the prior mean and precision are $2.22$ and $1.62$ and we suspect this is starting to put too much mass on $\sigma^{2}_{i}$ values much smaller than $\sigma^{2}=4$. For $c = 2$, the performance still improves from $a_{s} = 5$ to $a_{s} = 10$. Here the mean is $8.89$ and precision is only $0.1$; apparently not yet large enough to degrade the performance due to an incorrect mean. Lastly, Tukey's statistic performs marginally better than Huber's. This is likely due to the fact that Tukey's estimator trims extreme outliers completely in the estimation procedure \citep{huber2009}.
  
-\begin{figure}[H]
+\begin{figure}[t]
 \centering
-\includegraphics[width = 6in, height = 4in]{kl_sim2_facet_scale.png}
+\includegraphics[width = 4in]{kl_sim2_facet_scale.png}
 \label{kl_sim}
-\caption{summary of simulation}
+\caption{Average KL - divergence plus/minus one standard error for each value of $a_{s}$ and $c$. The panels correspond to $c = 0.5$ (left), $c=1$ (middle), and $c=2$ (right) with the values of $a_{s}$ on the horizontal axis.}
 \end{figure}
 
-It is also interesting to look at the effects of $n_{i}$, $p_{i}$, and $m_{i}$. For this, the  $KL^{(M)}_{ik}$ are grouped by 
+It is also interesting to consider the effects of factors $n_{i}$, $p_{i}$, and $m_{i}$. For a given factor and simulation, the $KL^{(M)}_{ik}$  are averaged by factor level. For the Bayesian models, the averages are also taken over the different values of $a_{s}$ and $c$. Figure \ref{kl_mnp} displays these averages for $m,n,$ and $p$ with error bars plus/minus one standard error. The restricted likelihood versions consistently perform better than their classical counterparts. Intuitively, as the amount of contamination ($p$) increases performance degrades as it becomes more difficult to identify the good data. Likewise, as $n$ increases, the performance for the Bayesian methods become closer to that of the their classical counterparts reflecting the diminishing effect of the prior. However, the decrease of KL-diveregence with $m$ and increase with $n$ is somewhat surprising. To investigate, Figure \ref{boxTheta} and \ref{boxSigma} display boxplots of $(\theta_{i} - \hat\theta_{i})$ and $\hat\sigma_{i}$ for each simulated data set. The $\hat\theta_{i}$'s have no systematic bias however the $\hat\sigma_{i}$'s do; consistently biased upward from the value of $\sigma = 2$ for the good portion of data. As $n$ increases, the bias remains the same and the variation in the estimates gets smaller. Thus, the estimates are getting more certain about an incorrect value; explaining the degradation of the KL - divergence. As $m$ increases, the variance in the estimates gets larger and there is a marginal increase in the bias. Thus, for $m=9$ there is more certainty about an incorrect value and  the increased uncertainty at $m=25$ helps to improve the KL-divergence. %Finally, as $p$ grows the bias of the estimates gets significantly larger; resulting in poorer estimation and poorer KL-divergences.
+ 
+\begin{figure}[t]
+\centering
+\includegraphics[width = 4in]{kl_sim2_mnp.png}
+\caption{Average KL - divergence plus/minus one standard error grouped by the factors $m$ (left), $n$ (middle), and $p$ (right)}
+\label{kl_mnp}
+\end{figure}
+\begin{figure}[t]
+\centering
+\includegraphics[width = 4in]{rlm_mnp_theta.png}
+\caption{Boxplots $(\theta_{i} - \hat\theta_{i})$ across all simulations separated by the values for $m$ (left), $n$ (middle), $p$ (right) where $\hat\theta_{i}$ are the classical robust estimators (Huber's and Tukey's).}
+\label{boxTheta}
+\end{figure}
+\begin{figure}[t]
+\centering
+\includegraphics[width = 4in]{rlm_mnp_sigma.png}
+\caption{Boxplots of the classical robust estimators (Huber's and Tukey's) for $\sigma_{i}$ across all simulations separated by the values for $m$ (left), $n$ (middle), $p$ (right). The horizontal line at $\sigma = 2$ highlights the true standard deviation of the `good' data.}
+\label{boxSigma}
+\end{figure}
 
-
-
+This simulation shows the potential of the restricted likelihood while highlighting some interesting observations. Specifically, the choice of summary statistics, along with corresponding tuning parameters is important. The parameters chosen to be $95\%$ at the normal result in bias estimates of the variance under the data generating model. Such bias can result in undesirable properties, such as poorer prediction as the sample size grows. These choices must be made in both the classical and Bayesian settings. The Bayesian setting allows for the incorporation of informative prior information which, as shown in this example, can dramatically improve prediction. The amount of improvement, of course, depends on the prior but here we have observed good relative improvement over the classical counterparts for a range of prior choices.   
 
 %
 %\begin{figure}[H]
@@ -1122,12 +1214,6 @@ It is also interesting to look at the effects of $n_{i}$, $p_{i}$, and $m_{i}$. 
 %\centering
 %\includegraphics[scale = .3]{hist_sig2_ests.png}
 %\end{figure}
-
-
-
-
-
-
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
@@ -1163,9 +1249,9 @@ The data a grouped by states with a varying number of agencies by state. Identif
 As an exploratory view, a plot of the square root of household count in 2012, against that in 2010 
 is shown in Figure \ref{fig:ctVct} for three states. Each state has a varying number of agencies and  the different colors represent the varying contractual agreements as they stood in 2010.  Among the open agencies, linear correlations exists with strength depending on agency type and state.  `Type 1' agencies are of special interest and one could easily subset the analysis to only these agencies, removing the others. Additionally, a large number of agencies closed sometime before 2012, as represented by the many $0$ counts for 2012. The other agency types and the zero counts are `outliers' and could arguably just be removed prior to analysis. However,  we leave them and us the data as a test bed for our techniques by fitting models that do not account for agency closures or contract type.  Our expectation is that the restricting likelihood will facilitate prediction for the `good' part of the data (i.e. open, `type 1' agencies). 
 
-\begin{figure}[H]
+\begin{figure}[t]
 \centering
-\includegraphics[width=6in]{scatter_by_state.png}
+\includegraphics[width=5in]{scatter_by_state.png}
 \caption{The square root of count in 2012 versus that in 2010 (after centering and scaling). The colors represent the varying contractual agreements as they stood in 2010.  Agencies that closed during the 2010-2012 period are represented by the zero counts for 2012. Scalings on the axes are purposely left off for proprietary reasons.}
 \label{fig:ctVct}
 \end{figure}
@@ -1242,30 +1328,30 @@ results from $n=25,100,1000,$ and $2000$ out of a total of $3180$ agencies. The 
 In practice, we would set $\alpha$ slightly larger than $0.16$.  
 
 
-\begin{sidewaysfigure}
-\centering
-\captionsetup{justification=centering}
-%\subcaptionbox{}{\includegraphics[width=\textwidth,page=1]{logMargType1AgenciesBaseModelt}}\quad
-%\subcaptionbox{}{\includegraphics[width=\textwidth,page=2]{logMargType1AgenciesBaseModelt}}\quad
-%\subcaptionbox{}{\includegraphics[width=\textwidth,page=3]{logMargType1AgenciesBaseModelt}}
-\subcaptionbox{}{\includegraphics[width=3.4in,height=3.3in, page=1]{logMargType1AgenciesBaseModelt}}\quad
-\subcaptionbox{}{\includegraphics[width=3.4in,height=3.3in,page=2]{logMargType1AgenciesBaseModelt}}\quad
-\subcaptionbox{}{\includegraphics[width=3.4in,height=3.3in,page=3]{logMargType1AgenciesBaseModelt}}
-\caption{Model evaluation for `Type 1' agencies for training sample
-  sizes of $n=25,100$, and $1000$. The $t$-model is used as the base
-  method to compute TLM. Plotted are the mean TLM for each model
-  against the trimming fraction across the $100$ cross-validation
-  samples. Error bars correspond to one standard deviation of TLM
-  above and below the mean. Models are labeled with the following
-  abbreviations: `rlm' corresponds to a classical robust fit, `restr.'
-  corresponds to our restricted likelihood method, and `t' corresponds to the
-  heavy-tailed $t$-distribution model. The letters `T' and `H'
-  appearing after `rlm' and `restr.' correspond to the use of  Tukey's
-  and Huber's $\psi$ respectively.  
-}
-\label{fig:Type1Marg}
-\end{sidewaysfigure}
-
+%\begin{sidewaysfigure}
+%\centering
+%\captionsetup{justification=centering}
+%%\subcaptionbox{}{\includegraphics[width=\textwidth,page=1]{logMargType1AgenciesBaseModelt}}\quad
+%%\subcaptionbox{}{\includegraphics[width=\textwidth,page=2]{logMargType1AgenciesBaseModelt}}\quad
+%%\subcaptionbox{}{\includegraphics[width=\textwidth,page=3]{logMargType1AgenciesBaseModelt}}
+%\subcaptionbox{}{\includegraphics[width=3.4in,height=3.3in, page=1]{logMargType1AgenciesBaseModelt}}\quad
+%\subcaptionbox{}{\includegraphics[width=3.4in,height=3.3in,page=2]{logMargType1AgenciesBaseModelt}}\quad
+%\subcaptionbox{}{\includegraphics[width=3.4in,height=3.3in,page=3]{logMargType1AgenciesBaseModelt}}
+%\caption{Model evaluation for `Type 1' agencies for training sample
+%  sizes of $n=25,100$, and $1000$. The $t$-model is used as the base
+%  method to compute TLM. Plotted are the mean TLM for each model
+%  against the trimming fraction across the $100$ cross-validation
+%  samples. Error bars correspond to one standard deviation of TLM
+%  above and below the mean. Models are labeled with the following
+%  abbreviations: `rlm' corresponds to a classical robust fit, `restr.'
+%  corresponds to our restricted likelihood method, and `t' corresponds to the
+%  heavy-tailed $t$-distribution model. The letters `T' and `H'
+%  appearing after `rlm' and `restr.' correspond to the use of  Tukey's
+%  and Huber's $\psi$ respectively.  
+%}
+%\label{fig:Type1Marg}
+%\end{sidewaysfigure}
+%
 
 
 Model evaluation for `Type 1' agencies is shown in Figure
@@ -1329,63 +1415,63 @@ method for computing TLM. Trimming fractions between $0.15$ and $0.3$ are displa
 
 
 
-\begin{sidewaysfigure}[t]
-%\subcaptionbox{}{\includegraphics[width=2.75in,page=1]{hierlogMargType1AgenciesBaseModelt}}\quad
-%\subcaptionbox{}{\includegraphics[width=2.75in,page=2]{hierlogMargType1AgenciesBaseModelt}}
-\subcaptionbox{}{\includegraphics[width=4in,page=1]{hierlogMargType1AgenciesBaseModelt}}\quad
-\subcaptionbox{}{\includegraphics[width=4in,page=2]{hierlogMargType1AgenciesBaseModelt}}
-\caption{Model evaluation for `Type 1' agencies under the hierarchical model for $n=1000$ and $2000$. The $t$-model is used as the base method to compute TLM. Plotted are the mean TLM for each model against the trimming fraction across the $100$ cross-validation samples. Error bars correspond to one standard deviation of TLM above and below the mean. Models are labeled using the same notation as the previous figure. Only the relevant trimming fractions ($\alpha\geq .15$) are pictured.  
-}
-\label{fig:hierType1Marg}
-\end{sidewaysfigure}
+%\begin{sidewaysfigure}[t]
+%%\subcaptionbox{}{\includegraphics[width=2.75in,page=1]{hierlogMargType1AgenciesBaseModelt}}\quad
+%%\subcaptionbox{}{\includegraphics[width=2.75in,page=2]{hierlogMargType1AgenciesBaseModelt}}
+%\subcaptionbox{}{\includegraphics[width=4in,page=1]{hierlogMargType1AgenciesBaseModelt}}\quad
+%\subcaptionbox{}{\includegraphics[width=4in,page=2]{hierlogMargType1AgenciesBaseModelt}}
+%\caption{Model evaluation for `Type 1' agencies under the hierarchical model for $n=1000$ and $2000$. The $t$-model is used as the base method to compute TLM. Plotted are the mean TLM for each model against the trimming fraction across the $100$ cross-validation samples. Error bars correspond to one standard deviation of TLM above and below the mean. Models are labeled using the same notation as the previous figure. Only the relevant trimming fractions ($\alpha\geq .15$) are pictured.  
+%}
+%\label{fig:hierType1Marg}
+%\end{sidewaysfigure}
+%
 
-
-
-\subsection{Comparison of hierarchical and non-hierarchical fits}
-
-The performance of the methods for the hierarchical and non-hierarchical models can be contrasted through our cross validations studies.  We focus on Tukey's and Huber's conditioning statistic and concentrate our evaluation on the `Type 1' agencies. Table~\ref{tab:tlmTable} displays the mean TLM for each model and range of trimming fractions.  Our summary below focuses exclusively on realistic trimming fractions, $\alpha \geq 0.15$, and Tukey's conditioning statistic.  
-
-We first note that for the non-hierarchical model, there is little difference between mean TLM for $n=1000$ and $n=2000$, with 
-the numbers differing only in the third decimal place (see rows 1 and 3 of the table).  This is due to the posterior predictive distributions having stabilized.  The
-mean TLMs for the hierarchical model show a greater change with increases of about $0.05$ to $0.08$ as the training sample size changes
-from $1000$ to $2000$ (see rows 2 and 4 of the table).  For calibration, the mean TLM for a normal with mean $0.5$ and variance $1$ is approximately this size
-when trimming is done under a standard normal base model.  Thus, the increase in mean TLM is substantial.  
-We attribute the change for the hierarchical model to the 
-improvement in fits, particularly for states with fewer agencies.  
-
-Direct comparison of the hierarchical and non-hierarchical models shows that, for $n=1000$, the non-hierarchical model has uniformly 
-(for $\alpha$ of interest) better mean TLM (rows 1 and 2).  The differences are substantial, and the summaries primarily reflect greater stability of fits on a state-by-state basis under the non-hierarchical model.  To a lesser extent, they reflect variation in the evaluation criterion which stems from modest validation sample size, particularly with larger trimming fractions.  The trimmed cases are not proportionally distributed across states.  The pattern changes for $n=2000$ (rows 3 and 4), with the hierarchical model showing larger mean TLMs for trimming fractions $0.15$ and $0.20$.  The improvement reflects the ability of the hierarchical model to capture differences in regressions across the states which is realized when the training sample size is large enough.  We attribute the better performance of the non-hierarchical model for the largest trimming fractions to variation in the evaluation.  
-
-\begin{table}[!tbp]
-{\small
-\begin{center}
-\begin{tabular}{lllll}
-\hline\hline
-& \multicolumn{4}{c}{Trimming fraction ($\alpha$)}\\
-\multicolumn{1}{l}{}&\multicolumn{1}{c}{$0.15$}&\multicolumn{1}{c}{$0.2$}&\multicolumn{1}{c}{$0.25$}&\multicolumn{1}{c}{$0.3$}\tabularnewline
-\hline
-{\mdseries Tukey ($n=1000$)}&&&&\tabularnewline
-~~Non-Hier.&1.072 (0.014)&1.179 (0.022)&1.226 (0.029)&1.255 (0.033)\tabularnewline
-~~Hier.&1.021 (0.063)&1.110 (0.070)&1.157 (0.067)&1.187 (0.065)\tabularnewline
-\hline
-{\mdseries Tukey ($n=2000$) }&&&&\tabularnewline
-~~Non-Hier.&1.068 (0.029)&1.178 (0.007)&1.225 (0.011)&1.254 (0.014)\tabularnewline
-~~Hier.&1.094 (0.041)&1.189 (0.036)&1.221 (0.033)&1.242 (0.028)\tabularnewline
-\hline
-{\mdseries Huber  ($n=1000$)}&&&&\tabularnewline
-~~Non-Hier.&1.020 (0.020)&1.114 (0.035)&1.157 (0.041)&1.184 (0.045)\tabularnewline
-~~Hier.&0.861 (0.073)&0.937 (0.079)&1.001 (0.074)&1.063 (0.064)\tabularnewline
-\hline
-{\mdseries Huber ($n=2000$)}&&&&\tabularnewline
-~~Non-Hier.&1.015 (0.021)&1.112 (0.014)&1.154 (0.019)&1.181 (0.023)\tabularnewline
-~~Hier.&0.930 (0.041)&1.014 (0.043)&1.080 (0.035)&1.148 (0.027)\tabularnewline
-\hline
-\end{tabular}
-\end{center}
-\caption{Mean (standard deviation) of TLM for `Type 1' agencies for the Bayesian restricted likelihood non-hierarchical and hierarchical models for $n=1000$ and $2000$.} \label{tab:tlmTable}
-}
-\end{table}
-
+%
+%\subsection{Comparison of hierarchical and non-hierarchical fits}
+%
+%The performance of the methods for the hierarchical and non-hierarchical models can be contrasted through our cross validations studies.  We focus on Tukey's and Huber's conditioning statistic and concentrate our evaluation on the `Type 1' agencies. Table~\ref{tab:tlmTable} displays the mean TLM for each model and range of trimming fractions.  Our summary below focuses exclusively on realistic trimming fractions, $\alpha \geq 0.15$, and Tukey's conditioning statistic.  
+%
+%We first note that for the non-hierarchical model, there is little difference between mean TLM for $n=1000$ and $n=2000$, with 
+%the numbers differing only in the third decimal place (see rows 1 and 3 of the table).  This is due to the posterior predictive distributions having stabilized.  The
+%mean TLMs for the hierarchical model show a greater change with increases of about $0.05$ to $0.08$ as the training sample size changes
+%from $1000$ to $2000$ (see rows 2 and 4 of the table).  For calibration, the mean TLM for a normal with mean $0.5$ and variance $1$ is approximately this size
+%when trimming is done under a standard normal base model.  Thus, the increase in mean TLM is substantial.  
+%We attribute the change for the hierarchical model to the 
+%improvement in fits, particularly for states with fewer agencies.  
+%
+%Direct comparison of the hierarchical and non-hierarchical models shows that, for $n=1000$, the non-hierarchical model has uniformly 
+%(for $\alpha$ of interest) better mean TLM (rows 1 and 2).  The differences are substantial, and the summaries primarily reflect greater stability of fits on a state-by-state basis under the non-hierarchical model.  To a lesser extent, they reflect variation in the evaluation criterion which stems from modest validation sample size, particularly with larger trimming fractions.  The trimmed cases are not proportionally distributed across states.  The pattern changes for $n=2000$ (rows 3 and 4), with the hierarchical model showing larger mean TLMs for trimming fractions $0.15$ and $0.20$.  The improvement reflects the ability of the hierarchical model to capture differences in regressions across the states which is realized when the training sample size is large enough.  We attribute the better performance of the non-hierarchical model for the largest trimming fractions to variation in the evaluation.  
+%
+%\begin{table}[!tbp]
+%{\small
+%\begin{center}
+%\begin{tabular}{lllll}
+%\hline\hline
+%& \multicolumn{4}{c}{Trimming fraction ($\alpha$)}\\
+%\multicolumn{1}{l}{}&\multicolumn{1}{c}{$0.15$}&\multicolumn{1}{c}{$0.2$}&\multicolumn{1}{c}{$0.25$}&\multicolumn{1}{c}{$0.3$}\tabularnewline
+%\hline
+%{\mdseries Tukey ($n=1000$)}&&&&\tabularnewline
+%~~Non-Hier.&1.072 (0.014)&1.179 (0.022)&1.226 (0.029)&1.255 (0.033)\tabularnewline
+%~~Hier.&1.021 (0.063)&1.110 (0.070)&1.157 (0.067)&1.187 (0.065)\tabularnewline
+%\hline
+%{\mdseries Tukey ($n=2000$) }&&&&\tabularnewline
+%~~Non-Hier.&1.068 (0.029)&1.178 (0.007)&1.225 (0.011)&1.254 (0.014)\tabularnewline
+%~~Hier.&1.094 (0.041)&1.189 (0.036)&1.221 (0.033)&1.242 (0.028)\tabularnewline
+%\hline
+%{\mdseries Huber  ($n=1000$)}&&&&\tabularnewline
+%~~Non-Hier.&1.020 (0.020)&1.114 (0.035)&1.157 (0.041)&1.184 (0.045)\tabularnewline
+%~~Hier.&0.861 (0.073)&0.937 (0.079)&1.001 (0.074)&1.063 (0.064)\tabularnewline
+%\hline
+%{\mdseries Huber ($n=2000$)}&&&&\tabularnewline
+%~~Non-Hier.&1.015 (0.021)&1.112 (0.014)&1.154 (0.019)&1.181 (0.023)\tabularnewline
+%~~Hier.&0.930 (0.041)&1.014 (0.043)&1.080 (0.035)&1.148 (0.027)\tabularnewline
+%\hline
+%\end{tabular}
+%\end{center}
+%\caption{Mean (standard deviation) of TLM for `Type 1' agencies for the Bayesian restricted likelihood non-hierarchical and hierarchical models for $n=1000$ and $2000$.} \label{tab:tlmTable}
+%}
+%\end{table}
+%
 
 \section{Discussion}
 \label{Conclusions}
@@ -1536,7 +1622,7 @@ $\Sigma_\rho=(1-\rho)I+\rho \mb{1}\mb{1}^{\top}$ and find the MLE, $\hat\rho_{ml
 %Plugging the estimates of $z_j$ into the multivariate normal, the mean of $\mu_\rho$ is set to the MLE of $\rho$ and the variance is set to the observed inverse Fisher information matrix, inflated by a factor of $2$ to weaken the prior for this parameter.  We use the same MLE and inflated information matrix to set the mean for $\psi_{\rho}$. Its variance is chosen to cover a range of plausible values. A range of other values for the fixed hyper-parameters was also studied.  The differences in results were negligible. 
 
 
-\bibliographystyle{apalike}
+\bibliographystyle{ba}
 \bibliography{refPaper1}
 
 \end{document}

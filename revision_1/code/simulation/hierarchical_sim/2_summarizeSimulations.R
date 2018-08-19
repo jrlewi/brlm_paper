@@ -10,6 +10,9 @@ for(data_sim in sims){
 data <- read_rds(file.path(getwd(),'data_sig2_4', paste0('data_', data_sim, '.rds')))
 n_groups <- length(data$theta)
 results_df <- file.path(getwd(), 'results')
+factor_list <- as.data.frame(do.call(rbind, data$factorsList))  
+names(factor_list) <- c('p', 'n','m')
+
 
 ass.vec <- c(1.25, 5, 10) #c(1.25, 2.5,5,10,20) 
 scale_vec <- c(0.5,1, 2) #round(c(0.5, 1/sqrt(2),1, sqrt(2), 2),2)
@@ -30,14 +33,18 @@ for(ss in sig2){
     #computes the estimates --- 
     theta_huber_rest <- apply(huber$theta, 2, mean)
     theta_huber_rlm  <- sapply(huber$robustFits, function(x) x$coefficients)
-    huber_df <- tibble(theta = rep(data$theta,2), 
+    sigma2_huber_rest <- apply(huber$sigma2, 2, mean)
+    sigma2_huber_rlm  <- sapply(huber$robustFits, function(x) summary(x)$sigma^2)
+    
+    huber_df <- as_tibble(cbind(factor_list, theta = rep(data$theta,2), 
                        theta_hat = c(theta_huber_rest, theta_huber_rlm), 
+                       sigma2_hat = c(sigma2_huber_rest,  sigma2_huber_rlm),
                        statistic = rep('Huber', 2*n_groups), 
                        method = c(rep('restricted', n_groups), rep('rlm', n_groups)),
                        a_s = rep(as, 2*n_groups),
                        scale_as = rep(sc, 2*n_groups),
                        sigma2 = rep(ss, 2*n_groups)
-                       )
+                       ))
     
     
     tukey <- read_rds(file.path(results_df, paste0("tukey", rds_name)))
@@ -45,15 +52,18 @@ for(ss in sig2){
     #computes the estimates --- 
     theta_tukey_rest <- apply(tukey$theta, 2, mean)
     theta_tukey_rlm  <- sapply(tukey$robustFits, function(x) x$coefficients)
+    sigma2_tukey_rest <- apply(tukey$sigma2, 2, mean)
+    sigma2_tukey_rlm  <- sapply(tukey$robustFits, function(x) summary(x)$sigma^2)
     
-    tukey_df <- tibble(theta = rep(data$theta,2), 
+    tukey_df <- as_tibble(cbind(factor_list, theta = rep(data$theta,2), 
                        theta_hat = c(theta_tukey_rest, theta_tukey_rlm), 
+                       sigma2_hat = c(sigma2_tukey_rest,  sigma2_tukey_rlm),
                        statistic = rep('Tukey', 2*n_groups), 
                        method = c(rep('restricted', n_groups), rep('rlm', n_groups)),
                        a_s = rep(as, 2*n_groups),
                        scale_as = rep(sc, 2*n_groups),
-                       sigma2 = rep(ss, 2*n_groups)
-    )
+                       sigma2 = rep(ss, 2*n_groups)))
+    
     
     
     
@@ -61,15 +71,17 @@ for(ss in sig2){
     normal <- read_rds(file.path(results_df, paste0("normal", rds_name)))
     #computes the estimates --- 
     theta_normal <- apply(normal$theta, 2, mean)
-
-    normal_df <- tibble(theta = data$theta, 
+    sigma2_normal <- apply(normal$sigma2, 2, mean)
+    
+    normal_df <-  as_tibble(cbind(factor_list, theta = data$theta, 
                        theta_hat = c(theta_normal), 
+                       sigma2_hat =  sigma2_normal, 
                        statistic = rep('Normal', n_groups), 
                        method =  rep('Normal', n_groups),
                        a_s = rep(as, n_groups),
                        scale_as = rep(sc, n_groups),
                        sigma2 = rep(ss, n_groups)
-    )
+    ))
     
     df <- bind_rows(huber_df, tukey_df, normal_df)
     dfs[[i]] <- df
@@ -84,7 +96,7 @@ dfs_all[[data_sim]] <- bind_rows(dfs)
 
 df_estimates <- bind_rows(dfs_all, .id = 'simulation')
 
-df_mse <- df_estimates %>% 
+df_mse <- df_estimates %>% dplyr::select(-p,-n,-m) %>%  
   group_by(simulation, statistic, method, a_s, scale_as, sigma2) %>% 
   summarise(MSE = mean((theta - theta_hat)^2)) %>% 
   ungroup() %>% 
@@ -372,6 +384,67 @@ ggplot(df_nmp %>% filter(method != 'Normal', statistic != 'Normal') , aes(x = as
   facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") +
   labs(x = "Value",  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
 ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_mnp.png'), width = 6, height = 4)
+
+
+#investigate behavior of KL main effects a functions of m,n,p by looking at estimates
+
+est_mnp_rlm <- df_estimates %>% 
+  filter(method == 'rlm', a_s == '1.25', scale_as == '0.5') %>% #git rid of repeated rlm data.frames
+  gather(variable, value, p,n,m)   
+names(est_mnp_rlm)
+
+View(head(filter(est_mnp_rlm, variable == 'p', value == "0.1")))
+  
+View(head(filter(est_mnp_rlm, variable == 'n', value == "25")))   
+View(df_estimates %>% 
+       filter(method == 'rlm', a_s == '1.25', scale_as == '0.5'))
+
+ggplot(est_mnp_rlm, aes(x = as.factor(value), y = theta - theta_hat, col = statistic)) +
+  geom_boxplot() +
+  facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") + labs(y = bquote(theta - widehat(theta)), x = 'Value') + geom_hline(yintercept = 0, lty = 2) +
+  theme(text = element_text(family = 'Times'))
+ggsave(file.path(getwd(), "..", "..", "..", "figs", 'rlm_mnp_theta.png'), width = 6, height = 4)
+
+ggplot(est_mnp_rlm, aes(x = as.factor(value), y = sqrt(sigma2_hat), col = statistic)) +
+  geom_boxplot() +
+  facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") + geom_hline(yintercept = 2, lty = 2) +
+  labs(y = bquote(widehat(sigma)), x = 'Value') +
+  theme(text = element_text(family = 'Times'))
+ggsave(file.path(getwd(), "..", "..", "..", "figs", 'rlm_mnp_sigma.png'), width = 6, height = 4)
+
+est_mnp_tukey <- df_estimates %>% 
+  filter(method == 'restricted', statistic == 'Tukey') %>%
+  gather(variable, value, p,n,m)   
+
+tmp_df <- df_estimates %>% 
+  filter(method == 'rlm',statistic == 'Tukey', a_s == '1.25', scale_as == '0.5') %>% dplyr::select(p,n,m, sigma2_hat) %>% mutate(sigma_hat = sqrt(sigma2_hat), p = as.factor(p), n = as.factor(n), m = as.factor(m)) %>% 
+  as_tibble()
+
+fit_mnp <- lm(sigma_hat  ~ (m + n+ p)^2, data = tmp_df )
+summary(fit_mnp) 
+
+
+
+tmp_df <- df_kl %>% 
+  filter(method == 'restricted', statistic == 'Tukey') %>% dplyr::select(p,n,m, KL) %>%  
+  mutate(p = as.factor(p), n = as.factor(n), m = as.factor(m)) 
+
+fit_mnp <- lm(KL  ~ (m + n+ p), data = tmp_df )
+summary(fit_mnp) 
+
+
+ggplot(est_mnp_tukey, aes(x = as.factor(value), y = theta - theta_hat)) +
+  geom_boxplot() + geom_hline(yintercept = 0, lty = 2) +
+  facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") + labs(y = bquote(theta - widehat(theta)), x = 'Value') +
+  theme(text = element_text(family = 'Times'))
+
+ggplot(est_mnp_tukey, aes(x = as.factor(value), y = sqrt(sigma2_hat))) +
+  geom_boxplot() +
+  facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") + geom_hline(yintercept = 2, lty = 2) +
+  labs(y = bquote(widehat(sigma)), x = 'Value') +
+  theme(text = element_text(family = 'Times'))
+
+
 
 # gen_data <- function(m,n,p){
 #   ps <- rbinom(n,1,p)
