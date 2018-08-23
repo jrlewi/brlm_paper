@@ -46,9 +46,15 @@ for(data_sim in sims){
 }
 
 
-plot(convergence_scores, pch = 19, cex = .3)
+plot(convergence_scores, pch = 19, cex = .1)
+abline(h = c(-2,2), col = 4)
+
 mean(abs(convergence_scores)>2)
 2*(1-pnorm(2))
+
+mean(abs(convergence_scores)>3)
+2*(1-pnorm(3))
+
 range(convergence_scores[,1,,,])
 range(convergence_scores[,2,,,])
 range(convergence_scores[,3,,,])
@@ -57,8 +63,8 @@ saveRDS(convergence_scores, "summarize_convergence.rds")
 
 
 library(MCMCpack)
-summary(rinvgamma(1000, 10, 4*2*10))
-summary(rinvgamma(1000, 10, 4*.5*10))
+# summary(rinvgamma(1000, 10, 4*2*10))
+# summary(rinvgamma(1000, 10, 4*.5*10))
 
 f1 <- function(x){
   a <- 10
@@ -83,7 +89,7 @@ curve(f1, from = 0, to = 20, add = TRUE)
 abline(v = 4)
 
 
-a <- 100
+a <- 10
 c <- 2
 b <- 4*a*c
 

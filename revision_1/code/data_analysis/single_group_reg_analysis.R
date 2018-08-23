@@ -11,29 +11,31 @@ library(tidyverse)
 
 strt <- Sys.time()
 
-ns <- c(10, 25, 50) #percent sample size for training set
-states <- c(2,3,27)
-v_inflate <- c(5, 10, 50, 100)
+states <- c(2, 15, 27, 36)
+ns <- c(25, 50) 
+v_inflate <- c(100)
 
-sims <-1:20
+sims <-1:50
 reps <-  length(sims)# number of training sets
 
-nburn <- 1000 #set length of mcmc chains
-nkeep <- 1000
-nkeept <- 1000 #for the t-model.
-nu <- 3
+nburn <- 1e4 #set length of mcmc chains
+nkeep <- 1e4
+nkeept <- 1e4
+nburnt <- 2e4 #for the t-model.
+nu <- 5
 #set seed 
 set.seed(min(sims))
 
 for(State_keep in states){
+  
 #prior -----
 prior_data <- read_rds(file.path(here::here(), 'data', 'prior_data.rds'))
 # cnts <- prior_data %>%  group_by(State) %>% summarize(n = n())
 # View(cnts)
 prior_data <- prior_data %>% 
-  mutate(sqrt_count_2008 = sqrt(Count_2008), sqrt_count_2010 = sqrt(Count_2010))  %>% filter(Type == 1 & State == State_keep)
+  mutate(sqrt_count_2008 = sqrt(Count_2008), sqrt_count_2010 = sqrt(Count_2010))  %>% filter(State == State_keep, Type == 1, Count_2010 > 0)
 
-# ggplot(prior_data) + geom_point(aes(x = sqrt_count_2008, y = sqrt_count_2010)) + xlim(c(0,100))
+# ggplot(prior_data) + geom_point(aes(x = sqrt_count_2008, y = sqrt_count_2010)) + xlim(c(0,100)) +ylim(c(0,100))
 
 # pooled regression analysis ----
 prior_fit <- MASS::rlm(sqrt_count_2010 ~ sqrt_count_2008 - 1 , scale.est = 'Huber', data =  prior_data, maxit = 100)
@@ -44,29 +46,24 @@ prior_fit <- MASS::rlm(sqrt_count_2010 ~ sqrt_count_2008 - 1 , scale.est = 'Hube
 #load analysis data -------
 
 analysis_data <- read_rds(file.path(here::here(), 'data', 'analysis_data.rds'))
-cnts <- analysis_data %>%  group_by(State) %>% summarize(n = n())
-View(cnts %>% filter(State %in% states))
+# cnts <- analysis_data %>%  group_by(State) %>% summarize(n = n()) 
+# 
+# View(cnts)
+
 analysis_data <- analysis_data %>% 
   mutate(sqrt_count_2010 = sqrt(Count_2010), sqrt_count_2012 = sqrt(Count_2012)) %>% filter(State == State_keep)
 
+ggplot(analysis_data) + geom_point(aes(x = sqrt_count_2010, y = sqrt_count_2012)) + xlim(c(0,100))
 
-# 
-# for(beta_var_inflate in c(10, 50, 100)){
-# 
-# summary(prior_fit)
-# beta_0 <- coef(prior_fit)
-# se_beta_0 <- vcov(prior_fit)^.5
-# #beta_var_inflate <- 10 #nrow(prior_data)
-# var_beta_0 <- beta_var_inflate*se_beta_0^2 
-# sigma2_hat <- prior_fit$s^2
-# 
-# a_0 <- 5
-# b_0 <- sigma2_hat*(a_0 - 1)
+#MASS::rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1 , scale.est = 'Huber', data =  analysis_data, maxit = 100)
 
 N <- nrow(analysis_data)
 p <- length(coef(prior_fit))
 
 for(n_percent in ns){ # percent to use as training set. 
+  
+  converge_matrix <- array(NA, c(4, 2, length(v_inflate), length(sims))) 
+  
   n <- floor(n_percent*N/100)
   # Set storing objects -----
   
@@ -130,7 +127,7 @@ for(n_percent in ns){ # percent to use as training set.
   
   
   # simulation -----
-  system.time(  
+ # system.time(  
     for(i in sims){
       
       trainIndices <- sort(sample(1:N, n))
@@ -168,8 +165,7 @@ for(n_percent in ns){ # percent to use as training set.
       #rlmPreds <- predict(rlmfit, newdata = data.frame(sqrt_count_2010 = Xholdout))
       rlmPredMat[i,] <- rlmPreds
       margRlm[i,] <- dnorm(yholdout,mean=rlmPreds, sd=rlmfit$s)
-      
-      
+     
       
       #rlm on training: Huber ----
       rlmfitHuber <- rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, psi=psi.huber, scale.est='Huber',data = train, maxit=1000)
@@ -188,10 +184,10 @@ for(n_percent in ns){ # percent to use as training set.
       margOls[i,] <- dnorm(yholdout,mean=olsPreds, sd=summary(olsFit)$sigma)
       
 #bayes models
-v_ind <- 1
+
 for(beta_var_inflate in v_inflate){
-      
-        summary(prior_fit)
+v_ind <- which(beta_var_inflate == v_inflate)   
+        #summary(prior_fit)
         beta_0 <- coef(prior_fit)
         se_beta_0 <- vcov(prior_fit)^.5
         var_scalar <- floor(nrow(prior_data)*beta_var_inflate/100)
@@ -220,7 +216,7 @@ for(beta_var_inflate in v_inflate){
       sigma2Ntheory <- postMeansNtheory[p+1]
       nTheoryPreds <- Xholdout%*%betaNTheory
       nTheoryPredMat[i, v_ind,] <- nTheoryPreds
-      
+     
       # get marginals f(y_h) for each element in holdout set 
       nMuMatrix <- Xholdout%*%(t(nTheory$mcmc)[1:p,])
       #sd's across samples for each houldout set
@@ -229,7 +225,9 @@ for(beta_var_inflate in v_inflate){
       #this is estiamate L(y_h) of the marginal f(y_h) for each y_h in the holdout set for normal model
       margNTheory[i,v_ind,] <- rowMeans(dnorm(yholdout,mean = nMuMatrix, sd = nSigmaMat))
       
+      converge_matrix[1,, v_ind, i] <- geweke.diag(nTheory$mcmc)$z
       
+        
       # restricted likelihood -----
       
       
@@ -245,7 +243,7 @@ for(beta_var_inflate in v_inflate){
                                             nkeep = nkeep, 
                                             nburn= nburn, 
                                             maxit=1000)
-      
+      #plot(restricted$mcmc, ask=FALSE, density=FALSE)
       postMeansRest <- colMeans(restricted$mcmc)
       restrictedEstimates[,i,v_ind] <- postMeansRest
       betaRest <- postMeansRest[1:p]
@@ -264,6 +262,10 @@ for(beta_var_inflate in v_inflate){
       
       #estiamate (L(y_h)) of the marginal f(y_h) for each y_h in the holdout set for  restricted model
       margRest[i,v_ind,] <- rowMeans(dnorm(yholdout,mean=restMuMatrix, sd=restSigmaMat))
+      # plot(margRest[i,v_ind,], margRlm[i,])
+      # abline(0,1)
+      # mean(margRest[i,v_ind,]); mean(margRlm[i,])
+      converge_matrix[2,, v_ind, i] <- geweke.diag(restricted$mcmc)$z
       
       
       #Huber version ----
@@ -297,6 +299,8 @@ for(beta_var_inflate in v_inflate){
       margRestHuber[i,v_ind,] <- rowMeans(dnorm(yholdout,mean=restMuMatrixHuber, sd=restSigmaMatHuber))
       
       
+      converge_matrix[3, ,v_ind, i] <- geweke.diag(restrictedHuber$mcmc)$z
+      
       
       # t-model ----
       
@@ -311,7 +315,7 @@ for(beta_var_inflate in v_inflate){
                                    parInit = NULL,
                                    nu = nu, 
                                    nkeep = nkeept, 
-                                   nburn = nburn,
+                                   nburn = nburnt,
                                    rwTune = NULL)  
       postMeansT <- colMeans(tmodel$mcmc)
       tmodelEstimates[,i,v_ind] <- postMeansT
@@ -327,14 +331,15 @@ for(beta_var_inflate in v_inflate){
       tSigmaMat <- matrix(sqrt(rep(t(tmodel$mcmc)[p+1,],N-n)),N-n,nkeept, byrow = TRUE)
       
       margT[i,v_ind,] <- rowMeans(tdensity(yholdout, mean=tMuMatrix,sigma=tSigmaMat, nu = nu))
-      v_ind <- v_ind + 1
+      
+      converge_matrix[4, ,v_ind, i] <- geweke.diag(tmodel$mcmc)$z
+  
+      # v_ind <- v_ind + 1
 }
 print(i)
 }
-)  
-  # save output
-  # rm(list=setdiff(ls(),c('y_hold','yOpenMat','y_open_type1','acceptY','acceptYHuber','acceptT', 'n','rlmEstimates',"rlmEstimatesHuber",'nTheoryEstimates','restrictedEstimates',"restrictedEstimatesHuber",'tmodelEstimates','olsEstimates', 'mu0Star', 'Sigma0Star','margNTheory','margRest',"margRestHuber",'margT','margRlm',"margRlmHuber",'margOls','holdIndicesMatrix',"rlmPredMat", 'rlmPredHuberMat','olsPredMat','nTheoryPredMat','restPredMat','restPredHuberMat','tPredMat', 'reps', 'run')))
-  
+# )  
+ 
   
   out <- list(y_hold = y_hold,
               y_open = y_open,
@@ -342,6 +347,7 @@ print(i)
               acceptY = acceptY,
               acceptYHuber = acceptYHuber,
               acceptT = acceptT,
+              converge_matrix = converge_matrix,
               margRlm = margRlm,
               margRlmHuber = margRlmHuber,
               margOls = margOls,
@@ -365,8 +371,9 @@ print(i)
               restrictedEstimatesHuber = restrictedEstimatesHuber,
               tmodelEstimates = tmodelEstimates)
   
-  write_rds(out, file.path(here::here(), paste0('single_reg_state_', State_keep, '_n_', n_percent, '.rds' )))
+write_rds(out, file.path(here::here(), paste0('single_reg_state_', State_keep, '_n_', n_percent, '.rds' )))
 } 
+print(paste0('finish state ', State_keep))
 }
 
 end <- Sys.time()

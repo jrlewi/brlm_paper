@@ -109,7 +109,7 @@ a_psir <- parms_prior$a_psir
 b_psir <- parms_prior$b_psir
 
 
-nu <- 3 #df for t-model
+nu <- 5 #df for t-model
 ns <- c(1000, 2000) #sample size for training set
 reps <- 10 # number of training sets
 

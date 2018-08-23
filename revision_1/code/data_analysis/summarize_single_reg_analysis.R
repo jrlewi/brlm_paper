@@ -3,9 +3,9 @@ library(tidyverse)
 library(MASS)
 
 
-ns <- c(10, 25, 50) #sample size for training set
-states <- c(2,3,27)
-v_inflate <- c(5, 10, 50, 100)
+ns <- c(25, 50) #sample size for training set
+states <- c(2, 15, 27, 36)
+v_inflate <- c(100)
 
 # plots ---- 
 analysis_data <- read_rds(file.path(here::here(), 'data', 'analysis_data.rds'))
@@ -22,16 +22,16 @@ ggsave(file.path(getwd(), "..", "..", "figs", 'scatter_all.png'), width = 6, hei
 
 
 
-analysis_data %>% group_by(State) %>% 
+cnts <- analysis_data %>% group_by(State) %>% 
   summarise(n = n())
-
-ggplot(analysis_data) + geom_point(aes(x = sqrt_count_2010, y = sqrt_count_2012, col = Type), size = 1, alpha = .25) +
-  facet_wrap(~State, labeller = label_bquote(State ~ .(State)))+ 
-  theme_bw() + 
-  labs(x = 'square root of 2010 houshold count', y = 'square root of 2012 houshold count') +
-  theme(text = element_text(family = 'Times'))
-ggsave(file.path(getwd(), "..", "..", "figs", 'scatter_by_state.png'), width = 6, height = 4)
-
+# 
+# ggplot(analysis_data) + geom_point(aes(x = sqrt_count_2010, y = sqrt_count_2012, col = Type), size = 1, alpha = .25) +
+#   facet_wrap(~State, labeller = label_bquote(State ~ .(State)))+ 
+#   theme_bw() + 
+#   labs(x = 'square root of 2010 houshold count', y = 'square root of 2012 houshold count') +
+#   theme(text = element_text(family = 'Times'))
+# ggsave(file.path(getwd(), "..", "..", "figs", 'scatter_by_state.png'), width = 6, height = 4)
+# 
 
 
 
@@ -81,7 +81,8 @@ single_marginal_tibble <- function(pooled_results, MargName, ModelName){
     y_open <- logical_ytibble(pooled_results$y_open, colname = 'Open')
     y_type1 <- logical_ytibble(pooled_results$y_type1, colname = 'Type1')
     
-    full_join(tmp, y_open,  by = c("holdout sample", "Repetition")) %>% full_join(., y_type1,  by = c("holdout sample", "Repetition"))
+    full_join(tmp, y_open,  by = c("holdout sample", "Repetition")) %>% full_join(., y_type1,  by = c("holdout sample", "Repetition")) %>% 
+      mutate(var_inflate = NA)
   }
 }
 
@@ -113,17 +114,25 @@ bind_rows(list_1)
 }
 
 pooled_marginals <- pooled_marginals_all(ns, states)
-anyNA(pooled_marginals)
+# anyNA(pooled_marginals)
 pooled_marginals <- pooled_marginals %>% 
   mutate(n = as.factor(n), State = as.factor(State))
 # var_inflate = as.factor(var_inflate)
 #add artificial levels of v-inflate for the classical models
 
-p0 <- pooled_marginals %>% filter(is.na(var_inflate)) %>% dplyr::select(-var_inflate) %>% mutate(var_inflate = "5")
-p1 <- pooled_marginals %>% filter(is.na(var_inflate)) %>% dplyr::select(-var_inflate) %>% mutate(var_inflate = "10")
-p2 <- pooled_marginals %>% filter(is.na(var_inflate)) %>% dplyr::select(-var_inflate) %>% mutate(var_inflate = "50")
-p3 <- pooled_marginals %>% filter(is.na(var_inflate)) %>% dplyr::select(-var_inflate) %>% mutate(var_inflate = "100")
-pooled_marginals <- bind_rows(pooled_marginals %>% filter(!is.na(var_inflate)), p0, p1, p2, p3) 
+
+
+# p0 <- pooled_marginals %>% filter(is.na(var_inflate)) %>% dplyr::select(-var_inflate) %>% mutate(var_inflate = "5")
+# p1 <- pooled_marginals %>% filter(is.na(var_inflate)) %>% dplyr::select(-var_inflate) %>% mutate(var_inflate = "10")
+# p2 <- pooled_marginals %>% filter(is.na(var_inflate)) %>% dplyr::select(-var_inflate) %>% mutate(var_inflate = "50")
+# p3 <- pooled_marginals %>% filter(is.na(var_inflate)) %>% dplyr::select(-var_inflate) %>% mutate(var_inflate = "100")
+
+
+p0 <- map(as.character(v_inflate), .f = function(v){
+  pooled_marginals %>% filter(is.na(var_inflate)) %>% dplyr::select(-var_inflate) %>% mutate(var_inflate = v)
+})
+
+pooled_marginals <- bind_rows(pooled_marginals %>% filter(!is.na(var_inflate)), p0) 
 # Trimmed log marginal distribution 
 # tlm <- function(marginals, fun = mean, trimming_fraction = 0.3){
 #   log_marg <- log(marginals)
@@ -135,11 +144,11 @@ pooled_marginals <- bind_rows(pooled_marginals %>% filter(!is.na(var_inflate)), 
 # Finding TLM with a specific base model -----
 
 
-base_model <- 'Student-t'
+base_model <- "Student-t"
 trimming_fraction <- 0.3
 
 marginals_open_type1 <- pooled_marginals %>% 
-  filter(Open == TRUE & Type1 == TRUE)
+  filter(Open == TRUE, Type1 == TRUE)
 
 base_model_marg <-  marginals_open_type1 %>% 
   filter(Model == base_model) 
@@ -169,7 +178,7 @@ marg_split <- marginals_open_type1 %>%
 
 summary_tibble <- marg_split %>% 
   group_by(Repetition, Model, n, State, var_inflate) %>% 
-  summarise(tlm_mean = mean(Marginal), tlm_sd = sd(Marginal)) %>% 
+  summarise(tlm_mean = mean(Marginal), tlm_sd = sd(Marginal)/tlm_mean) %>% 
   ungroup() %>% 
   group_by(Model, n,State, var_inflate) %>% 
   summarise(mean = mean(tlm_mean), 
@@ -177,18 +186,43 @@ summary_tibble <- marg_split %>%
             mean_sd = mean(tlm_sd),
             sd_sd = sd(tlm_sd)) %>% 
   ungroup() %>% 
-  mutate(Model = factor(Model, levels = c( 'Restricted - Huber','Rlm - Huber', 'Restricted - Tukey', 'Rlm - Tukey','Student-t', 'Normal', 'OLS')), n = factor(n), var_inflate = factor(var_inflate, levels = v_inflate))
+  mutate(Model = factor(Model, levels = c('Restricted - Huber','Rlm - Huber', 'Restricted - Tukey', 'Rlm - Tukey','Student-t', 'Normal', 'OLS')), n = factor(n), var_inflate = factor(var_inflate, levels = v_inflate))
+
+
+
+
 
 
 
 theme_set(theme_bw(base_family = 'Times'))
-ggplot(filter(summary_tibble, !Model %in% c('OLS', 'Normal')), aes(x = n, y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + #geom_line(position = position_dodge(width = .5)) +
-  geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 'dotted') +
-  facet_wrap(~State+var_inflate, drop = FALSE)
+ggplot(filter(summary_tibble, var_inflate == 100), aes(x = n, y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + #geom_line(position = position_dodge(width = .5)) +
+  geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 'dotted')  + 
+  facet_wrap(~State, drop = FALSE)
 
 
+ggplot(filter(summary_tibble, var_inflate == 100), aes(x = State, y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + #geom_line(position = position_dodge(width = .5)) +
+  geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 'dotted')  + 
+  facet_wrap(~n, drop = FALSE)
 
-ggplot(filter(summary_tibble, !Model %in% c('OLS', 'Normal')), aes(x = n, y = mean_sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + #geom_line(position = position_dodge(width = .5)) +
-  geom_errorbar(mapping = aes(ymin = (mean_sd - sd_sd)/mean, ymax = (mean_sd + sd_sd)/mean), width = 0.05, position  = position_dodge(width = .5), linetype = 'dotted') +
-  facet_wrap(~State+var_inflate, drop = FALSE, scales = 'free')
 
+# ggplot(filter(summary_tibble, !Model %in% c('OLS', 'Normal')), aes(x = n, y = mean_sd, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + #geom_line(position = position_dodge(width = .5)) +
+#   geom_errorbar(mapping = aes(ymin = (mean_sd - sd_sd), ymax = (mean_sd + sd_sd)), width = 0.05, position  = position_dodge(width = .5), linetype = 'dotted') +
+#   facet_wrap(~State, drop = FALSE, scales = 'free')
+
+
+ggplot(filter(summary_tibble, !Model %in% c('OLS', 'Normal')), aes(x = n, y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .2)) + #geom_line(position = position_dodge(width = .2), lty = 2) +
+  #geom_errorbar(mapping = aes(ymin = (mean_sd - sd_sd), ymax = (mean_sd + sd_sd)), width = 0.05, position  = position_dodge(width = .5), linetype = 'dotted') +
+  facet_wrap(~State, drop = FALSE)
+
+
+ggplot(filter(summary_tibble, !Model %in% c('OLS', 'Normal')), aes(x = State, y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .2)) + geom_line(position = position_dodge(width = .2), lty = 2) +
+  #geom_errorbar(mapping = aes(ymin = (mean_sd - sd_sd), ymax = (mean_sd + sd_sd)), width = 0.05, position  = position_dodge(width = .5), linetype = 'dotted') +
+  facet_wrap(~n, drop = FALSE)
+
+
+ggplot(analysis_data) + geom_point(aes(x = sqrt_count_2010, y = sqrt_count_2012, col = Type), size = 1, alpha = .25) +
+  facet_wrap(~State, labeller = label_bquote(State ~ .(State)))+ 
+  theme_bw() + 
+  labs(x = 'square root of 2010 houshold count', y = 'square root of 2012 houshold count') +
+  theme(text = element_text(family = 'Times'))
+ggsave(file.path(getwd(), "..", "..", "figs", 'scatter_by_state.png'), width = 6, height = 4)
