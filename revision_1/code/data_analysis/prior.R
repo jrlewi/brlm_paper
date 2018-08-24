@@ -216,6 +216,7 @@ hist(rho_samp)
 
 hier_parms_prior <- list(mu_0 = beta_0, 
                          Sigma_0 = se_beta_0^2,
+                         sigma2_hat = sigma2_hat,
                          a_0 = a_0, 
                          b_0 = b_0,
                          mu_bstr = mu_b,
@@ -224,6 +225,7 @@ hier_parms_prior <- list(mu_0 = beta_0,
                          w2 = w2,
                          a_psir = a_psir,
                          b_psir = b_psir,
-                         beta_var_inflate = beta_var_inflate)
+                         beta_var_inflate = beta_var_inflate,
+                         prior_fit = prior_fit)
 write_rds(hier_parms_prior, "hier_parms_prior.rds")
 

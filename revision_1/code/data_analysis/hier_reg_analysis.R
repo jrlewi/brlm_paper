@@ -79,7 +79,7 @@ get_pseudo_samps <- function(inv_chi2_samps, models_lm){
 
 # load data and prior information ----
 analysis_data <- read_rds(file.path(here::here(), 'data', 'analysis_data.rds'))
-parms_prior <- read_rds(file.path(here::here(), 'parms_prior.rds'))
+# parms_prior <- read_rds(file.path(here::here(), 'parms_prior.rds'))
 analysis_data <- analysis_data %>% 
   mutate(sqrt_count_2010 = sqrt(Count_2010), sqrt_count_2012 = sqrt(Count_2012)) %>%
   group_by(State) %>% 
@@ -110,12 +110,13 @@ b_psir <- parms_prior$b_psir
 
 
 nu <- 5 #df for t-model
-ns <- c(1000, 2000) #sample size for training set
-reps <- 10 # number of training sets
+ns <- floor(nrow(analysis_data)*.5) #c(1000, 2000) #sample size for training set
+reps <- 50 # number of training sets
 
-nburn <- 1000 #set length of mcmc chains
-nkeep <- 1000
-nkeept <- 1000 #for the t-model.
+nburn <- 1e4 #set length of mcmc chains
+nkeep <- 1e4
+nburnt <- 1.5e4
+nkeept <- 1e4 #for the t-model.
 maxit <- 1000 #parameter in MASS::rlm
 
 #set seed 
@@ -138,7 +139,18 @@ t_ind <- 7
 for(n in ns){
   
   percent_sample <- n/N
-  strata_sizes <- round(percent_sample*state_sizes$n, 0)
+  strata_sizes <- round(percent_sample*state_sizes$n)
+ 
+  #make sure to sample exactly n values in total
+  while(sum(strata_sizes) < n){
+    ind <- which.max(strata_sizes)
+    strata_sizes[ind] <- strata_sizes[ind] + 1
+  }
+
+  while(sum(strata_sizes) > n){
+    ind <- which.max(strata_sizes)
+    strata_sizes[ind] <- strata_sizes[ind] - 1
+  }
   
   
   # Set storing objects -----
@@ -172,9 +184,9 @@ converge <- array(NA, c(nModels, 5, reps))
 
 #auxilary functions and constants ---- 
 #t density with center and scale and df = nu
-  tdensity<-function(y, mean, sigma, nu){
-    (gamma(.5*(nu+1))/(gamma(.5*nu)*sigma*sqrt(nu*pi)))*(1+((y-mean)/sigma)^2/nu)^(-.5*(nu+1))
-  }
+  # tdensity<-function(y, mean, sigma, nu){
+  #   (gamma(.5*(nu+1))/(gamma(.5*nu)*sigma*sqrt(nu*pi)))*(1+((y-mean)/sigma)^2/nu)^(-.5*(nu+1))
+  # }
   fits<-function(betahats, X){X%*%betahats}
   
  
@@ -187,7 +199,9 @@ converge <- array(NA, c(nModels, 5, reps))
       holdIndices <- c(1:N)[-strat_sample$ID_unit]
       holdIndicesMatrix[i,] <- holdIndices
       train <- analysis_data[strat_sample$ID_unit,]
+      train$index <- strat_sample$ID_unit
       hold <- analysis_data[holdIndices,]
+      hold$index <- holdIndices
       yholdout <- hold$sqrt_count_2012
       y_hold[i,] <- yholdout
   
@@ -224,7 +238,6 @@ converge <- array(NA, c(nModels, 5, reps))
       X <- models_lm %>% 
         map(.f = function(m) m$x)
       
-      
       betaHats <- models_lm %>% 
         map(.f = function(m) coef(m)) %>% 
         unlist()
@@ -235,7 +248,6 @@ converge <- array(NA, c(nModels, 5, reps))
         unlist()
       group_estimates[ols_ind, p+1, , i] <- sigHats
 
-      
       #prepare the holdout data for predictions
       #yhold is list of holdout responses from each group
       #Xhold is list of holfout design matrices for each group
@@ -257,7 +269,7 @@ converge <- array(NA, c(nModels, 5, reps))
 #predictions on the holdoutset
       olsPreds <- by_state_hold$data %>% 
         map2(.x = ., .y = models_lm, .f = function(x, y){
-          predict(y, newdata = x)
+        predict(y, newdata = x)
         })
       
   predictions[ols_ind, i, ] <- olsPreds %>% unlist()
@@ -265,30 +277,30 @@ converge <- array(NA, c(nModels, 5, reps))
   
   
 #marginals on holdoutset  
-  #get psuedo posterior samples
-  inv_chi2_samps <- lapply(nis, function(n) (n-p)/rchisq(nkeep, df = n-p))
-  pseudo_samps <- get_pseudo_samps(inv_chi2_samps, models_lm)
+  #get psuedo posterior samples - roughly same results
+  # inv_chi2_samps <- lapply(nis, function(n) (n-p)/rchisq(nkeep, df = n-p))
+  # pseudo_samps <- get_pseudo_samps(inv_chi2_samps, models_lm)
+  # 
+  # beta_samps <- sapply(pseudo_samps, function(x) x[,1])
+  # betal <- array(NA, c(p,nkeep, nGroups))
+  # betal[p,,] <- beta_samps
+  # sigma2_samps <- sapply(pseudo_samps, function(x) x[,2])
+  # 
+  # ols_marg_mn_sd <-fn.compute.marginals.hierModelNormal(betal,  sigma2_samps, yhold,Xhold)
+  # ols_marg <- lapply(ols_marg_mn_sd, function(x) x[,1])
+  # ols_marg_sd <- lapply(ols_marg_mn_sd, function(x) x[,2])
+  # marginals[ols_ind, i,] <- ols_marg %>% unlist() 
+  # marginals_sd[ols_ind, i,] <- ols_marg_sd %>% unlist() 
   
-  beta_samps <- sapply(pseudo_samps, function(x) x[,1])
-  betal <- array(NA, c(p,nkeep, nGroups))
-  betal[p,,] <- beta_samps
-  sigma2_samps <- sapply(pseudo_samps, function(x) x[,2])
-  
-  ols_marg_mn_sd <-fn.compute.marginals.hierModelNormal(betal,  sigma2_samps, yhold,Xhold)
-  ols_marg <- lapply(ols_marg_mn_sd, function(x) x[,1])
-  ols_marg_sd <- lapply(ols_marg_mn_sd, function(x) x[,2])
-  marginals[ols_ind, i,] <- ols_marg %>% unlist() 
-  marginals_sd[ols_ind, i,] <- ols_marg_sd %>% unlist() 
-  
-# olsMarginals <-
-#         list(yhold, olsPreds, models_lm) %>% 
-#         pmap(.f = function(y, prd, m){
-#           dnorm(y,prd,summary(m)$sigma) 
-#         })
-#      marginals[ols_ind, i, ] <- olsMarginals %>% unlist()  
+olsMarginals <-
+        list(yhold, olsPreds, models_lm) %>%
+        pmap(.f = function(y, prd, m){
+          dnorm(y,prd,summary(m)$sigma)
+        })
+marginals[ols_ind, i, ] <- olsMarginals %>% unlist()  
 
     
-    #RLM Tukey on training -----
+  #RLM Tukey on training -----
       state_rlm <- function(df){
         rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, psi=psi.bisquare, scale.est='Huber', data = df, maxit=1000)
       }
@@ -314,35 +326,14 @@ converge <- array(NA, c(nModels, 5, reps))
       
       predictions[rlm_ind, i, ] <- rlmPreds %>% unlist()
      
+    # marginals ----
+      rlmMarginals <- list(yhold, rlmPreds, models_rlm) %>%
+        pmap(.f = function(y, prd, m){
+          dnorm(y,prd,summary(m)$sigma)
+        })
       
-  # get pseudo posterior samples ----     
-      pseudo_samps <- get_pseudo_samps(inv_chi2_samps, models_rlm) 
-      
-      beta_samps <- sapply(pseudo_samps, function(x) x[,1])
-      betal <- array(NA, c(p,nkeep, nGroups))
-      betal[p,,] <- beta_samps
-      sigma2_samps <- sapply(pseudo_samps, function(x) x[,2])
-      
-      rlm_marg_mn_sd <-fn.compute.marginals.hierModelNormal(betal,  sigma2_samps, yhold,Xhold)
-      rlm_marg <- lapply(rlm_marg_mn_sd, function(x) x[,1])
-      rlm_marg_sd <- lapply(rlm_marg_mn_sd, function(x) x[,2])
-      marginals[rlm_ind, i,] <- rlm_marg %>% unlist() 
-      marginals_sd[rlm_ind, i,] <- rlm_marg_sd %>% unlist()
-      
-      # plot(rlm_marg %>% unlist(), rest_marg %>% unlist())
-      # abline(0,1, col = 2)
-      # plot(rlm_marg_sd %>% unlist(), rest_marg_sd %>% unlist())
-      # abline(0,1, col = 2)
-      # 
-      
-      # 
-      # 
-      # rlmMarginals <- list(yhold, rlmPreds, models_rlm) %>%
-      #   pmap(.f = function(y, prd, m){
-      #     dnorm(y,prd,summary(m)$sigma) 
-      #   })
-      # marginals[rlm_ind, i, ] <- rlmMarginals %>% unlist()  
-      # 
+      marginals[rlm_ind, i, ] <- rlmMarginals %>% unlist()
+
       
       
       
@@ -376,28 +367,12 @@ converge <- array(NA, c(nModels, 5, reps))
       
       predictions[rlm_huber_ind, i, ] <- rlmPreds %>% unlist()  
       
-#get psuedo posterior samples ---
+        rlmMarginals <- list(yhold, rlmPreds, models_rlm) %>%
+        pmap(.f = function(y, prd, m){
+          dnorm(y,prd,summary(m)$sigma)
+        })
 
-      pseudo_samps <- get_pseudo_samps(inv_chi2_samps, models_rlm)
-      beta_samps <- sapply(pseudo_samps, function(x) x[,1])
-      betal <- array(NA, c(p,nkeep, nGroups))
-      betal[p,,] <- beta_samps
-      sigma2_samps <- sapply(pseudo_samps, function(x) x[,2])
-      
-      rlm_marg_mn_sd <-fn.compute.marginals.hierModelNormal(betal,  sigma2_samps, yhold,Xhold)
-      rlm_marg <- lapply(rlm_marg_mn_sd, function(x) x[,1])
-      rlm_marg_sd <- lapply(rlm_marg_mn_sd, function(x) x[,2])
-      marginals[rlm_huber_ind, i,] <- rlm_marg %>% unlist() 
-      marginals_sd[rlm_huber_ind, i,] <- rlm_marg_sd %>% unlist() 
-      
-      
-
-        # rlmMarginals <- list(yhold, rlmPreds, models_rlm) %>%
-        # pmap(.f = function(y, prd, m){
-        #   dnorm(y,prd,summary(m)$sigma) 
-        # })
-        # 
-        # marginals[rlm_huber_ind, i, ] <- rlmMarginals %>% unlist()  
+        marginals[rlm_huber_ind, i, ] <- rlmMarginals %>% unlist()
 
 
 # Hierarchical Models -----    
@@ -491,16 +466,10 @@ converge <- array(NA, c(nModels, 5, reps))
 #computing marginal likelihoods for each element in holdout sample
 nTheory_marg_mn_sd <-fn.compute.marginals.hierModelNormal(betal, nTheory$sigma2s, yhold,Xhold)
 nTheory_marg <- lapply(nTheory_marg_mn_sd, function(x) x[,1])
-nTheory_marg_sd <- lapply(nTheory_marg_mn_sd, function(x) x[,2])
 marginals[norm_ind, i,] <- nTheory_marg %>% unlist() 
 nTheory_marg_sd <- lapply(nTheory_marg_mn_sd, function(x) x[,2])
 marginals_sd[norm_ind, i,] <- nTheory_marg_sd %>% unlist() 
 
-# nTheory_pt_marg <- list(yhold,  nTheoryPreds, postMeansSigma2s^.5) %>%
-#   pmap(.f = function(y, prd, sig){
-#     dnorm(y,prd,sig) 
-#   })  
-# marginals[norm_pt_ind, i,] <- nTheory_pt_marg %>% unlist() 
 
 ################################################
 # restricted likelihood models -----
@@ -705,8 +674,8 @@ marginals_sd[rest_hub_ind, i,] <- rest_marg_sd %>% unlist()
     
       tModel <- brlm::hier_TLm(y,
                             X,
-                            nkeep,
-                            nburn,
+                            nkeept,
+                            nburnt,
                             mu0,
                             Sigma0,
                             a0, 
@@ -782,6 +751,8 @@ marginals_sd[t_ind, i,] <- t_marg_sd %>% unlist()
 
 ################################################
 print(i)
+end <- Sys.time() - strt
+print(end) 
     }
  end <- Sys.time() - strt
  print(end)  
