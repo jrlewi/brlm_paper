@@ -1139,6 +1139,7 @@ where $\psi$ and $\chi$ are almost surely differentiable. Differentiating this s
 %In this section we apply the restricted likelihood to both simulated and real data. 
 
 \section{Simulated Data}
+\label{simData}
 We study the performance of the restricted likelihood in a hierarchical setting contaminated with outliers. Specifically, simulated data come from the following data generating model:
 \begin{align}
 \label{gensim2}
@@ -1156,7 +1157,7 @@ with $\mu = 0, \tau^{2} = 1, \sigma^{2} = 4$. The values of $p_{i}, m_{i}$, and 
 & y_{ij}\sim  N(\theta_{i},\sigma^{2}_{i}), \ j = 1, 2, \dots, n_{i}.
 \end{split}
 \end{equation}
-For the restricted likelihood versions we condition on robust M-estimators (see,$\eqref{Mest}$) of location and scale in each group: $T_{i}(y_{i1}, \dots, y_{in_{i}}) = (\hat\theta_{i}, \hat\sigma^{2}_{i}), i = 1, 2, ..., 90$. The two versions use Huber's and Tukey's $\psi$ function, while both versions use Huber's $\chi$ function in $\eqref{Mest}$. The tuning parameters are chosen so that the estimators are $95\%$ efficient under normally distributed data \citep{huber2009}. %We will see that his choice has some interesting effects on the results. %These estimators are implemented in the R function \texttt{MASS::rlm} with \cite{huber2009} providing further details. 
+For the restricted likelihood versions we condition on robust M-estimators of location and scale in each group: $T_{i}(y_{i1}, \dots, y_{in_{i}}) = (\hat\theta_{i}, \hat\sigma^{2}_{i}), i = 1, 2, ..., 90$.  These estimators are solutions to equation \eqref{Mest} (where $x_{i}\equiv 1$) with user specified $\psi$ and $\chi$ functions designed to discount outliers. The two versions use Huber's and Tukey's $\psi$ function, while both versions use Huber's $\chi$ function. The tuning parameters associate with these functions are chosen so that the estimators are $95\%$ efficient under normally distributed data. Both of these are well known M-estimators used in robust regression settings  \citep{huber2009}.  %We will see that his choice has some interesting effects on the results. %These estimators are implemented in the R function \texttt{MASS::rlm} with \cite{huber2009} providing further details. 
 
 To complete the specification of model \eqref{fullsim2},  $a_{s}$ and $b_{s}$ are fixed to a variety of values representing different levels of prior knowledge. For each we set $b_{s} = 4a_{s}c$ resulting in a prior mean for each $\sigma^{2}_{i}$ of $\frac{4ca_{s}}{a_{s}-1}, \ a_{s} >1$. The precision is $\frac{(a_{s} -1)^{2}(a_{s}-2)}{(4ca_{s})^{2}}$; meaning the larger $a_{s}$, the more informative the prior. With $c = 1$ the shrinkage (for large $a_{s}$) is to the true value of $\sigma^{2} = 4$. We consider $a_{s} = 1.25,  5, 10$ and $c = 0.5, 1, 2$. %Values of $c \neq 1$ will result in shrinkage towards the wrong value of $\sigma^{2}$.
 
@@ -1167,9 +1168,9 @@ To assess the predictive capability, the models are compared using Kullback-Leib
 \label{kl}
 KL^{(M)}_{ik} = \int \log \frac{f(\tilde y | \theta_{i}, \sigma^{2})}{f_{i}(\tilde y | M, \by_{k})}  f(\tilde y | \theta_{i}, \sigma^{2}) \ dy
 \end{equation}
-where $M$ indexes the fitting model, $f(\tilde y | \theta_{i}, \sigma^{2}) = N(\tilde y | \theta_{i}, \sigma^{2})$; the mean $\theta_{i}$, variance $\sigma^{2}$ normal pdf evaluated at $\tilde y$. For the Bayesian models ${f_{i}(\tilde y | M, \by_{k})} = \int f(\tilde y |\theta_{i}, \sigma_{i}^{2}) \pi(\theta_{i}, \sigma^{2}_{i} | M, \by_{k})d\theta_{i}d\sigma^{2}_{i}$ where $\pi(\theta_{i}, \sigma^{2}_{i} | M, \by_{k})$ is the posterior for the $i^{th}$ group model parameters under model $M$ for the $k^{th}$ data set. $M$ denotes either the full normal theory model \eqref{fullsim2} or one of the two restricted likelihood versions, along with $a_{s}$ and $c$. For the classical robust fits, we set $f_{i}(\tilde y | M, \by_{k}) = N(\tilde y|\hat\theta_{i}, \hat\sigma^{2}_{i})$ as a groupwise plug-in estimator for the predictive distribution. The classical fits are done separately for each group with no consideration of the hierarchical structure between the groups. The overall mean $\overline{KL}^{(M)}_{{\cdot}{\cdot}} = \frac{1}{90K} \sum_{k = 1}^{K} \sum_{i=1}^{90} KL^{(M)}_{ik}$ is used to compare the models. Sampling variation is summarized with the standard error $SE(\overline{KL}^{(M)}_{{\cdot} k}) = \sqrt{\frac{1}{K(K-1)}\sum_{k = 1}^{K} (\overline{KL}^{(M)}_{{\cdot} k} - \overline{KL}^{(M)}_{{\cdot}{\cdot}})^{2}}$ where $\overline{KL}^{(M)}_{{\cdot} k} = \frac{1}{90}\sum_{i = 1}^{90} KL^{(M)}_{ik}$.
+where $M$ indexes the fitting model, $f(\tilde y | \theta_{i}, \sigma^{2}) = N(\tilde y | \theta_{i}, \sigma^{2})$; the mean $\theta_{i}$, variance $\sigma^{2}$ normal pdf evaluated at $\tilde y$. For the Bayesian models ${f_{i}(\tilde y | M, \by_{k})} = \int f(\tilde y |\theta_{i}, \sigma_{i}^{2}) \pi(\theta_{i}, \sigma^{2}_{i} | M, \by_{k})d\theta_{i}d\sigma^{2}_{i}$ where $\pi(\theta_{i}, \sigma^{2}_{i} | M, \by_{k})$ is the posterior for the $i^{th}$ group model parameters under model $M$ for the $k^{th}$ data set. $M$ denotes either the full normal theory model \eqref{fullsim2} or one of the two restricted likelihood versions, along with $a_{s}$ and $c$. For the classical robust fits, we set $f_{i}(\tilde y | M, \by_{k}) = N(\tilde y|\hat\theta_{i}, \hat\sigma^{2}_{i})$ as a groupwise plug-in estimator for the predictive distribution. The classical fits are done separately for each group with no consideration of the hierarchical structure between the groups. The overall mean $\overline{KL}^{(M)}_{{\cdot}{\cdot}} = \frac{1}{90K} \sum_{k = 1}^{K} \sum_{i=1}^{90} KL^{(M)}_{ik}$ is used to compare the models where smaller means correspond to better fits. Sampling variation is summarized with the standard error $SE(\overline{KL}^{(M)}_{{\cdot} k}) = \sqrt{\frac{1}{K(K-1)}\sum_{k = 1}^{K} (\overline{KL}^{(M)}_{{\cdot} k} - \overline{KL}^{(M)}_{{\cdot}{\cdot}})^{2}}$ where $\overline{KL}^{(M)}_{{\cdot} k} = \frac{1}{90}\sum_{i = 1}^{90} KL^{(M)}_{ik}$.
  
-Figure \ref{kl_sim} displays $\overline{KL}^{(M)}_{{\cdot}{\cdot}}$  with errors-bars plus/minus one $SE(\overline{KL}^{(M)}_{{\cdot} k})$ for each $a_{s} = 1.25,  5, 10$ and $c = 0.5, 1, 2$. %The panels are for $c = 0.5, 1, 2$ with $a_{s} = 1.25,  5, 10$ on the abscissa. 
+Figure \ref{kl_sim} displays $\overline{KL}^{(M)}_{{\cdot}{\cdot}}$  with error-bars plus/minus one $SE(\overline{KL}^{(M)}_{{\cdot} k})$ for each $a_{s} = 1.25,  5, 10$ and $c = 0.5, 1, 2$. %The panels are for $c = 0.5, 1, 2$ with $a_{s} = 1.25,  5, 10$ on the abscissa. 
 The values of $a_{s}$ and $c$, do not effect the classical robust linear models. The normal theory model results are left out as they perform significant worse. Overall, the results are strikingly in favor of the restricted likelihood methods for the range of hyper-parameter values studied. Undoubtably, the most precise and accurate prior studied is  $c = 1$ and $a_{s} = 10$  and this results in the lowest (and best) average KL for both the Tukey and Huber restricted likelihood versions ((shown in the middle panel). $c = 0.5$ performs the worst, but still better than the classical fits. There is evidence that performance starts to degrade as $a_{s} = 10$ as reflected in a larger average KL for $a_{s} = 10$. Here, the prior mean and precision are $2.22$ and $1.62$ and we suspect this is starting to put too much mass on $\sigma^{2}_{i}$ values much smaller than $\sigma^{2}=4$. For $c = 2$, the performance still improves from $a_{s} = 5$ to $a_{s} = 10$. Here the mean is $8.89$ and precision is only $0.1$; apparently not yet large enough to degrade the performance due to an incorrect mean. Lastly, Tukey's statistic performs marginally better than Huber's. This is likely due to the fact that Tukey's estimator trims extreme outliers completely in the estimation procedure \citep{huber2009}.
  
 \begin{figure}[t]
@@ -1200,7 +1201,7 @@ It is also interesting to consider the effects of factors $n_{i}$, $p_{i}$, and 
 \label{boxSigma}
 \end{figure}
 
-This simulation shows the potential of the restricted likelihood while highlighting some interesting observations. Specifically, the choice of summary statistics, along with corresponding tuning parameters is important. The parameters chosen to be $95\%$ at the normal result in bias estimates of the variance under the data generating model. Such bias can result in undesirable properties, such as poorer prediction as the sample size grows. These choices must be made in both the classical and Bayesian settings. The Bayesian setting allows for the incorporation of informative prior information which, as shown in this example, can dramatically improve prediction. The amount of improvement, of course, depends on the prior but here we have observed good relative improvement over the classical counterparts for a range of prior choices.   
+This simulation shows the potential of the restricted likelihood while highlighting some interesting observations. Specifically, the choice of summary statistics, along with corresponding tuning parameters is important. For the tuning parameters, the standard choice of $95\%$ efficiency at the normal was used.  Under the data generating model here, this choice results in bias in the scale estimation which affects the performance of the method. These choices must be made in both the classical and Bayesian settings. The Bayesian setting allows for the incorporation of informative prior information which, as shown in this example, can dramatically improve prediction. The results are sensitive to the prior, but here we have observed good relative improvement over the classical counterparts for a range of prior choices.   
 
 %
 %\begin{figure}[H]
@@ -1241,13 +1242,13 @@ We illustrate our methods with a pair of regression models for data from Nationw
 Nationwide sells many of its insurance policies through agencies which provide direct service to policy holders.  
 The contractual agreements between Nationwide and these agencies vary.  Our interest is the prediction of future performance of agencies where  performance is measured by the total number of households an agency services (`household count'). 
 %A serviced household is one in which at least one person living at that residence has at least one policy written through the agency. 
-We used data from previous years to build a model to forecast future household count. In particular, we use household count  as measured during a single month in $2010$, to predict household counts in the corresponding month in $2012$.  
+%We used data from previous years to build a model to forecast future household count. In particular, we use household count  as measured during a single month in $2010$, to predict household counts in the corresponding month in $2012$.  
 %In particular, we use agency characteristics, as measured during a single month in $2010$, to predict household counts in the corresponding month in $2012$. The characteristics used are household count and two measurements of agency size/experience. The two measurements of agency size/experience are, roughly, the number of employed persons at the agency and the length of time the agency has been affiliated with Nationwide. 
 %The household counts (response and predictor) have been square rooted to stabilize variance. 
-The data a grouped by states with a varying number of agencies by state. Identifiers such as agency/agent names are removed. State labels and agency types (identifying the varying contractual agreements) have been made generic to protect the proprietary nature of the data.
+The data a grouped by states with a varying number of agencies by state. Identifiers such as agency/agent names are removed. Likewise, state labels and agency types (identifying the varying contractual agreements) have been made generic to protect the proprietary nature of the data.
 %The data are proprietary, and to mask them all variables have been individually centered and scaled and identifiers (agency/agent names and state labels) have been removed.All subsequent analysis is done on this scale.  
 As an exploratory view, a plot of the square root of household count in 2012, against that in 2010 
-is shown in Figure \ref{fig:ctVct} for three states. Each state has a varying number of agencies and  the different colors represent the varying contractual agreements as they stood in 2010.  Among the open agencies, linear correlations exists with strength depending on agency type and state.  `Type 1' agencies are of special interest and one could easily subset the analysis to only these agencies, removing the others. Additionally, a large number of agencies closed sometime before 2012, as represented by the many $0$ counts for 2012. The other agency types and the zero counts are `outliers' and could arguably just be removed prior to analysis. However,  we leave them and us the data as a test bed for our techniques by fitting models that do not account for agency closures or contract type.  Our expectation is that the restricting likelihood will facilitate prediction for the `good' part of the data (i.e. open, `type 1' agencies). 
+is shown in Figure \ref{fig:ctVct} for four states. The states have varying number of agencies and  the different colors represent the varying types of contractual agreements as they stood in 2010 (`Type').  A significant number of agencies closed sometime before 2012, as represented by the $0$ counts for 2012. Among the open agencies, linear correlations exists with strength depending on agency type and state.  `Type 1' agencies open in 2012 are of special interest and one could easily subset the analysis to only these agencies, removing the others. However,  we leave them and use the data as a test bed for our techniques by fitting models that do not account for agency closures or contract type.  Our expectation is that the restricting likelihood will facilitate prediction for the `good' part of the data (i.e. open, `type 1' agencies). 
 
 \begin{figure}[t]
 \centering
@@ -1256,9 +1257,9 @@ is shown in Figure \ref{fig:ctVct} for three states. Each state has a varying nu
 \label{fig:ctVct}
 \end{figure}
 
-\subsection{Regression model}
+\subsection{State Level Regression model}
 \label{regModelNW}
-The first analysis considered is based on individual regressions fit separately within a state.  The following normal theory regression model is used as the full model 
+The first analysis considered is based on individual regressions fit separately within states.  The following normal theory regression model is used as the full model for a single state:
 \begin{equation}
 \label{eq:regModel}
 \beta\sim N(\mu_0, \sigma^{2}_0);\ \ \sigma^2\sim IG(a_0,b_0);\ \  
@@ -1269,23 +1270,20 @@ where $y_{i}$ and $x_{i}$ are the square rooted household count in 2012 and 2010
 %with covariate vector $\bx_{i}$.  Although the mean of covariates and response have been removed, we include the intercept as fitting is done on a holdout set to evaluate predictive performance.  
 The hyper-parameters $a_0, b_0, \mu_0$ and $\sigma^{2}_0$ are all fixed and set from a 
 robust regression fit to the corresponding state's data from the time period two years
-before. Specifically, Let $\hat\beta$ and $\hat\sigma^{2}$ be estimates from the robust linear regression of 2010 counts on 2012 counts.  We fix $a_0 = 5$ and set $b_0 = \hat\sigma^{2}(a_0 - 1)$. We set $\mu_0 = \hat\beta$ and $\sigma^{2}_0 =  fn_{p}se(\hat\beta)^{2}$ where $n_{p}$ is the number of agencies in the prior data set and $se(\hat\beta)$ is the standard error of $\hat\beta$ derived from the robust regression. The value of $f$ is varied, controlling the prior certainty on $\beta$, with smaller values corresponding to a more certain prior.  We take $f = 0.05, 0.1, 0.5, 1$ and note the prior is in the spirit of the Zellner's $g$-prior \citep{zellner1986, liang2008}; scaling the prior variance $se(\hat\beta)^{2}$ by a factor $g = fn_{p}$. $f = 1$ is analogous to the unit-information prior \citep{kass1995reference}.  %We fit the models separately for each $g^{*} = 0.05, 0.1, 0.5, 1$  %represent the estimate of the coefficients from this fit we  set $\bmu_0=\hat\bbeta$ and $ \Sigma_0=n\cdot \mbox{var}(\hat\bbeta)$ where here $n$ is the sample size of the prior data set.  %corresponding to  a unit information prior for $\bbeta$. 
+before. Specifically, Let $\hat\beta$ and $\hat\sigma^{2}$ be estimates from the robust linear regression of 2010 counts on 2008 counts.  We fix $a_0 = 5$ and set $b_0 = \hat\sigma^{2}(a_0 - 1)$ so the prior mean is $\hat\sigma^{2}$. We set $\mu_0 = \hat\beta$ and $\sigma^{2}_0 =  n_{p}se(\hat\beta)^{2}$ where $n_{p}$ is the number of agencies in the prior data set and $se(\hat\beta)$ is the standard error of $\hat\beta$ derived from the robust regression. %The value of $f$ is varied, controlling the prior certainty on $\beta$, with smaller values corresponding to a more certain prior.  
+This prior is in the spirit of the Zellner's $g$-prior \citep{zellner1986, liang2008}; in general scaling the prior variance $se(\hat\beta)^{2}$ by a factor $g$. $g = n_{p}$ is analogous to the unit-information prior \citep{kass1995reference}, with the difference that we are using a prior data set, not the current data set, to set the prior. %$f = 0.05, 0.1, 0.5, 1$ and%We fit the models separately for each $g^{*} = 0.05, 0.1, 0.5, 1$  %represent the estimate of the coefficients from this fit we  set $\bmu_0=\hat\bbeta$ and $ \Sigma_0=n\cdot \mbox{var}(\hat\bbeta)$ where here $n$ is the sample size of the prior data set.  %corresponding to  a unit information prior for $\bbeta$. 
 %The hyperparameters for $\sigma^2$ are set so that the prior mean is $s^2$, the estimated variance from the robust regression, and the spread of the prior covers the range of plausible values with high probability. All values are then transformed appropriately to match the current scale of the data. In the end we take $\bmu_0=(0.18,  0.81,0.01,-0.02)^\top$ and set the mean of $\sigma^2$ to $0.014$ and standard deviation to  $0.033$. 
 
 
-
-
-
-
-We compare four Bayesian models: the standard Bayesian normal theory model, two restricted likelihood models, both with simultaneous M-estimators, and a heavy-tailed model.  For the restricted likelihood methods we use the same simultaneous M-estimators as in Section \ref{darwinAnalysis} adapted to linear regression.  The heavy-tailed model replaces the normal sampling density in \eqref{eq:regModel} with a $t$-distribution with $\nu = 3$ degrees of freedom. %We have used the default tuning parameter settings for the {\tt rlm} function in the R package {\tt MASS} \citep{venables2002}.  Both use Huber's scale estimator as in the {\tt rlm} implementation.  
+We compare four Bayesian models: the standard Bayesian normal theory model, two restricted likelihood models, both with simultaneous M-estimators, and a heavy-tailed model.  For the restricted likelihood methods we use the same simultaneous M-estimators as in the simulation of Section \ref{simData} adapted to linear regression.  The heavy-tailed model replaces the normal sampling density in \eqref{eq:regModel} with a $t$-distribution with $\nu = 5$ degrees of freedom. The Bayesian models are all fit using MCMC, with the restricted versions using the algorithm presented in Section \ref{highDim}.
 We also fit the corresponding classical robust regressions and a least squares regression.  
 
 \subsubsection{Method of model comparison}
 We wish to examine the performance of the models in a fashion that preserves the essential features of the 
 problem.  Since we are concerned with outliers and model 
-misspecification, we understand that our models are imperfect and so prefer to use an out-of-sample measure of fit.  
+misspecification, we understand that our models are imperfect and prefer to use an out-of-sample measure of fit.  
 This leads us to cross-validation.  We repeatedly split the data into training
-and validation sets.  We fit the model to the training data and assess its performance on the validation data.  
+and holdout data sets; fitting the model to the training data and assessing performance on the holdout data.  
 
 The presence of numerous outliers in the data implies that both training and validation data will contain 
 outliers.  For this reason, the evaluation must be robust to a certain fraction of bad data.  
@@ -1294,38 +1292,60 @@ to retain the desired evaluation function and trim cases \citep{jung2014}.  Here
 we pursue the trimming approach with log predictive density for the Bayesian models and log plug-in 
 maximum likelihood for the classical fits used as the evaluation function.
 
-The trimmed evaluation proceeds as follows in our context.  The evaluation function for case $i$ in the hold-out data
+The trimmed evaluation proceeds as follows in our context.  The evaluation function for case $i$ in the holdout data
 is the log predictive density, say
 $\log(f(y_i))$, with the conditioning on the 
 summary statistic suppressed.  The trimming 
 fraction is set at $0 \leq \alpha < 1$. To score a method,
 we first identify a base method. Denote the predictive density under this method by $f_{b}(y)$.  Under the base method, $\log(f_{b}(y_i))$ is computed for each case in the 
-validation sample, say $i = 1, \ldots, M$.  Order the validation
-sample according to the ordering of $\log(f_{b}(y_i))$ and denote this
+holdout sample, say $i = 1, \ldots, M$.  Order the holdout sample according to the ordering of $\log(f_{b}(y_i))$ and denote this
 ordering by $y_{(1)}^b, y_{(2)}^b, \dots, y_{(M)}^b$. That is, for $i<j$
-$\log(f_{b}(y_{(i)}^b))<\log(f_{b}(y_{(j)}^b))$. All of the methods are then scored on the validation sample with the mean trimmed log marginal pseudo likelihood, 
+$\log(f_{b}(y_{(i)}^b))<\log(f_{b}(y_{(j)}^b))$. All of the methods are then scored on the holdout sample with the mean trimmed log marginal pseudo likelihood, 
 \[TLM_b(A) = (M - [\alpha M])^{-1} \sum_{i=[\alpha M]+1}^{M}
     \log(f_A(y_{(i)}^b)),\]
  where $f_A$ corresponds to the predictive
  distribution under the method ``A'' being scored.  In other words, the $[\alpha M]$ observations with the smallest values of $\log(f_{b}(y))$ are 
 removed from the validation sample and all of the methods are scored using only the
-remaining $M - [\alpha M]$ observations. This process is advantageous to the base method.  A method
-that performs poorly when it is the base method is discredited.  For a complete evaluation, we allow each method
-to appear as the base method.  For brevity, we present only a selection of results in our subsequent analyses.  
+remaining $M - [\alpha M]$ observations. This process is advantageous to the base method since the smallest scores from this method are guarenteed to be trimmed.  A method
+that performs poorly when it is the base method is discredited.  %For a complete evaluation, we allow each method
+%to appear as the base method.  For brevity, we present only a selection of results in our subsequent analyses.  
 
 \subsubsection{Comparison of predictive performance}
-Model performance is assessed
-using the mean and standard deviation of the TLM 
-across $100$ different splits into training and validation samples. First, we include all observations
-in each validation sample to calculate TLM for each split. We then
-repeat the evaluation using only certain subsets of the validation
-sample that are of special interest. Subsets include open agencies,
-open `Type 1' agencies, and `Type 1' agencies. For brevity, we include
-results for the `Type 1' agencies only. As noted, assessing model
-predictions on this set of agencies is of special interest to the
-company.  A range of training sample sizes was used and we include
-results from $n=25,100,1000,$ and $2000$ out of a total of $3180$ agencies. The trimming fraction, $\alpha$, ranges from $0$ to $0.3$. A classical robust regression to the prior data assigns zero weight to around $16\%$ of observations; in essence removing these from the analysis. This informed the range of trimming fractions chosen.  
-In practice, we would set $\alpha$ slightly larger than $0.16$.  
+%Model performance is assessed using the mean and standard deviation of the TLM 
+%across $K = 50$ different splits into training and holdout samples. 
+`Type 1' agencies are of special interest to the company and so the evaluation of the TLM is done on only holdout samples of `Type 1', wheres the training is done on agencies of all types. This is intended to demonstrate the robustness properties of the various methods. 
+%First, we include all observations
+%in each validation sample to calculate TLM for each split. We then
+%repeat the evaluation using only certain subsets of the validation
+%sample that are of special interest. Subsets include open agencies,
+%open `Type 1' agencies, and `Type 1' agencies. For brevity, we include
+%results for the `Type 1' agencies only. As noted, assessing model
+%predictions on this set of agencies is of special interest to the
+%company.  A range of training sample sizes was used and we include
+%results from $n=25,100,1000,$ and $2000$ out of a total of $3180$ agencies. 
+%The trimming fraction, $\alpha$, ranges from $0$ to $0.3$. A classical robust regression to the prior data assigns zero weight to around $16\%$ of observations; in essence removing these from the analysis. This informed the range of trimming fractions chosen.  
+%In practice, we would set $\alpha$ slightly larger than $0.16$.  
+Models are fit to four states labelled State 2, 15, 27, and 36, with $n = 222, 40, 117,$ and $46$, representing a range of sample sizes. Training sample sizes are taken to be $.25n$ and $0.50n$ with holdout evaluation done on the remaining (`Type 1`) samples. The average $TLM_b(A)$ over $K = 50$ training/holdout samples for the four states and seven methods are shown in Figure \ref{fig:tlm} where the base model is the Student - t model and $\alpha = 0.3$. Similar results are observed for other base models, with this one being most advantageous to the Student - t model. The error-bars are plus/minus one standard deviation of the average $TLM_b(A)$ over the $K = 50$  training/holdout samples. It is clear the normal Bayesian model used as the base model (Normal) and the classical ordinary least squares fits (OLS) have poor performance, as expected, due to the significant amount of outlier contamination in the data. In comparing are restricted methods to their corresponding classical methods, there is small, but consistent improvement across the states and training sample size. For state 2, the largest state with $n = 222$, the restricted and classical robust methods have similar performance especially for larger training sample size. This reflects the diminishing effect of the prior as the sample size grows. Notably, the Student - t model performs poorly in comparison for this state. The predictive distribution explicitly accounts for heavy-tailed values, resulting in poorer predictions of the `good` data (i.e. the Type 1 agencies). Likewise, for State 27, another larger state, the Student-t model is outperformed by our restricted methods.   For the other states, the Student-t performs similarly to our restricted methods for the smaller states (State 15 and 36) and smaller training size (25\% of the sample). However, the performance is worse for the larger training size (50\% of the sample). Intuitively, as more data is available for fitting, more outliers appear and the heavy-tailed model compensates for them by assuming they come from the tails of the model; detrimental for prediction. The relative performance of the models are similar for various values $\alpha$. Figure \ref{fig:tlmbyAlpha} shows the results for one state (State 27) with training sample size $0.5n$ as an example. 
+
+
+
+%A mixture model could replace the heavy-tailed model. We assert it is more difficult to refine a mixture model in this setting reflecting the different types of outliers including the zero counts and agency types. The appeal of the restricted likelihood (and the classical robust approaches) is the avoidance of refining the model to capture (potentially transient) outlier generating mechanisms. Instead, the modeler focuses on estimating quantities of interest via statistics $T(\by)$. The improvement in our restricted likelihood versions over the classical robust fits is due to the informative prior distributions. In this case, similar data from previous years was used to formulate the prior. Like all Bayesian methods, performance is affected by the prior and it is important the prior accurately reflects the prior state of knowledge. 
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=6in]{tlm_base_Student-t.png}
+\caption{Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples. The panels are for the different states  2, 15, 27, and 36, with $n = 222, 40, 117,$ and $46$, respectively. The horizontal axis is the percent of $n$ used in each training set. The color corresponds to the fitting model. }
+\label{fig:tlm}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=6in]{tlm_base_Student-tbyTrimming.png}
+\caption{Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples for several values of the trimming fraction $\alpha$. The training sample size used is $0.5n$.}
+\label{fig:tlmbyAlpha}
+\end{figure}
+
+
 
 
 %\begin{sidewaysfigure}
@@ -1354,38 +1374,37 @@ In practice, we would set $\alpha$ slightly larger than $0.16$.
 %
 
 
-Model evaluation for `Type 1' agencies is shown in Figure
-\ref{fig:Type1Marg} for training sample sizes $n=25, 100,$ and $1000$.
-The $t$-model is used as the base
-  method to compute TLM.
-The models pictured are: classical robust regression with Tukey's $\psi$ function (rlm-T), restricted likelihood with Tukey $\psi$ (restr.-T), classical robust regression with Huber's $\psi$ function (rlm-H), restricted likelihood  with Huber's $\psi$ (restr.-H), and the thick tailed $t$-model (t). The normal theory models perform poorly due to the numerous outliers
-and are left out of the figures. Appearing in the figures are the mean TLM across
-validations set for each model and each trimming fraction, $\alpha$ (along the $x$-axis). The error bars depicted are one standard deviation of the TLM above and below the mean.  The range of the vertical axis is chosen to enhance important features and as a result, some evaluation measures extend below this range. In particular, the restricted likelihood methods perform poorly if no trimming is done; reflecting that these methods are not intended to fit well to outliers. Recall that we expect about 15-16\% outliers in the validation sets, thus trimming fractions slightly larger than this amount are needed in order to assess fits to the `good' data. For $n=25$, the thick tailed model  prevails across trimming fractions, although less so for $\alpha\geq 0.15$. For sample sizes as low as $n=100$, the restricted likelihood methods outperform the heavy-tailed model with the Tukey version performing the best.   
-The stronger performance of restricted likelihood based on Tukey's method and the t model is to be expected, as many of the 
-residuals are so extreme that trimming is better than winsorizing (as Huber's method effectively does).  
-As expected, with enough data,  the Bayesian methods and their classical counterparts perform similarly, although there
-is a persistent slight edge in favor of the Bayesian restricted likelihood methods.  We attribute this advantage to the weakly informative
-prior distribution which pulls the estimates slightly toward better values.  The similarity occurs as early as $n=100$. 
-
+%Model evaluation for `Type 1' agencies is shown in Figure
+%\ref{fig:Type1Marg} for training sample sizes $n=25, 100,$ and $1000$.
+%The $t$-model is used as the base
+%  method to compute TLM.
+%The models pictured are: classical robust regression with Tukey's $\psi$ function (rlm-T), restricted likelihood with Tukey $\psi$ (restr.-T), classical robust regression with Huber's $\psi$ function (rlm-H), restricted likelihood  with Huber's $\psi$ (restr.-H), and the thick tailed $t$-model (t). The normal theory models perform poorly due to the numerous outliers
+%and are left out of the figures. Appearing in the figures are the mean TLM across
+%validations set for each model and each trimming fraction, $\alpha$ (along the $x$-axis). The error bars depicted are one standard deviation of the TLM above and below the mean.  The range of the vertical axis is chosen to enhance important features and as a result, some evaluation measures extend below this range. In particular, the restricted likelihood methods perform poorly if no trimming is done; reflecting that these methods are not intended to fit well to outliers. Recall that we expect about 15-16\% outliers in the validation sets, thus trimming fractions slightly larger than this amount are needed in order to assess fits to the `good' data. For $n=25$, the thick tailed model  prevails across trimming fractions, although less so for $\alpha\geq 0.15$. For sample sizes as low as $n=100$, the restricted likelihood methods outperform the heavy-tailed model with the Tukey version performing the best.   
+%The stronger performance of restricted likelihood based on Tukey's method and the t model is to be expected, as many of the 
+%residuals are so extreme that trimming is better than winsorizing (as Huber's method effectively does).  
+%As expected, with enough data,  the Bayesian methods and their classical counterparts perform similarly, although there
+%is a persistent slight edge in favor of the Bayesian restricted likelihood methods.  We attribute this advantage to the weakly informative
+%prior distribution which pulls the estimates slightly toward better values.  The similarity occurs as early as $n=100$. 
+%
  
 \subsection{Hierarchical regression model}
 \label{hierRegNW}
-Nationwide agencies span many states and insurance regulations and the competitive environment varies between states. A natural extension to the previous analysis is a hierarchical regression model, grouping agencies within each state to reflect similar business environments. Using the same study design with the same training and validation splits, we re-analyze the data using the following hierarchical regression model:
+The previous analysis treated states independently. A natural extension is to  reflect similar business environments between states using a hierarchical regression. The proposed model is:
 \begin{align}
 %\begin{split}
 \label{eq:hierModel}
-&\bbeta\sim N_p(\bmu_0, a\Sigma_0);\ \ 
-\bbeta_j\iid N_p(\bbeta, b\Sigma_0); \ \  
+&\beta\sim N_p(\mu_0, a\sigma_0^{2});\ \ 
+\beta_j\iid N_p(\beta, b\sigma_0^{2}); \ \  
 \sigma_j^2\sim IG(a_0,b_0);  & \\ \nonumber
-& \by_{ij}=\bx_{ij}^\top\bbeta_j+\epsilon_{ij},\ \ \epsilon_{ij}\iid N(0, \sigma_j^2),\ i=1,\dots, n_j,\ j=1,\dots, J &
+& y_{ij}=x_{ij}\beta_j+\epsilon_{ij},\ \ \epsilon_{ij}\iid N(0, \sigma_j^2),\ i=1,\dots, n_j,\ j=1,\dots, J &
 %\end{split}
 \end{align}
-where $y_{ij}$  represents the $i^{th}$ observation in the $j^{th}$
-state, $n_j$ is the total number of agencies in each state, and $J$ is
-the number of states. $\bx_{ij}$ is a four dimensional vector
-comprised of the same covariates as above. $\bbeta_j$ represents the
-individual regression coefficient vector for state $j$.  We match this
-model to the non-hierarchical model in several ways. First, $\bmu_0$,
+where $y_{ij}$ is the $i^{th}$ observation of square rooted household count in 2012 in the $j^{th}$
+state, is the total number of agencies in state $j$, and $J$ is
+the number of states. $x_{ij}$ is the square rooted household count in 2010 and $\beta_j$ represents the individual regression coefficient vector for state $j$.  
+
+We match this model to the non-hierarchical model in several ways. First, $\bmu_0$,
 $\Sigma_0$, $a_0$, and $b_0$ are fixed as before. We constrain $a+b=1$
 in an attempt to partition the total variance between the individual
 $\bbeta_j$'s and the overall $\bbeta$. We take $b\sim
@@ -1615,7 +1634,7 @@ In setting the priors we use the same previous data set used to set the priors f
 First, consider $v_{1}$ and $v_{2}$ in the prior $b\sim\text{beta}(v_{1},v_{2})$.  In the hierarchical model \eqref{eq:hierModel}, $b=0$ implies all the $\bbeta_{j}'s$ are equal (no variation between states) and $b=1$ implies the $\bbeta_{j}'s$ vary about $\mu_{0}$ according to $\Sigma_{0}=n\cdot \mbox{var}(\hat\beta)$ (see Section \ref{regModelNW}). We seek a prior measure for what we think $b$ should be. In other words, how much prior uncertainty should we allow in $\bbeta$ as opposed to the uncertainty amongst the $\bbeta_{j}'s$? Using the prior fit, a measure for  uncertainty for $\bbeta$ is $\Sigma_{\hat\beta}=\mbox{var}(\hat\beta)$, the estimate of the covariance from the single regression. For the $\bbeta_{j}'s$, take $\delta_{j}=\hat\beta_{j}-\hat\beta$ and set the prior uncertainty to $\Sigma_{\delta}=n^{-1}\sum n_{j}\delta_{j}\delta_{j}^{\top}$. Consider the value $g= \left(|\Sigma_{\delta}|/|\Sigma_{\hat\beta}|\right)^{1/p}$. Heuristically, $g$ is measure of the amount of uncertainty between the $\bbeta_{j}'s$ to the amount of uncertainty in $\bbeta$. Now in the prior, we heuristically set the uncertainty in the $\bbeta_{j}'s$ ($b\Sigma_{0}$) to be approximately equal to $g\cdot\mbox{var}(\hat\beta)$. That is, $b\Sigma_{0}\approx g\cdot\mbox{var}(\hat\beta)= \frac{g}{n} \Sigma_{0}$, suggesting $b\approx  \frac{g}{n}$.  Hence we set $E[b]=\frac{g}{n}$. The precision, $v_{1}+v_{2}$, is set to be relatively high at $20$, completing the specification for the prior on $b$. 
 
 In setting the parameters for the beta prior on $\mu_{\rho}$ and gamma prior on  $\psi_\rho$ we first take $\hat z_{j}= \Phi^{-1} (H(\hat\sigma_{j}^{2}))$. As in the prior we assume $(\hat z_1,\dots,\hat z_J)\sim N_J(\mathbf{0}, \Sigma_\rho)$ with
-$\Sigma_\rho=(1-\rho)I+\rho \mb{1}\mb{1}^{\top}$ and find the MLE, $\hat\rho_{mle}$, and observed inverse Fisher information, $I^{-1}(\rho_{mle})$. The mean of the beta prior on $\mu_{\rho}$ is set to $\hat\rho_{mle}$. Its variance is inflated somewhat and set to $2I^{-1}(\hat\rho_{mle})$. Since $\text{var}(\rho|\mu_{\rho}, \psi_{\rho})=\mu_{\rho} (1-\mu_{p})/(\psi_{\rho}+1)$ we replace $\mu_{\rho}$ with $\hat\rho_{mle}$, $\text{var}(\rho|\mu_{\rho}, \psi_{\rho})$ with $2I^{-1}(\hat\rho_{mle})$, and set the mean of the gamma prior on $\psi_{\rho}$ equal to $\hat\rho_{mle} (1-\hat\rho_{mle})/(2I^{-1}(\hat\rho_{mle}))-1$. Finally, we arbitrarily set the variance of the gamma prior to be approximately the same as the mean.
+$\Sigma_\rho=(1-\rho)I+\rho \mb{1}\mb{1}^{\top}$ and find the MLE, $\hat\rho_{mle}$, and observed inverse Fisher information, $I^{-1}(\rho_{mle})$. The mean of the beta prior on $\mu_{\rho}$ is set to $\hat\rho_{mle}$. Its variance is inflated somewhat and set to $2I^{-1}(\hat\rho_{mle})$. Since $\text{var}(\rho|\mu_{\rho}, \psi_{\rho})=\mu_{\rho} (1-\mu_{p})/(\psi_{\rho}+1)$ we replace $\mu_{\rho}$ with $\hat\rho_{mle}$, $\text{var}(\rho|\mu_{\rho}, \psi_{\rho})$ with $2I^{-1}(\hat\rho_{mle})$, and set the mean of the gamma prior on $\psi_{\rho}$ equal to $\hat\rho_{mle} (1-\hat\rho_{mle})/(2I^{-1}(\hat\rho_{mle}))-1$. Finally, we  set the rate parameter to 1 implying the variance of the gamma prior is equal to its the mean.
 %The variance was set to twice the inverse Fisher information evaluated at $\hat\rho_{mle}$
 
 %

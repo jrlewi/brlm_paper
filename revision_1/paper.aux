@@ -139,6 +139,7 @@
 \newlabel{Mest}{{15}{18}{Evaluation of the proposal density}{equation.4.15}{}}
 \citation{huber2009}
 \@writefile{toc}{\contentsline {section}{\numberline {5}Simulated Data}{19}{section.5}}
+\newlabel{simData}{{5}{19}{Simulated Data}{section.5}{}}
 \newlabel{gensim2}{{16}{19}{Simulated Data}{equation.5.16}{}}
 \newlabel{fullsim2}{{17}{19}{Simulated Data}{equation.5.17}{}}
 \@writefile{brf}{\backcite{huber2009}{{19}{5}{equation.5.17}}}
@@ -157,9 +158,9 @@
 \citation{kass1995reference}
 \@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Boxplots of the classical robust estimators (Huber's and Tukey's) for $\sigma _{i}$ across all simulations separated by the values for $m$ (left), $n$ (middle), $p$ (right). The horizontal line at $\sigma = 2$ highlights the true standard deviation of the `good' data.}}{24}{figure.8}}
 \newlabel{boxSigma}{{8}{24}{Boxplots of the classical robust estimators (Huber's and Tukey's) for $\sigma _{i}$ across all simulations separated by the values for $m$ (left), $n$ (middle), $p$ (right). The horizontal line at $\sigma = 2$ highlights the true standard deviation of the `good' data}{figure.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}Regression model}{24}{subsection.6.1}}
-\newlabel{regModelNW}{{6.1}{24}{Regression model}{subsection.6.1}{}}
-\newlabel{eq:regModel}{{19}{24}{Regression model}{equation.6.19}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.1}State Level Regression model}{24}{subsection.6.1}}
+\newlabel{regModelNW}{{6.1}{24}{State Level Regression model}{subsection.6.1}{}}
+\newlabel{eq:regModel}{{19}{24}{State Level Regression model}{equation.6.19}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces The square root of count in 2012 versus that in 2010 (after centering and scaling). The colors represent the varying contractual agreements as they stood in 2010. Agencies that closed during the 2010-2012 period are represented by the zero counts for 2012. Scalings on the axes are purposely left off for proprietary reasons.}}{25}{figure.9}}
 \newlabel{fig:ctVct}{{9}{25}{The square root of count in 2012 versus that in 2010 (after centering and scaling). The colors represent the varying contractual agreements as they stood in 2010. Agencies that closed during the 2010-2012 period are represented by the zero counts for 2012. Scalings on the axes are purposely left off for proprietary reasons}{figure.9}{}}
 \@writefile{brf}{\backcite{zellner1986}{{25}{6.1}{equation.6.19}}}
@@ -171,22 +172,26 @@
 \@writefile{brf}{\backcite{ronchetti1997}{{26}{6.1}{section*.3}}}
 \@writefile{brf}{\backcite{jung2014}{{26}{6.1}{section*.3}}}
 \@writefile{toc}{\contentsline {subsubsection}{Comparison of predictive performance}{27}{section*.4}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Hierarchical regression model}{28}{subsection.6.2}}
-\newlabel{hierRegNW}{{6.2}{28}{Hierarchical regression model}{subsection.6.2}{}}
-\newlabel{eq:hierModel}{{20}{28}{Hierarchical regression model}{equation.6.20}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Discussion}{30}{section.7}}
-\newlabel{Conclusions}{{7}{30}{Discussion}{section.7}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {8}Appendix}{31}{section.8}}
-\newlabel{sec:appendix}{{8}{31}{Appendix}{section.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Proofs}{31}{subsection.8.1}}
-\newlabel{perpGradReg}{{8.1}{32}{Proofs}{equation.8.21}{}}
-\newlabel{eq:lem3.2}{{26}{32}{Proofs}{equation.8.26}{}}
-\newlabel{BigMatrix}{{27}{32}{Proofs}{equation.8.27}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples. The panels are for the different states 2, 15, 27, and 36, with $n = 222, 40, 117,$ and $46$, respectively. The horizontal axis is the percent of $n$ used in each training set. The color corresponds to the fitting model. }}{28}{figure.10}}
+\newlabel{fig:tlm}{{10}{28}{Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples. The panels are for the different states 2, 15, 27, and 36, with $n = 222, 40, 117,$ and $46$, respectively. The horizontal axis is the percent of $n$ used in each training set. The color corresponds to the fitting model}{figure.10}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples for several values of the trimming fraction $\alpha $. The training sample size used is $0.5n$.}}{29}{figure.11}}
+\newlabel{fig:tlmbyAlpha}{{11}{29}{Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples for several values of the trimming fraction $\alpha $. The training sample size used is $0.5n$}{figure.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {6.2}Hierarchical regression model}{29}{subsection.6.2}}
+\newlabel{hierRegNW}{{6.2}{29}{Hierarchical regression model}{subsection.6.2}{}}
+\newlabel{eq:hierModel}{{20}{29}{Hierarchical regression model}{equation.6.20}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Discussion}{31}{section.7}}
+\newlabel{Conclusions}{{7}{31}{Discussion}{section.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {8}Appendix}{32}{section.8}}
+\newlabel{sec:appendix}{{8}{32}{Appendix}{section.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}Proofs}{32}{subsection.8.1}}
+\newlabel{perpGradReg}{{8.1}{33}{Proofs}{equation.8.21}{}}
+\newlabel{eq:lem3.2}{{26}{33}{Proofs}{equation.8.26}{}}
+\newlabel{BigMatrix}{{27}{33}{Proofs}{equation.8.27}{}}
 \citation{miao1992}
-\@writefile{brf}{\backcite{miao1992}{{33}{8.1}{equation.8.27}}}
-\newlabel{MBI:lemma}{{8.1}{33}{}{theorem.8.1}{}}
-\newlabel{MBI:thm}{{8.2}{33}{}{theorem.8.2}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Setting the hierarchical prior values}{34}{subsection.8.2}}
+\@writefile{brf}{\backcite{miao1992}{{34}{8.1}{equation.8.27}}}
+\newlabel{MBI:lemma}{{8.1}{34}{}{theorem.8.1}{}}
+\newlabel{MBI:thm}{{8.2}{34}{}{theorem.8.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}Setting the hierarchical prior values}{35}{subsection.8.2}}
 \bibstyle{bib/ba}
 \bibdata{bib/refPaper1}
 \bibcite{berger2006}{{1}{2006}{{Berger}}{{}}}
@@ -199,7 +204,7 @@
 \bibcite{hoff2013}{{8}{2013}{{Hoff et~al.}}{{}}}
 \bibcite{huber2009}{{9}{2009}{{Huber and Ronchetti}}{{}}}
 \bibcite{huber1964}{{10}{1964}{{Huber}}{{}}}
-\@writefile{toc}{\contentsline {section}{References}{35}{section*.6}}
+\@writefile{toc}{\contentsline {section}{References}{36}{section*.6}}
 \bibcite{hwang2005}{{11}{2005}{{Hwang et~al.}}{{}}}
 \bibcite{joyce2008}{{12}{2008}{{Joyce and Marjoram}}{{}}}
 \bibcite{jung2014}{{13}{2014}{{Jung et~al.}}{{}}}
