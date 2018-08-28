@@ -144,25 +144,22 @@ pooled_marginals <- bind_rows(pooled_marginals %>% filter(!is.na(var_inflate)), 
 # Finding TLM with a specific base model -----
 
 
-base_model <- "Student-t"
+base_model <- 'Student-t' 
+get_tlm_tibble <- function(marginals_tibble, base_model = base_model, trimming_fractions = c(0, .1, .2, .3)){
 
-
-marginals_open_type1 <- pooled_marginals %>% 
+marginals_open_type1 <- marginals_tibble %>% 
   filter(Type1 == TRUE)
 
 base_model_marg <-  marginals_open_type1 %>% 
   filter(Model == base_model) 
 
-
-trimming_fraction <- 0.3
-summary_tibble <- purrr::map_dfr(c(0, .1, .2, .3), .f = function(trimming_fraction){
+summary_tibble_by_trim <- purrr::map_dfr(trimming_fractions, .f = function(trimming_fraction){
 lower_tlm_vals <- base_model_marg %>% 
   group_by(Repetition, n, State, var_inflate) %>% 
   summarise(lower_tlm = quantile(Marginal, trimming_fraction)) 
 
 
 #for each repetition, find the holdout sample indexes to include from the base model----
-
 holdout_include <- left_join(base_model_marg,lower_tlm_vals, by = c('Repetition', 'n', "State","var_inflate")) %>% 
   mutate(include = Marginal > lower_tlm) %>% 
   dplyr::select(`holdout sample`, Repetition, include, n, State, var_inflate, lower_tlm) %>% 
@@ -178,8 +175,7 @@ marg_split <- marginals_open_type1 %>%
   split(list(.$Repetition, .$n, .$State, .$var_inflate)) %>% map2(.x = ., .y = include_by_rep, .f = function(x, y) filter(x,  x$`holdout sample` %in% y)) %>% 
   bind_rows()
 
-
-summary_tibble <- marg_split %>% 
+  marg_split %>% 
   group_by(Repetition, Model, n, State, var_inflate) %>% 
   summarise(tlm_mean = mean(Marginal), tlm_sd = sd(Marginal)/tlm_mean) %>% 
   ungroup() %>% 
@@ -191,9 +187,11 @@ summary_tibble <- marg_split %>%
   ungroup() %>% 
   mutate(Model = factor(Model, levels = c('Restricted - Huber','Rlm - Huber', 'Restricted - Tukey', 'Rlm - Tukey','Student-t', 'Normal', 'OLS')), n = factor(n), var_inflate = factor(var_inflate, levels = v_inflate), `Trimming Fraction` = factor(trimming_fraction))
 })
-summary_tibble <- summary_tibble %>% 
+summary_tibble_by_trim %>% 
   mutate(`Trimming Fraction` = as.factor(`Trimming Fraction`))
+}
 
+summary_tibble <- get_tlm_tibble(pooled_marginals, base_model = 'Student-t', trimming_fractions = c(0, .1, .2, .3))
 
 theme_set(theme_bw(base_family = 'Times'))
 ggplot(filter(summary_tibble, var_inflate == 100, `Trimming Fraction` == 0.3), aes(x = n, y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + #geom_line(position = position_dodge(width = .5)) +

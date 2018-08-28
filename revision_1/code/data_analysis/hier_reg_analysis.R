@@ -79,12 +79,13 @@ get_pseudo_samps <- function(inv_chi2_samps, models_lm){
 
 # load data and prior information ----
 analysis_data <- read_rds(file.path(here::here(), 'data', 'analysis_data.rds'))
+
 # parms_prior <- read_rds(file.path(here::here(), 'parms_prior.rds'))
 analysis_data <- analysis_data %>% 
   mutate(sqrt_count_2010 = sqrt(Count_2010), sqrt_count_2012 = sqrt(Count_2012)) %>%
   group_by(State) %>% 
   filter(n() >= 25) %>% ungroup() %>% 
-  mutate(State = factor(State)) %>% 
+  mutate(State = factor(State)) %>% #filter(!State %in% c(14, 30)) %>% 
   arrange(State)
 
 #defined globally.
@@ -97,9 +98,12 @@ state_sizes <- analysis_data %>%
 #Set prior parameters ----
 parms_prior <- read_rds(file.path(here::here(), 'hier_parms_prior.rds'))
 mu0 <- parms_prior$mu_0
-Sigma0 <-  parms_prior$beta_var_inflate*parms_prior$Sigma_0
+Sigma0 <- parms_prior$Sigma_0
 a0 <- parms_prior$a_0
 b0 <- parms_prior$b_0
+# a0 <- 10
+# b0 <- parms_prior$sigma2_hat*(a0 - 1)
+
 mu_bstr <- parms_prior$mu_bstr
 psi_bstr <- parms_prior$psi_bstr
 swSq <- 1
@@ -110,7 +114,7 @@ b_psir <- parms_prior$b_psir
 
 
 nu <- 5 #df for t-model
-ns <- floor(nrow(analysis_data)*.5) #c(1000, 2000) #sample size for training set
+ns <- floor(nrow(analysis_data)*.5)  #c(1000, 2000) #sample size for training set
 reps <- 50 # number of training sets
 
 nburn <- 1e4 #set length of mcmc chains
@@ -118,6 +122,14 @@ nkeep <- 1e4
 nburnt <- 1.5e4
 nkeept <- 1e4 #for the t-model.
 maxit <- 1000 #parameter in MASS::rlm
+
+# reps <- 50
+# nburn <- 1e3 #set length of mcmc chains
+# nkeep <- 1e3
+# nburnt <- 1e3
+# nkeept <- 1e3 #for the t-model.
+# maxit <- 1000 #parameter in MASS::rlm
+
 
 #set seed 
 set.seed(123)
@@ -246,7 +258,7 @@ converge <- array(NA, c(nModels, 5, reps))
       sigHats <- models_lm %>% 
         map(.f = function(m) summary(m)$s) %>% 
         unlist()
-      group_estimates[ols_ind, p+1, , i] <- sigHats
+      group_estimates[ols_ind, p+1, , i] <- sigHats^2
 
       #prepare the holdout data for predictions
       #yhold is list of holdout responses from each group
@@ -317,7 +329,7 @@ marginals[ols_ind, i, ] <- olsMarginals %>% unlist()
       sigHats <- models_rlm %>% 
         map(.f = function(m) summary(m)$sigma) %>% 
         unlist()
-      group_estimates[rlm_ind, p+1, , i] <- sigHats
+      group_estimates[rlm_ind, p+1, , i] <- sigHats^2
       
       rlmPreds <- by_state_hold$data %>% 
         map2(.x = ., .y = models_rlm, .f = function(x, y){
@@ -357,7 +369,7 @@ marginals[ols_ind, i, ] <- olsMarginals %>% unlist()
       sigHats <- models_rlm %>% 
         map(.f = function(m) summary(m)$sigma) %>% 
         unlist()
-      group_estimates[rlm_huber_ind, p+1, , i] <- sigHats
+      group_estimates[rlm_huber_ind, p+1, , i] <- sigHats^2
       
       
       rlmPreds <- by_state_hold$data %>% 
@@ -389,12 +401,14 @@ marginals[ols_ind, i, ] <- olsMarginals %>% unlist()
       rho_step <- .1
       
       # nis <- unlist(lapply(y, length), use.names=FALSE)
-      sigs <- group_estimates[ols_ind, p+1, , i]
-      step_Z <- brlm:::fn.compute.Z(mean(sigs^2), a0, b0)/(sqrt(nis))
+      sigs2 <- group_estimates[ols_ind, p+1, , i]
+      step_Z <- abs(brlm:::fn.compute.Z(mean(sigs2), a0, b0)/(sqrt(nis)))
       if(any(is.na(step_Z))){
-        sigs <-  1
-        step_Z <-brlm:::fn.compute.Z(mean(sigs^2), a0, b0)/(sqrt(nis))
+        sigs2 <-  1
+        step_Z <- abs(brlm:::fn.compute.Z(mean(sigs2), a0, b0)/(sqrt(nis)))
       }
+      
+      
       
       nTheory <- brlm::hierNormTheoryLm(y,
                                         X,
@@ -476,11 +490,11 @@ marginals_sd[norm_ind, i,] <- nTheory_marg_sd %>% unlist()
 ################################################
 #Tukey version ----
 
-sigs <- group_estimates[rlm_ind, p+1, , i]
-step_Z <-brlm:::fn.compute.Z(mean(sigs^2), a0, b0)/(sqrt(nis))
+sigs2 <- group_estimates[rlm_ind, p+1, , i]
+step_Z <- abs(brlm:::fn.compute.Z(mean(sigs2), a0, b0)/(sqrt(nis)))
 if(any(is.na(step_Z))){
-  sigs <-  1
-  step_Z <-brlm:::fn.compute.Z(mean(sigs^2), a0, b0)/(sqrt(nis))
+  sigs2 <-  1
+  step_Z <-abs(brlm:::fn.compute.Z(mean(sigs2), a0, b0)/(sqrt(nis)))
 }
 
       restricted <- brlm::hierNormTheoryRestLm(y,
@@ -576,11 +590,11 @@ marginals_sd[rest_ind, i,] <- rest_marg_sd %>% unlist()
 ################################################     
 #Huber version ----
 
-sigs <- group_estimates[rlm_huber_ind, p+1, , i]
-step_Z <-brlm:::fn.compute.Z(mean(sigs^2), a0, b0)/(sqrt(nis))
+sigs2 <- group_estimates[rlm_huber_ind, p+1, , i]
+step_Z <-abs(brlm:::fn.compute.Z(mean(sigs2), a0, b0)/(sqrt(nis)))
 if(any(is.na(step_Z))){
-  sigs <-  1
-  step_Z <-brlm:::fn.compute.Z(mean(sigs^2), a0, b0)/(sqrt(nis))
+  sigs2 <-  1
+  step_Z <-abs(brlm:::fn.compute.Z(mean(sigs2), a0, b0)/(sqrt(nis)))
 }
 
       restricted_huber <- brlm::hierNormTheoryRestLm(y,
