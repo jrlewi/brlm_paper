@@ -37,7 +37,7 @@ write_rds(parms_prior, "parms_prior.rds")
 
 by_state <- prior_data %>% 
   group_by(State) %>% 
-  filter(n() >= 10) %>% 
+  filter(n() >= 40) %>% #use state with plenty of data
   nest() 
   
 state_model <- function(df){
@@ -75,6 +75,7 @@ abline(h = beta_0)
 
 plot(sigma2Hats)
 abline(h = sigma2_hat)
+sigma2Hats <- sigma2Hats[-which(sigma2Hats > 4)] #get rid of large estimates
 
 X <-model.matrix(prior_fit)
 p <- ncol(X)
@@ -83,24 +84,11 @@ p <- ncol(X)
 
 nStates <- nrow(by_state)
 
-cbind(sigma2Hats,n_is)
 
-wts <- n_is/sum(n_is)
-beta_0_mean <- mean(betaHats)
-#abline(h = beta_0_mean, lty = 2)
-# beta_0 ~ N(mu_0, a*Sigma_0)
-# beta_i ~ N(beta_0, b*Sigma_0)
-mu_0 <- coef(prior_fit) # when a = 1, b = 0, then there is only one regression (no State effect). Set mu_0 to the estimate from this regression
-Sigma_beta_0_hat <- vcov(prior_fit)
-
-Sigma_0 <- nrow(prior_data)*Sigma_beta_0_hat #set variance to the variance of beta_0_hat - scaled by the number of point --- unit information
 
 # prior for beta_i's
-
-# nrow(prior_data)
-# vcov(prior_fit)
+wts <- n_is/sum(n_is)
 p <- nrow(vcov(prior_fit))
-#Sigma_0 <-  var(betaHats)/length(betaHats) #se_beta_0^2 
 
 delta_is <- sapply(betaHats, FUN=function(x) x - beta_0)
 delta_is <- matrix(delta_is, p, nStates)
@@ -117,22 +105,15 @@ for(i in 1:length(dList)){
 SigmaDelta  
 K <-length(n_is)
 
-# #another way?
-# SigmaDelta2 <-matrix(rep(0, p*p), p,p)
-# for(i in 1:length(models)){
-#   SigmaDelta2<-SigmaDelta2+vcov(models[[i]])*wts[i]
-# }
-# SigmaDelta2
 vcov(prior_fit)
 
-g <- (det(SigmaDelta)/(det(Sigma_beta_0_hat)))^(1/p)
+g <- (det(SigmaDelta)/(det(vcov(prior_fit))))^(1/p)
 swSq <- sum(wts^2)
 
 
 
 mu_b <- g/nrow(prior_data) #mean for b (i.e. mu_bstr)
 swSq <- 1
-mu_b*swSq #want this to be the mean for b*c
 psi_b <- 10 #( psi_bstr)
 
 fn.compute.ab<-function(mu, psi){
@@ -148,29 +129,13 @@ curve(dbeta(x, ab[1], ab[2]))
 # prior for sigma2_i's
 # -------------------------
 
-# a0<-a0Star
-# sy<-sd(analysisSet[,"sqrt_Count2012"])
-# b0<-sy^2*b0Star
-# a0
-# b0
-# hist(sigma2Hats)
+
 #given z~N(0,1) compute inverse gamma(ao, b0) random variable
-invGam<-function(z, a0, b0){
-  c<-pnorm(z)
-  x<-qgamma(c, a0, scale=1/b0)
-  1/x 
-}
-
-
-sigma2_hat <- sum(wts*sigma2Hats) #weight the sigma2_hats by sample sizes  prior_fit$s^2 #mean(sigma2Hats) #
-#sigma2_hat <- prior_fit$s^2
-#sigma2_hat <- mean(sigma2Hats)
-#mean and sd of my inverse gamma
-a_0 <- 5
-b_0 <- sigma2_hat*(a_0 - 1) 
-b_0/(a_0-1)
-sqrt(b_0^2/((a_0-1)^2*(a_0-2)))
-
+# invGam<-function(z, a0, b0){
+#   c<-pnorm(z)
+#   x<-qgamma(c, a0, scale=1/b0)
+#   1/x 
+# }
 
 curve(dinvgamma(x, a_0,b_0), from=0,to=30)
 points( sigma2Hats,rep(.1,length(sigma2Hats)))
@@ -185,43 +150,41 @@ fn.compute.Z<-function(sigma2,a_0,b_0){
   qnorm(X)
 }
 Z <- sapply(sigma2Hats, FUN=fn.compute.Z, a_0, b_0)
+# Z <- (Z - mean(Z))/sd(Z)
 K <- length(Z)
 J <- matrix(1, K,K)
 
-log.like.rho<-function(rho){
-  K*log(1-rho)+log(1+K*rho/(1-rho))+(1-rho)*t(Z)%*%Z+rho*t(Z)%*%J%*%Z
-}
+# log.like.rho<-function(rho){
+#   K*log(1-rho)+log(1+K*rho/(1-rho))+(1-rho)*t(Z)%*%Z+rho*t(Z)%*%J%*%Z
+# }
 
 log.like.rho<-function(rho){
+  K*log(1-rho)+log(1+K*rho/(1-rho))+t(Z)%*%solve((1-rho)*diag(K) + rho*J)%*%Z
+}
+
+
+log.like.rho <-function(rho){
   Sigma_rho <- (1-rho)*diag(K) + rho*J
   Sigma_rho_inv <- solve(Sigma_rho)
   .5*log(det(2*pi*Sigma_rho_inv)) + .5*t(Z)%*%Sigma_rho_inv%*%Z
 }
 
-log.like.rho<-function(rho){
-  Sigma_rho <- (1-rho)*diag(K) + rho*J
-  Sigma_rho <- diag(wts)%*%Sigma_rho%*%diag(wts)
-  Sigma_rho_inv <- solve(Sigma_rho)
-  .5*log(det(2*pi*Sigma_rho)) + .5*t(Z)%*%Sigma_rho_inv%*%Z
-}
-
 rho_seq <- seq(.01, .99, by = .01)
 plot(rho_seq ,sapply(rho_seq , function(rho) log.like.rho(rho)))
+lines(rho_seq ,sapply(rho_seq , function(rho) log.like.rho2(rho)))
 
 
 #MLE of rho 
-#(op <- optim(.5, log.like.rho,control=list(fnscale=+1), lower=0, upper=.99, method = c("L-BFGS-B"), hessian=TRUE))
-
 (op <- optim(.5, log.like.rho, lower=0, upper=.99, method = c("L-BFGS-B"), hessian=TRUE))
 
-# mean_mu_rho <- as.numeric(op$par)
-# var_mu_rho <- -2*as.numeric(op$hessian^-1)
 
-mean_mu_rho <- .5
+mean_mu_rho <- as.numeric(op$par)
+var_mu_rho <- 2*as.numeric(op$hessian^-1)
 
-# w1_plus_w2 <- mean_mu_rho*(1-mean_mu_rho)/var_mu_rho-1
+#mean_mu_rho <- .5
 
-w1_plus_w2 <- 10
+w1_plus_w2 <- mean_mu_rho*(1-mean_mu_rho)/var_mu_rho-1
+
 var_mu_rho <- ((w1_plus_w2+1)/(mean_mu_rho*(1-mean_mu_rho)))^-1
 w1 <- mean_mu_rho*w1_plus_w2
 w2 <- w1_plus_w2-w1
@@ -234,8 +197,8 @@ w1*w2/((w1+w2)^2*(w1+w2+1))
 
 mean_psi_rho <- (mean_mu_rho*(1-mean_mu_rho))/(var_mu_rho) - 1
 
-a_psir <- mean_psi_rho #5
-b_psir<- 1 #a_psir/mean_psi_rho
+a_psir <- mean_psi_rho 
+b_psir<- 1 
 
 curve(dgamma(x, a_psir, b_psir), from=0, to=100)
 a_psir/b_psir
@@ -253,9 +216,9 @@ rho_samp <- rbeta(nsamps, a_rho_samp, b_rho_samp)
 hist(rho_samp)
 #results in strong correlation amongst the sigmas. 
 
-hier_parms_prior <- list(mu_0 = mu_0, #beta_0
-                         Sigma_0 = Sigma_0,
-                         sigma2_hat = mean(sigma2Hats),
+hier_parms_prior <- list(mu_0 = beta_0,
+                         Sigma_0 = nrow(prior_data)*se_beta_0^2,
+                         sigma2_hat = sigma2_hat,
                          a_0 = a_0, 
                          b_0 = b_0,
                          mu_bstr = mu_b,

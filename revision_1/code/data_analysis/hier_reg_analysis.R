@@ -101,12 +101,8 @@ mu0 <- parms_prior$mu_0
 Sigma0 <- parms_prior$Sigma_0
 a0 <- parms_prior$a_0
 b0 <- parms_prior$b_0
-# a0 <- 10
-# b0 <- parms_prior$sigma2_hat*(a0 - 1)
-
 mu_bstr <- parms_prior$mu_bstr
 psi_bstr <- parms_prior$psi_bstr
-swSq <- 1
 w1 <- parms_prior$w1
 w2 <- parms_prior$w2
 a_psir <- parms_prior$a_psir
