@@ -70,8 +70,7 @@ n_is <- by_state$data %>%
 
 plot(betaHats)
 abline(h = beta_0)
-beta_0_mean <- mean(betaHats)
-abline(h = beta_0_mean, lty = 2)
+
 
 
 plot(sigma2Hats)
@@ -87,7 +86,8 @@ nStates <- nrow(by_state)
 cbind(sigma2Hats,n_is)
 
 wts <- n_is/sum(n_is)
-
+beta_0_mean <- mean(betaHats)
+#abline(h = beta_0_mean, lty = 2)
 # beta_0 ~ N(mu_0, a*Sigma_0)
 # beta_i ~ N(beta_0, b*Sigma_0)
 mu_0 <- coef(prior_fit) # when a = 1, b = 0, then there is only one regression (no State effect). Set mu_0 to the estimate from this regression
@@ -102,7 +102,7 @@ Sigma_0 <- nrow(prior_data)*Sigma_beta_0_hat #set variance to the variance of be
 p <- nrow(vcov(prior_fit))
 #Sigma_0 <-  var(betaHats)/length(betaHats) #se_beta_0^2 
 
-delta_is <- sapply(betaHats, FUN=function(x) x- beta_0)
+delta_is <- sapply(betaHats, FUN=function(x) x - beta_0)
 delta_is <- matrix(delta_is, p, nStates)
 dList<-list()
 for(i in 1:ncol(delta_is)){
@@ -253,7 +253,7 @@ rho_samp <- rbeta(nsamps, a_rho_samp, b_rho_samp)
 hist(rho_samp)
 #results in strong correlation amongst the sigmas. 
 
-hier_parms_prior <- list(mu_0 = beta_0_mean, #beta_0
+hier_parms_prior <- list(mu_0 = mu_0, #beta_0
                          Sigma_0 = Sigma_0,
                          sigma2_hat = mean(sigma2Hats),
                          a_0 = a_0, 

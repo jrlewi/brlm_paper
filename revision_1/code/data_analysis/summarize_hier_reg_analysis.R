@@ -137,16 +137,20 @@ summary_tibble <- get_tlm_tibble(hier_marginals, base_model = 'Student-t', trimm
 #by rep - average over states, then average over reps
 overall_average <- summary_tibble %>% 
   group_by(Model, Repetition, n, `Trimming Fraction`) %>%
-  summarise(mean_tlm = mean(tlm)) %>% 
-  ungroup() %>% group_by(Model, n,  `Trimming Fraction`) %>% 
+  summarise(mean_tlm = mean(tlm)) %>% #ave over states
+  ungroup() %>% 
+  group_by(Model, n,  `Trimming Fraction`) %>% #ave/sd over reps
   summarize(mean = mean(mean_tlm), sd = sd(mean_tlm))
   
 
 
 theme_set(theme_bw(base_family = 'Times'))
 ggplot(overall_average, aes(x = `Trimming Fraction` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) 
+ggsave(file.path(getwd(), "..", "..", "figs", 'hier_average_tlm.png'), width = 6, height = 4)
+
 
 ggplot(overall_average %>%  filter(!Model %in% c('OLS', 'Normal', 'Student-t')), aes(x = `Trimming Fraction` , y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .0))  + geom_line(position  = position_dodge(width = .0), linetype = 1) 
+ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm.png'), width = 6, height = 4)
 
 
 
@@ -157,35 +161,49 @@ average_by_state <- summary_tibble %>%
   summarise(mean = mean(tlm), sd = sd(tlm)) %>% 
   ungroup() 
 
-theme_set(theme_bw(base_family = 'Times'))
-ggplot(average_by_state  %>% filter(`Trimming Fraction` == '0.3'), aes(x = State , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) 
+state_count <- analysis_data %>% group_by(State) %>% 
+  summarize(state_count = n())
+
+average_by_state <- left_join(average_by_state, state_count, by = 'State') %>% unite(col = 'State(n)', c('State', 'state_count'), sep = '(', remove = FALSE)  %>%  mutate(`State(n)` = reorder(as.factor(`State(n)`), state_count)) 
 
 
 theme_set(theme_bw(base_family = 'Times'))
-ggplot(average_by_state  %>% filter(`Trimming Fraction` == '0.3', State %in% c(2,15,27,36)), aes(x = State , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) 
-
-ggplot(average_by_state  %>% filter(State %in% c(2,15,27,36)), aes(x = `Trimming Fraction` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + facet_wrap(~State, scales = 'fixed')
-
-
-ggplot(average_by_state %>% filter(!Model %in% c('OLS', 'Normal')), aes(x = `Trimming Fraction` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + facet_wrap(~State, scales = 'free')
+ggplot(average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Tukey', 'Rlm - Tukey')), aes(x = `State(n)` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + theme(axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_log10()
+ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state.png'), width = 7.5, height = 5)
 
 
 
 
+# theme_set(theme_bw(base_family = 'Times'))
+# ggplot(average_by_state  %>% filter(`Trimming Fraction` == '0.3', State %in% c(2,15,27,36)), aes(x = State , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) 
+# 
+# ggplot(average_by_state  %>% filter(State %in% c(2,15,27,36)), aes(x = `Trimming Fraction` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + facet_wrap(~State, scales = 'fixed')
+# 
+# 
+# ggplot(average_by_state %>% filter(!Model %in% c('OLS', 'Normal')), aes(x = `Trimming Fraction` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + facet_wrap(~State, scales = 'free')
+# 
+# 
 
 
 
-label_vals <- c('2' = 'State 2', '15' = 'State 15', '27' = 'State 27', '36' = 'State 36')
 
-ggplot( average_by_state  %>% filter(State %in% c(2,15,27,36), !Model %in% c('OLS', 'Normal', 'Student-t')), aes(x = `Trimming Fraction` , y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line(position = position_dodge(width = 0)) + facet_wrap(~State, scales = 'free', labeller = labeller(State = label_vals))
-
-filter_df <- average_by_state  %>% filter(!Model %in% c('OLS', 'Normal', 'Student-t'))
-filter_df <- filter_df %>% mutate(State = as.factor(paste0('State ', State)))
-ggplot(filter_df, aes(x = `Trimming Fraction` , y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line(position = position_dodge(width = 0)) + facet_wrap(~State, scales = 'free')
+# 
+# label_vals <- c('2' = 'State 2', '15' = 'State 15', '27' = 'State 27', '36' = 'State 36')
+# 
+# ggplot( average_by_state  %>% filter(State %in% c(2,15,27,36), !Model %in% c('OLS', 'Normal', 'Student-t')), aes(x = `Trimming Fraction` , y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line(position = position_dodge(width = 0)) + facet_wrap(~State, scales = 'free', labeller = labeller(State = label_vals))
+# 
+# 
+# # ggplot( average_by_state %>% filter(!Model %in% c('OLS', 'Normal', 'Student-t'), `Trimming Fraction` == '0.3'), aes(x =state_count , y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line(position = position_dodge(width = 0)) + scale_x_log10() 
+# 
+# 
+# filter_df <- average_by_state  %>% filter(!Model %in% c('OLS', 'Normal', 'Student-t'))
+# filter_df <- filter_df %>% mutate(State = as.factor(paste0('State ', State)))
+# ggplot(filter_df, aes(x = `Trimming Fraction` , y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line(position = position_dodge(width = 0)) + facet_wrap(~State, scales = 'free')
 
 theme_set(theme_bw(base_family = 'Times'))
 sub_df <- average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Tukey', 'Rlm - Tukey'))
-ggplot(sub_df, aes(x = State , y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line()
+ggplot(sub_df, aes(x = `State(n)` , y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_log10()
+ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm_state.png'), width = 7.5, height = 5)
 
 # ----- 
 

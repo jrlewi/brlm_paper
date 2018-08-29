@@ -1306,7 +1306,7 @@ $\log(f_{b}(y_{(i)}^b))<\log(f_{b}(y_{(j)}^b))$. All of the methods are then sco
  where $f_A$ corresponds to the predictive
  distribution under the method ``A'' being scored.  In other words, the $[\alpha M]$ observations with the smallest values of $\log(f_{b}(y))$ are 
 removed from the validation sample and all of the methods are scored using only the
-remaining $M - [\alpha M]$ observations. This process is advantageous to the base method since the smallest scores from this method are guarenteed to be trimmed.  A method
+remaining $M - [\alpha M]$ observations. This process is advantageous to the base method since the smallest scores from this method are guaranteed to be trimmed.  A method
 that performs poorly when it is the base method is discredited.  %For a complete evaluation, we allow each method
 %to appear as the base method.  For brevity, we present only a selection of results in our subsequent analyses.  
 
@@ -1344,9 +1344,6 @@ Models are fit to four states labelled State 2, 15, 27, and 36, with $n = 222, 4
 \caption{Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples for several values of the trimming fraction $\alpha$. The training sample size used is $0.5n$.}
 \label{fig:tlmbyAlpha}
 \end{figure}
-
-
-
 
 %\begin{sidewaysfigure}
 %\centering
@@ -1401,36 +1398,65 @@ The previous analysis treated states independently. A natural extension is to  r
 %\end{split}
 \end{align}
 where $y_{ij}$ is the $i^{th}$ observation of square rooted household count in 2012 in the $j^{th}$
-state, is the total number of agencies in state $j$, and $J$ is
-the number of states. $x_{ij}$ is the square rooted household count in 2010 and $\beta_j$ represents the individual regression coefficient vector for state $j$.  
-
-We match this model to the non-hierarchical model in several ways. First, $\bmu_0$,
-$\Sigma_0$, $a_0$, and $b_0$ are fixed as before. We constrain $a+b=1$
+state, $n_{j}$ is the total number of agencies in state $j$, and $J$ is
+the number of states. $x_{ij}$ is the square rooted household count in 2010 and $\beta_j$ represents the individual regression coefficient vector for state $j$. As with the state level regression, the parameters $\mu_0$,
+$\sigma^{2}_0$, $a_0$, and $b_0$ are fixed. Specifically we set $\mu_{0} = \hat\beta$ and $n_{p}\hat\sigma^{2}_{0}$ where $n_{p}$ is the number of observations in the prior data set and the estimates are from a robust fit of $y_{ij}=x_{ij}\beta+\epsilon_{ij}$ on the prior data. For $\sigma^{2}_{j}$, $a_{0}=5$ and $b_{0} = \bar\sigma^{2}(a_{0} -1)$ where $\bar\sigma^{2}$ is a weighted (by number of observation) average of individual estimates of each $\sigma_{j}^{2}$ from the previous data set. We constrain $a+b=1$
 in an attempt to partition the total variance between the individual
-$\bbeta_j$'s and the overall $\bbeta$. We take $b\sim
-\text{beta}(v_1,v_2)$. Using the previous data set, we assess the
+$\beta_j$'s and the overall $\beta$. We take $b\sim
+\text{beta}(v_1,v_2)$. Using the prior data set, we assess the
 variation between individual estimates of the $\beta_j$ to set $v_1$
 and $v_2$ to allow for a reasonable amount of shrinkage. To allow for
 dependence across the $\sigma_j^2$ we first take
 $(z_1,\dots,z_J)\sim N_J(\mathbf{0}, \Sigma_\rho)$ with
-$\Sigma_\rho=(1-\rho)I+\rho \mb{1}\mb{1}^{\top}$. Then we set
+$\Sigma_\rho=(1-\rho)\mb{I}+\rho \mb{1}\mb{1}^{\top}$. Then we set
 $\sigma^2_j=H^{-1}(\Phi(z_j))$ where $H$ is the cdf of an
 $IG(a_0,b_0)$ and $\Phi$ is the cdf of a standard normal. This results in the specified marginal distribution, while
 introducing correlation via $\rho$. We assume $\rho\sim
 \text{beta}(a_\rho,b_\rho)$ with mean $\mu_\rho=a_\rho/(a_\rho+b_\rho)$ and precision
 $\psi_\rho=a_\rho+b_\rho$. The parameters $\mu_\rho$ and
-$\psi_{\rho}$  are given beta and gamma distributions, respectively. We fix the parameters of these distributions by again considering fits to individual states from the previous data set. More precise details on setting $v_{1}, v_{2}$ and the the priors on $\mu_{\rho}$ and $\psi_{\rho}$ are given in the appendix. We note that we tried a range of other fixed hyper-parameters resulting in negligible differences in the results. 
+$\psi_{\rho}$  are given beta and gamma distributions, with fixed hyperparameters. More details on setting prior parameters are given in the appendix. 
 
 Using the same techniques as in the previous section, 
-we fit the normal theory hierarchical model above, a thick tailed $t$ version with $\nu = 3$ d.f., and two restricted likelihood versions (Huber's and Tukey's) of the model.  For the incomplete restricted methods, we condition on robust regression estimates fit separately within each state. We also fit classical robust regression counterparts and a least squares regression separately within each state.  
+we fit the normal theory hierarchical model above, a thick-tailed $t$ version with $\nu = 3$ d.f., and two restricted likelihood versions (Huber's and Tukey's) of the model.  For the incomplete restricted methods, we condition on robust regression estimates fit separately within each state. We also fit classical robust regression counterparts and a least squares regression separately within each state. Hierarchical models naturally require more
+data and so we include states having at least 25 agencies resulting in 22 states and $n = \sum_{j} n_{j} =  3180$ total agencies. For training data we take a stratified (by state) sample of size $3180/2 = 1590$ where the strata sizes are $n_{j}/2$ (rounded to the nearest integer). The remaining data is used for a holdout evaluation using TLM computed separately within each state: $TLM_b(A)_{j} = (M_{j} - [\alpha M_{j}])^{-1} \sum_{i=[\alpha M_{j}]+1}^{M_{j}} \log(f_A(y_{(i)j}^b))$ where $y_{(1)j}^b, y_{(2)j}^b,..., y_{(M_{j})j}^b$ is the ordering of the $M_{j}$ holdout observations within state $j$ according to the log marginals under the base model $b$. For the non-Bayesian models,  $f_A(y_{(i)j}^b$ is estimated using plug-in estimators for the parameters for state $j$. $TLM_b(A)_{j}$ is computed for each state for $K=50$ splits into training and holdout sets. For each fit the Bayesian models are fit using MCMC with the restricted versions applying the algorithm laid out in Section \ref{BayesLinMod} adapted to the hierarchical setting as described in Section \ref{simData}.
 
-We digress briefly to note that for the restricted likelihood methods no additional computational strategies outside of those discussed in Section~\ref{highDim} are needed to fit the hierarchical models described here. Since we condition on statistics which are computed within each state, the model's conditional independence between the states allows the data augmentation described earlier to be performed independently within each state.  Updates of hyperparameters follow conventional MCMC procedures.  We note that different types of statistics could be chosen for each state, if desired, allowing for a large amount of flexibility.  
+%We digress briefly to note that for the restricted likelihood methods no additional computational strategies outside of those discussed in Section~\ref{highDim} are needed to fit the hierarchical models described here. Since we condition on statistics which are computed within each state, the model's conditional independence between the states allows the data augmentation described earlier to be performed independently within each state.  Updates of hyperparameters follow conventional MCMC procedures.  We note that different types of statistics could be chosen for each state, if desired, allowing for a large amount of flexibility.  
 
-Selected results for the hierarchical fits appear in Figure
-\ref{fig:hierType1Marg}. Hierarchical models naturally require more
-data and so we consider only training sizes of $n=1000$ and
-$2000$.  Again, the $t$-model is used as the base
-method for computing TLM. Trimming fractions between $0.15$ and $0.3$ are displayed, as patterns for smaller trimming fractions are similar to those from the non-hierarchical fits. That is, without sufficient trimming, the Bayesian restricted likelihood fits' evaluation measure is poor. Again, the normal theory fits, both Bayesian and classical, perform poorly and are left out of the figures.  We see that the restricted likelihood with Tukey's estimator performs best in each case (assuming sufficient trimming). Huber's version also tops the thick tailed model for $n=2000$.  The Bayesian restricted likelihood fits considerably outperform their respective individual classical robust fits for training size of $n=1000$. This observation remains, though marginally so, for $n=2000$. The advantage of the hierarchical models seen here is due to the pooling of information across states, resulting in better predictive performance as compared to both the thick tailed competitor as well the respective classical fits.
+The average over states, $\overline{TLM}_b(A)$ for each of the $K$ repetitions is summarized in Figure
+\ref{fig:hierTLM} for several trimming fractions using the Student-t as the base model. The points are the average of the $\overline{TLM}_b(A)$ over the $K$ repetitions with errorbars plus/minus one standard deviation over $K$. Again, the normal theory fits, both Bayesian and classical, perform poorly.  We also see, that even using it as the base model to compute TLM, the Student-t doesn't perform well in comparison to the robust regressions. On average, the classical robust regressions fit separately within each state slightly outperform the restricted likelihood hierarchical models. The hierarchical model does however, reduce variance in predictions at the cost of an increase in bias induced by the prior distributions. This can be seen in Figure \ref{fig:hierTLMsd} which shows the standard deviation of $\overline{TLM}_b(A)$ relative to the mean over the $K=50$ repetitions. The results displayed are for the two restricted likelihood versions of the hierarchical model and their corresponding robust regression models fit separately within each state. It is clear that the hierarchical model reduces sample-to-sample variation in comparison the the classical robust model counterparts.  
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=6in]{hier_average_tlm.png}
+\caption{Hierarchical model results: $\overline{TLM}_b(A)$  plus/minus one standard deviation over $K = 50$ splits into training and holdout sets for several values of the trimming fraction $\alpha$.}
+\label{fig:hierTLM}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=6in]{hier_sd_tlm.png}
+\caption{Hierarchical model results: standard deviation of $\overline{TLM}_b(A)$ relative to the mean over $K = 50$ splits into training and holdout sets for several values of the trimming fraction $\alpha$. Results are given for the two restricted likelihood versions of the hierarchical model and their corresponding robust regression models fit separately within each state.}
+\label{fig:hierTLMsd}
+\end{figure}
+
+It is also interesting to examine the individual results within each state. Figure \ref{fig:hierTLMstate} summarizes ${TLM}_b(A)_{j}$ for each state where the points and errorbars are the averages and plus/minus one standard deviation over the $K = 50$ repetitions. The results are only given for the models using Tukey's M-estimators since, in general, these models performed the best.  The states are ordered along the x-axis according to number of agencies with the state (shown in parentheses). In several of the smaller states, the restricted hierarchical model performs better on average with similar performance between the models in most of the larger states; a reflection of the decreased influence of the prior. It is clear that the prior is having the affect of pooling information across states; this is beneficial for average TLM in some states but detrimental in others. However, for each state, the sample-to-sample variance in smaller under the restricted likelihood model. This is shown in Figure \ref{fig:hierTLMstateSD} of the standard deviation of ${TLM}_b(A)_{j}$ relative to the mean for each. The general trend in the figure is that the standard deviation decreases as the number of observations within a state increases. Additionally, the differences between the restricted likelihood hierarchical and classical robust version is larger for smaller states with virtually identical standard deviations for the larger states. 
+
+ 
+\begin{figure}[t]
+\includegraphics[width=7in]{hier_ave_tlm_state.png}
+\caption{Hierarchical model results: ${TLM}_b(A)_{j}$  plus/minus one standard deviation over $K = 50$ repetitions for each state and $\alpha = 0.3$. The states are ordered along the x-axis according to number of agencies with the state (shown in parentheses). Results displayed are for the robust models using Tukey's M-estimators.}
+\label{fig:hierTLMstate}
+\end{figure}
+
+\begin{figure}[t]
+\includegraphics[width=7in]{hier_sd_tlm_state.png}
+\caption{Hierarchical model results: Standard deviation of ${TLM}_b(A)_{j}$  relative to the mean over $K = 50$ repetitions for each state and $\alpha = 0.3$. The states are ordered along the x-axis according to number of agencies with the state (shown in parentheses). Results displayed are for the robust models using Tukey's M-estimators.}
+\label{fig:hierTLMstateSD}
+\end{figure}
+
+
+
+%We see that the restricted likelihood with Tukey's estimator performs best in each case (assuming sufficient trimming). Huber's version also tops the thick tailed model for $n=2000$.  The Bayesian restricted likelihood fits considerably outperform their respective individual classical robust fits for training size of $n=1000$. This observation remains, though marginally so, for $n=2000$. The advantage of the hierarchical models seen here is due to the pooling of information across states, resulting in better predictive performance as compared to both the thick tailed competitor as well the respective classical fits.
 
 
 
