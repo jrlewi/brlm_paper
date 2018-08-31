@@ -210,23 +210,20 @@ range of scientific problems and have many well-documented advantages
 over competing methods. However, these methods run into difficulties
 for two major and prevalent classes of problems: handling data sets
 with outliers and dealing with model misspecification. We outline the
-drawbacks of previous solutions to both of these problems (e.g., use of
-heavy-tailed likelihoods) and propose a new method as an
-alternative.  When working with the new method, we summarize
-the data through a set of insufficient statistics,
-targeting inferential quantities of interest, and update the prior
-distribution with the summary statistics rather than the complete
+drawbacks of previous solutions to both of these problems and propose a new method as an
+alternative.  When working with the new method, the data is summarized
+through a set of insufficient statistics, targeting inferential quantities of interest, and the prior
+distribution is updated with the summary statistics rather than the complete
 data.  By careful choice of conditioning statistics, we
 retain the main benefits of Bayesian methods while reducing the
 sensitivity of the analysis to features of the data not captured by
 the conditioning statistics. For reducing sensitivity to outliers,
 classical robust estimators (e.g., M-estimators) are natural choices
-for conditioning statistics. With these choices, the method can be thought of as a
-blend of classical robust estimation and Bayesian methods. A major contribution of this work is the development of a data 
+for conditioning statistics. %With these choices, the method can be thought of as a blend of classical robust estimation and Bayesian methods. 
+A major contribution of this work is the development of a data 
 augmented Markov chain Monte Carlo (MCMC) algorithm
-for the linear model and a wide range of choices for
-summary statistics. We demonstrate the method on an
-insurance agency data set containing many outliers and subject to model
+for the linear model and a large class of
+summary statistics. We demonstrate the method on simulated and real data sets containing outliers and subject to model
 misspecification. Success is manifested in better predictive
 performance for data points of interest as compared to competing
 methods.
@@ -241,7 +238,7 @@ methods.
 %\end{keyword}
 
 \begin{keyword}
-\kwd{Approximate Bayesian computation}
+%\kwd{Approximate Bayesian computation}
 \kwd{Markov chain Monte Carlo}
 \kwd{M-estimation}
 \kwd{Robust regression}
@@ -251,18 +248,16 @@ methods.
 
 \section{Introduction}
 Bayesian methods have provided successful solutions to a wide range of scientific problems, with their value
-having been demonstrated both empirically and theoretically.  Bayesian inference relies on a complete Bayesian model consisting of three elements:  the prior distribution, the loss function, and the likelihood or sampling density.  While formal optimality of Bayesian methods is unquestioned if one accepts the validity of all three of these elements, a healthy skepticism encourages us to question each of them.  Concern about the prior distribution has been addressed through the development of techniques for subjective elicitation \citep{garthwaite2005, ohagan2006} and objective Bayesian methods \citep{berger2006}.  Concern about the loss function is reflected in, for example, the
-extensive literature on Bayesian hypothesis tests \citep{kass1995}.  
+having been demonstrated both empirically and theoretically.  Bayesian inference relies on a model consisting of three elements:  the prior distribution, the loss function, and the likelihood or sampling density.  While formal optimality of Bayesian methods is unquestioned if one accepts the validity of all three of these elements, a healthy skepticism encourages us to question each of them.  Concern about the prior distribution has been addressed through the development of techniques for subjective elicitation \citep{garthwaite2005, ohagan2006} and objective Bayesian methods \citep{berger2006}.  Concern about the loss function is reflected in, for example, the extensive literature on Bayesian hypothesis tests \citep{kass1995}.  
 %This work focus on the likelihood.  % sampling density has been given less attention from a specificallyBayesian view, although the work on predictive diagnostics \citep{box1980} departs from classical traditions.  
 
-The focus of this work is the development of techniques to handle imperfections in the likelihood $f(\by|\bth)$.  These imperfections often show themselves through the presence of outliers--cases not reflecting the phenomenon under study. There are three main solutions to Bayesian outlier-handling.  The first is to replace the basic sampling density with a mixture model which includes one component for the ``good'' data and a second component for the ``bad'' data.  With this approach, the good component of the sampling density is used for prediction of future good data.  The second approach replaces the
+The focus of this work is the development of techniques to handle imperfections in the likelihood $f(\by|\bth) = L(\bth|\by)$. Concern for imperfections in the likelihood are reflected in work considering minimally informative likelihoods \citep{yuan1999minimally}, sensitivities of inferences to perturbations in the model \citep{zhu2011}, the specification of a class of models and the use of Bayesian model averaging over the class \citep{clyde2004}, and considerations of such averaging when the specified class may not contain the so-called true data generating model \citep{bernardo2000, clyde2013, clarke2013Complete}.   In practice, the imperfections in a proposed likelihood often show themselves through the presence of outliers--cases not reflecting the phenomenon under study. There are three main solutions to Bayesian outlier-handling.  The first is to replace the basic sampling density with a mixture model which includes one component for the ``good'' data and a second component for the ``bad'' data.  With this approach, the good component of the sampling density is used for prediction of future good data.  The second approach replaces the
 basic sampling density with a thick-tailed density in an attempt to discount outliers, yielding techniques that 
-often provide solid estimates of the center of the distribution but 
-do not easily translate to predictive densities for further good data.  The third approach fits a flexible (typically nonparametric) model to  the data, producing a Bayesian version of a density estimate for both good and bad data.  In recent development, inference is made through the use of robust inference functions \citep{lee2014}.  
+often provide solid estimates of the center of the distribution but do not easily translate to predictive densities for further good data.  The third approach fits a flexible (typically nonparametric) model to  the data, producing a Bayesian version of a density estimate for both good and bad data.  In recent development, inference is made through the use of robust inference functions \citep{lee2014}.  
 
 These traditional strategies  all have their drawbacks.  The outlier-generating processes 
 may be transitory in nature, constantly shifting as the source of bad data changes.  This prevents us from appealing to large-sample arguments to claim that, with enough data, we can nail down a model for both good and bad data combined.  Instead of attempting to model both good and bad data, we propose a novel strategy for handling outliers. In a nutshell, we begin with a complete model  as if all of the data are good. Rather than driving the move from prior to posterior  by the full likelihood, we use only the likelihood driven by a few summary statistics which typically target inferential quantities
-of interest.  We call this likelihood a restricted likelihood because conditioning is done on a restricted set of data; the set which satisfies the observed summary statistics. This is a formal update of the prior distribution based on the sampling density of the summary statistics. %The novelty of the work is twofold.  We make use of classical robust estimators as  summary statistics in a formal Bayesian framework, using the sampling density of the estimators as a replacement for the  sampling density of the data.  Second, we advance the argument that conditioning on an insufficient summary of the data is sound practice, rather than merely being done for computational and modelling convenience.  
+of interest.  We call this likelihood a restricted likelihood because conditioning is done on a restricted set of data; the set which satisfies the observed summary statistics. This is a formal update of the prior distribution based on the sampling density of the summary statistics. The spirit of the approach  %The novelty of the work is twofold.  We make use of classical robust estimators as  summary statistics in a formal Bayesian framework, using the sampling density of the estimators as a replacement for the  sampling density of the data.  Second, we advance the argument that conditioning on an insufficient summary of the data is sound practice, rather than merely being done for computational and modelling convenience.  
 
 % \red{[Steve, just a reminder that a paragraph about model misspecification was here orginally but commented out by John following a referee's suggestion. I also agree with the referee in that model misspecification could be a much broader issue than having a fraction of bad data while the model for good data is correctly specified.]}
 %In addition to outlier-prone data, the 
@@ -276,7 +271,7 @@ of interest.  We call this likelihood a restricted likelihood because conditioni
 %we do when outliers are present.  Thus, outliers are but one form of misspecified model.  
 %We recommend a common solution for dealing with outliers and more general forms of model misspecification.}  
 
-The remainder of the paper develops....  %Bayesian restricted likelihood (Section~\ref{restrictedlikelihood}), shows how it can be applied to a Bayesian linear model (Section~\ref{BayesLinMod}), illustrates its use on an insurance agencies data set with a novel twist on model evaluation (Section~\ref{Applications}), and wraps up with a discussion (Section~\ref{Conclusions}).  A major contribution of this work is the computational strategy whose legitimacy is established in Section~\ref{BayesLinMod}.  The technical proofs are in the appendix.   
+The remainder of the paper is as follows: Section~\ref{restrictedlikelihood} introduces the Bayesian restricted likelihood and provides context with previous work, Section~\ref{illustrations} demonstrates some advantages of the methods on simple examples, and Section~\ref{BayesLinMod} details a MCMC algorithm to apply the method to Bayesian linear models. This is a major contribution to the work providing an approach to apply the method on realistic examples. Many of the the technical proofs are in the Appendix \ref{sec:appendix} with R code available from the authors. Section \ref{Applications} illustrates the method on a messy insurance industry data set with a novel twist on model evaluation. A discussion (Section~\ref{Conclusions}) provides some final commentary on the new method. 
 
 \section{Restricted Likelihood}
 \label{restrictedlikelihood}
@@ -355,11 +350,10 @@ f(y_{n+1} | T(\by)) = \int f(y_{n+1} | \bth) \pi(\bth | T(\by))\ d\bth .
 \end{eqnarray}
 
 \subsection{Literature review}
-Direct use of restricted likelihood appears in many areas of the literature.  The motivation is often similar to ours:   
-concern about outliers or, more generally, model misspecification.  For example, the use of rank likelihoods is discussed by \cite{savage1969}, \cite{pettitt1983, pettitt1982}, and more recently by \cite{hoff2013}.  
+
+Our motivation for the use of summary statistics in Bayesian inference is concern about outliers or, more generally, model misspecification. Specifically, the likelihood is not specified correctly and concentrating on using well chosen parts of the data can help improve the analysis \citep[e.g.,][]{wong2004}. Direct use of restricted likelihood for this reason appears in many areas of the literature.  For example, the use of rank likelihoods is discussed by \cite{savage1969}, \cite{pettitt1983, pettitt1982}, and more recently by \cite{hoff2013}.  
 \cite{lewis2012} make use order statistics and robust estimators for $T(\by)$ in the location-scale setting. 
-Asymptotic properties of restricted posteriors are studied by \cite{doksum1990}, \cite{clarke1995}, \cite{yuan2004},  and \cite{hwang2005}. The tenor of these asymptotic 
-results is that, for a variety of conditioning statistics with non-trivial regularity conditions on prior, model, and likelihood, the
+Asymptotic properties of restricted posteriors are studied by \cite{doksum1990}, \cite{clarke1995}, \cite{yuan2004},  and \cite{hwang2005}. The tenor of these asymptotic results is that, for a variety of conditioning statistics with non-trivial regularity conditions on prior, model, and likelihood, the
 posterior distribution resembles the asymptotic sampling distribution of the conditioning statistic.  
 
 Restricted likelihoods have also been used as practical approximations to a full likelihood. For example, \cite{pratt1965} appeals to heuristic arguments regarding approximate sufficiency to justify the use of the restricted likelihood of the sample mean and standard deviation. Approximate sufficiency is also appealed to in the use of Approximate Bayesian Computation (ABC), which is related to our method.  
@@ -373,7 +367,7 @@ With an approximately sufficient $T(\cdot)$ and a small enough $\epsilon$, heuri
 
 % In a related, but distinctly different, approach which also takes advantage of summary statistics, the full data log likelihood is replaced by a loss function \citep[e.g.][]{bissiri2013} in an effort to concentrate inference only on parameters of interest. In contrast, the incomplete likelihood is formulated using a full probability model, allowing for a formal Bayesian update, while remaining robust to misspecification.
 
-This work extends the development of Bayesian restricted likelihood by arguing that deliberate choice of $T(\by)$ is sound practice and also by expanding the class of conditioning statistics in which exact conditioning can be achieved.  Our methods do not rely on asymptotic properties, nor do they rely on approximate conditioning.%, \green{nor do they need to correspond to artificial censoring to create incomplete or missing data}  \citep[e.g.,][]{albert1988, hoffwakefield2013}.  
+This work extends the development of Bayesian restricted likelihood by arguing that deliberate choice of $T(\by)$ on which to guide inference is sound practice. We also expand the class of conditioning statistics in which a formal Bayesian update can be achieved.  Our methods do not rely on asymptotic properties, nor do they rely on approximate conditioning.%, \green{nor do they need to correspond to artificial censoring to create incomplete or missing data}  \citep[e.g.,][]{albert1988, hoffwakefield2013}.  
 %\green{Note - fix references here hoffwakefield for asymptotic; albert for ? .}  
 
 %The key to productive use of the restricted likelihood is the choice of $T(\by)$ and the development
@@ -1504,24 +1498,26 @@ It is also interesting to examine the results within each state. Figure \ref{fig
 \section{Discussion}
 \label{Conclusions}
 
-%In this work, we have presented an approach which begins to reconcile Bayesian methods with the practice of data analysis.
+%This work describes the concept of conditioning on insufficient statistics in Bayesian models, a method we term the restricted likelihood. The examples demonstrate the potential predictive improvement over competing methods in outlier-prone settings where the conditioning statistic targets the mean of the non-outlying data (e.g. M-estimators). 
+%Attempting to model outliers can be seen as a special case of  misspecification of the original model for the non-outlying data. The traditional view is that, if the model is inadequate, one should build a better model. In our empirical work, as data sets have become larger and more complex, we have bumped into settings where we cannot realistically build the perfect model. We ask the question Òby attempting to improve our model through elaboration, will the overall performance of the model suffer?Ó If yes, we avoid the elaboration, retaining a model with some level of misspecification. Acknowledging that the model is misspecified implies acknowledging that the sampling density is incorrect, exactly as we do when outliers are present. In this sense, misspecified models and outliers are reflections of the same phenomenon, and we see the restricted likelihood as a method for dealing with this problem. 
 Many routine choices in an analysis react to the gap between reality and the
 statistical model, where a bit of set-up work improves inferential
 performance.  Often, these choices can be recast in the framework of
 restricted likelihood presented here, lending them more formality and facilitating
-development of theoretical results.  But a much greater benefit of our
-framework is that it leads us to blend classical estimation with
-Bayesian methods.  Here, we use the likelihood from robust regression
-estimators to move from prior distribution to posterior distribution.
-Conditioning on the estimator, the update follows Bayes' Theorem
-exactly.   Computation is driven by MCMC methods, requiring only a modest supplement to existing algorithms.  In another context, we might condition on the results of a set of estimating equations, designed to enforce lexical preferences for those features of the analysis considered most important, yet still producing inferences for secondary aspects of the problem. For example, the computational strategies we devised here allow us to apply the method to inference on quantiles of a regression model. In other settings, we envision conditioning on a mix of estimators and some of the observed data.  
+development of theoretical results. A greater benefit of our framework is that it leads us to blend classical estimation with
+Bayesian methods. Here, we concentrate on outlier-prone settings where natural choices for conditioning statistic are classical robust estimators targeting the mean of the non-outlying data (e.g., M-estimators).  The likelihood conditioned on these estimators is used to move from prior to posterior. The update follows Bayes' Theorem, conditioning on the observed estimators exactly.   Computation is driven by MCMC methods, requiring only a supplement to existing algorithms by adding a Gibbs step to sample from the space of data sets satisfying the observed statistic. This step has additional computation costs. The estimator must be computed at every iteration to propose a new $\by$. This cost, as well as the need to find orthonormal bases derived from gradients of the estimators, adds some computational time compared to the full likelihood MCMC. The cost of finding the bases can be driven down by an understanding of the geometric space from which the samples are drawn as described in Section~\ref{highDim}. Additionally, we have seen good mixing of the MCMC chains across a wide-variety of examples. 
 
-The framework we propose allows us to retain many benefits of Bayesian methods:  it requires a full and complete model for the data; it lets us combine various sources of information both through the use of a prior distribution and through creation of a hierarchical model; it guarantees admissibility of our decision rules among the class based on the summary statistic $T(\by)$; and it naturally leads us to focus on predictive inference.   
+Outside of outlier-prone settings, we might condition on the results of a set of estimating equations, designed to enforce lexical preferences for those features of the analysis considered most important, yet still producing inferences for secondary aspects of the problem. For example, the computational strategies we devised here allow us to apply the method to inference on quantiles of a regression model by, for example, conditioning on estimates of these quantiles. This leads to questions regarding the choice of summary statistic to apply. For outliers, we have applied some obvious choices (M-estimators, LMS, LTS) which have shown value in classical robust estimation. Properties of such estimators are well known and can be used as a basis for selecting one. In general, great ingenuity has been used to create a wide variety of estimators designed to handle specific manifestations of a misspecified model; where outliers are just a specific case.  The estimators are typically accompanied by asymptotic results on consistency and distribution.  These results can be used as starting point for choosing appropriate statistics in specific settings. In general, we recommend a choice based on the analyst's understanding of the problem, model, reality, deficiencies in the model,  inferences to be made, and the relative importance of various inferences.  %In our words, to provide desirable inference, we recommend use of robust and relevant summary statistics in conjunction with Bayesian models. 
 
-This same framework retains many of the benefits of classical estimation.  Great ingenuity has been used to create a wide variety of estimators in this tradition, many of which are designed to handle specific flaws in the model.  The estimators are typically accompanied by asymptotic results on consistency and distribution.  Many of these results carry over to our blend of classical and Bayesian methods, although regularity conditions differ.  We expect our procedures to have strong large sample performance, especially in settings where
-pooling of information is of value.  
+%Many of these results carry over to our blend of classical and Bayesian methods, although regularity conditions differ.  We expect our procedures to have strong large sample performance, especially in settings where
+%pooling of information is of value.  
+ 
+The most general setting, of which outliers are a subset, is model misspecification. The traditional view is that, if the model is inadequate, one should build a better model. In our empirical work, as data sets have become larger and more complex, we have bumped into settings where we cannot realistically build the perfect model. We ask the question Òby attempting to improve our model through elaboration, will the overall performance of the model suffer?Ó If yes, we avoid the elaboration, retaining a model with some level of misspecification. Acknowledging that the model is misspecified implies acknowledging that the sampling density is incorrect, exactly as we do when outliers are present. In this sense, misspecified models and outliers are reflections of the same phenomenon, and we see the restricted likelihood as a method for dealing with this more general problem. 
 
-This framework opens a number of questions, including a need to revisit such issues as model selection, model averaging for predictive performance, and the role of diagnostics.  Perhaps the biggest question is which summary statistic to choose.  For this, we recommend a choice based on the analyst's understanding of the problem, model, reality, deficiencies in the model,  inferences to be made, and the relative importance of various inferences.  \green{In our words, to provide desireable inference, we recommend use of robust and relevant summary statistics in conjunction with Bayesian models.}  
+The framework allows us to retain many benefits of Bayesian methods:  it requires a complete model for the data; it lets us combine various sources of information both through the use of a prior distribution and through creation of a hierarchical model; it guarantees admissibility of our decision rules among the class based on the summary statistic $T(\by)$; and it naturally leads us to focus on predictive inference.  The work does open a number of questions open to further work, including a need to revisit such issues as model selection, model averaging for predictive performance, and the role of diagnostics. 
+
+
+%Perhaps the biggest question is which summary statistic to choose.  For this, we recommend a choice based on the analyst's understanding of the problem, model, reality, deficiencies in the model,  inferences to be made, and the relative importance of various inferences.  \green{In our words, to provide desireable inference, we recommend use of robust and relevant summary statistics in conjunction with Bayesian models.}  
 
 
 \section{Appendix}

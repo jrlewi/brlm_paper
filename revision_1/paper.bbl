@@ -1,5 +1,5 @@
  \newcommand{\noop}[1]{}
-\begin{thebibliography}{35}
+\begin{thebibliography}{42}
 \newcommand{\enquote}[1]{``#1''}
 \expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
 \expandafter\ifx\csname url\endcsname\relax
@@ -13,10 +13,34 @@ Berger, J. (2006).
 \newblock {\em {B}ayesian Analysis\/}, 1: 385--402.
 \endbibitem
 
+\bibitem[{Bernardo and Smith(2000)}]{bernardo2000}
+Bernardo, J.~M. and Smith, A. (2000).
+\newblock {\em Bayesian Theory\/}.
+\newblock John Wiley \& Sons Ltd.
+\endbibitem
+
 \bibitem[{Clarke and Ghosh(1995)}]{clarke1995}
 Clarke, B. and Ghosh, J.~K. (1995).
 \newblock \enquote{Posterior Convergence Given the Mean.}
 \newblock {\em The Annals of Statistics\/}, 23: 2116--2144.
+\endbibitem
+
+\bibitem[{Clarke et~al.(2013)Clarke, Clarke, Yu et~al.}]{clarke2013Complete}
+Clarke, J.~L., Clarke, B., Yu, C.-W., et~al. (2013).
+\newblock \enquote{Prediction in M-complete Problems with Limited Sample Size.}
+\newblock {\em Bayesian Analysis\/}, 8(3): 647--690.
+\endbibitem
+
+\bibitem[{Clyde and George(2004)}]{clyde2004}
+Clyde, M. and George, E.~I. (2004).
+\newblock \enquote{Model uncertainty.}
+\newblock {\em Statistical science\/}, 81--94.
+\endbibitem
+
+\bibitem[{Clyde and Iversen(2013)}]{clyde2013}
+Clyde, M.~A. and Iversen, E.~S. (2013).
+\newblock \enquote{Bayesian model averaging in the M-open framework.}
+\newblock {\em Bayesian theory and applications\/}.
 \endbibitem
 
 \bibitem[{Doksum and Lo(1990)}]{doksum1990}
@@ -243,10 +267,24 @@ Tavar{\'e}, S., Balding, D.~J., Griffiths, R., and Donnelly, P. (1997).
 \newblock {\em Genetics\/}, 145: 505--518.
 \endbibitem
 
+\bibitem[{Wong and Clarke(2004)}]{wong2004}
+Wong, H. and Clarke, B. (2004).
+\newblock \enquote{Improvement over Bayes prediction in small samples in the
+  presence of model uncertainty.}
+\newblock {\em Canadian Journal of Statistics\/}, 32(3): 269--283.
+\endbibitem
+
 \bibitem[{Yuan and Clarke(2004)}]{yuan2004}
 Yuan, A. and Clarke, B. (2004).
 \newblock \enquote{Asymptotic Normality of the Posterior Given a Statistic.}
 \newblock {\em The Canadian Journal of Statistics\/}, 32: 119--137.
+\endbibitem
+
+\bibitem[{Yuan and Clarke(1999)}]{yuan1999minimally}
+Yuan, A. and Clarke, B.~S. (1999).
+\newblock \enquote{A minimally informative likelihood for decision analysis:
+  illustration and robustness.}
+\newblock {\em Canadian Journal of Statistics\/}, 27(3): 649--665.
 \endbibitem
 
 \bibitem[{Zellner(1986)}]{zellner1986}
@@ -255,6 +293,12 @@ Zellner, A. (1986).
   analysis with g-prior distributions.}
 \newblock {\em {In} {B}ayesian Inference and Decision Techniques: Essays in
   Honor of Bruno de Finetti\/}, 233.
+\endbibitem
+
+\bibitem[{Zhu et~al.(2011)Zhu, Ibrahim, and Tang}]{zhu2011}
+Zhu, H., Ibrahim, J.~G., and Tang, N. (2011).
+\newblock \enquote{Bayesian influence analysis: a geometric approach.}
+\newblock {\em Biometrika\/}, 98(2): 307--323.
 \endbibitem
 
 \end{thebibliography}
