@@ -232,3 +232,17 @@ ggplot(analysis_data) + geom_point(aes(x = sqrt_count_2010, y = sqrt_count_2012,
   theme_bw() + 
   labs(x = 'square root of 2010 houshold count', y = 'square root of 2012 houshold count') +
   theme(text = element_text(family = 'Times'))
+
+
+# acceptance rates -----
+
+list_1 <- lapply(states, function(State_keep){  
+  tbl_list <- lapply(ns, function(n){
+    read_rds(paste0('single_reg_state_', State_keep, '_n_', n, '.rds' ))
+    })
+     })
+
+range(sapply(list_1, function(x){
+  sapply(x, function(y) range(c(y$acceptYHuber, y$acceptY)))
+}))
+
