@@ -628,4 +628,196 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
  [25pdfTeX warning (ext4): destination with the same identifier (name{figure.9}
 ) has been already used, duplicate ignored
 
-\AtBegShi@Output ...ipout \box 
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.1254 
+        <./figs/scatter_by_state.png>]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [26]
+[27] <figs/tlm_base_Student-t.png, id=541, 1806.75pt x 1204.5pt>
+File: figs/tlm_base_Student-t.png Graphic file (type png)
+
+<use figs/tlm_base_Student-t.png>
+Package pdftex.def Info: figs/tlm_base_Student-t.png used on input line 1310.
+(pdftex.def)             Requested size: 433.62pt x 289.06752pt.
+
+<figs/tlm_base_Student-tbyTrimming.png, id=542, 1806.75pt x 1204.5pt>
+File: figs/tlm_base_Student-tbyTrimming.png Graphic file (type png)
+
+<use figs/tlm_base_Student-tbyTrimming.png>
+Package pdftex.def Info: figs/tlm_base_Student-tbyTrimming.png used on input li
+ne 1317.
+(pdftex.def)             Requested size: 433.62pt x 289.06752pt.
+ [28]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [29pdfTeX warning (ext4): destination with the same identifier (name{figure.10
+}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.1396 
+        <./figs/tlm_base_Student-t.png>]
+Underfull \vbox (badness 1742) has occurred while \output is active []
+
+ [30pdfTeX warning (ext4): destination with the same identifier (name{figure.11
+}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.1396 
+        <./figs/tlm_base_Student-tbyTrimming.png>]
+<figs/hier_average_tlm.png, id=564, 1806.75pt x 1204.5pt>
+File: figs/hier_average_tlm.png Graphic file (type png)
+
+<use figs/hier_average_tlm.png>
+Package pdftex.def Info: figs/hier_average_tlm.png used on input line 1404.
+(pdftex.def)             Requested size: 433.62pt x 289.06752pt.
+
+<figs/hier_sd_tlm.png, id=565, 1806.75pt x 1204.5pt>
+File: figs/hier_sd_tlm.png Graphic file (type png)
+
+<use figs/hier_sd_tlm.png>
+Package pdftex.def Info: figs/hier_sd_tlm.png used on input line 1411.
+(pdftex.def)             Requested size: 433.62pt x 289.06752pt.
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [31]
+<figs/hier_ave_tlm_state.png, id=578, 2258.4375pt x 1505.625pt>
+File: figs/hier_ave_tlm_state.png Graphic file (type png)
+
+<use figs/hier_ave_tlm_state.png>
+Package pdftex.def Info: figs/hier_ave_tlm_state.png used on input line 1420.
+(pdftex.def)             Requested size: 505.89pt x 337.2577pt.
+
+Overfull \hbox (72.27pt too wide) in paragraph at lines 1420--1421
+ [][] 
+ []
+
+<figs/hier_sd_tlm_state.png, id=579, 2258.4375pt x 1505.625pt>
+File: figs/hier_sd_tlm_state.png Graphic file (type png)
+
+<use figs/hier_sd_tlm_state.png>
+Package pdftex.def Info: figs/hier_sd_tlm_state.png used on input line 1426.
+(pdftex.def)             Requested size: 505.89pt x 337.2577pt.
+
+Overfull \hbox (72.27pt too wide) in paragraph at lines 1426--1427
+ [][] 
+ []
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [32pdfTeX warning (ext4): destination with the same identifier (name{figure.12
+}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.1506 
+        <./figs/hier_average_tlm.png>]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [33pdfTeX warning (ext4): destination with the same identifier (name{figure.13
+}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.1506 
+        <./figs/hier_sd_tlm.png>]
+Missing character: There is no Ò in font cmr10!
+Missing character: There is no Ó in font cmr10!
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [34]
+[35] [36] [37] (./paper.bbl (./paper.brf)
+\tf@brf=\write5
+\openout5 = `paper.brf'.
+
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [38]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [39]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [40]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [41])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1650.
+
+[42] [43pdfTeX warning (ext4): destination with the same identifier (name{figur
+e.14}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.1650 \end{document}
+                      <./figs/hier_ave_tlm_state.png>] [44pdfTeX warning (ext4)
+: destination with the same identifier (name{figure.15}) has been already used,
+ duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.1650 \end{document}
+                      <./figs/hier_sd_tlm_state.png>]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1650.
+ (./paper.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1650.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1650.
+
+Package rerunfilecheck Info: File `paper.out' has not changed.
+(rerunfilecheck)             Checksum: FA27F8B1C6C4FB82404441F5C65B8CBE;1427.
+Package rerunfilecheck Info: File `paper.brf' has not changed.
+(rerunfilecheck)             Checksum: F2F7E4A3ED2BA42703D1604E631E884C;2399.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+ ) 
+Here is how much of TeX's memory you used:
+ 8929 strings out of 493089
+ 129668 string characters out of 6134842
+ 226708 words of memory out of 5000000
+ 12086 multiletter control sequences out of 15000+600000
+ 22258 words of font info for 83 fonts, out of 8000000 for 9000
+ 1141 hyphenation exceptions out of 8191
+ 32i,17n,34p,2547b,524s stack positions out of 5000i,500n,10000p,200000b,80000s
+</usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
+></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb><
+/usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbxsl10.pfb>
+</usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb><
+/usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></
+usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></us
+r/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/
+local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></usr/lo
+cal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmib10.pfb></usr/lo
+cal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cmextra/cmmib7.pfb></us
+r/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/
+local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr5.pfb></usr/loc
+al/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/
+texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/tex
+live/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/texliv
+e/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2
+015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsl10.pfb></usr/local/texlive/20
+15/texmf-dist/fonts/type1/public/amsfonts/cm/cmssbx10.pfb></usr/local/texlive/2
+015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/20
+15/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy5.pfb></usr/local/texlive/2015
+/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy6.pfb></usr/local/texlive/2015/t
+exmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2015/tex
+mf-dist/fonts/type1/public/amsfonts/cm/cmsy8.pfb></usr/local/texlive/2015/texmf
+-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2015/texmf-d
+ist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2015/texmf-di
+st/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2015/texmf-dis
+t/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2015/texmf-dist/
+fonts/type1/public/amsfonts/symbols/msbm10.pfb>
+Output written on paper.pdf (44 pages, 2563019 bytes).
+PDF statistics:
+ 843 PDF objects out of 1000 (max. 8388607)
+ 164 named destinations out of 1000 (max. 500000)
+ 262 words of extra memory for PDF output out of 10000 (max. 10000000)
+
