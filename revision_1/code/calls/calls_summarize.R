@@ -16,6 +16,7 @@ rl_fit <- read_rds(file.path(here::here(), 'out', 'rl_fit.rds'))
 t_fit <- read_rds(file.path(here::here(), 'out', 't_fit.rds'))
 nu <- 5
 normal_fit <- read_rds(file.path(here::here(), 'out', 'normal_fit.rds'))
+normal_fit_all <- read_rds(file.path(here::here(), 'out', 'normal_fit_all.rds'))
 mixture_fit <- read_rds(file.path(here::here(), 'out', 'mixture_fit.rds'))
 # samples from 'good' part of model
 mixture_fit_good <- cbind(mixture_fit$beta0[,1],mixture_fit$beta1[,1], mixture_fit$sigma[,1])
@@ -123,7 +124,7 @@ length(unique(ppd_rl_gather$sample))
 
 rl_cred_bounds <- ppd_rl_gather %>% 
   group_by(x_grid) %>% 
-  summarize(lower = quantile(value, probs = .05), upper = quantile(value, probs = .95), Model = 'restricted likelihood')
+  summarize(lower = quantile(value, probs = .05), upper = quantile(value, probs = .95), Model = 'Restricted Likelihood')
 
 # t Model -----
 ppd_t <- sapply(x_grid, function(x){
@@ -143,13 +144,27 @@ ppd_normal <- sapply(x_grid, function(x){
   rpd_normal(normal_fit,x, n = n_samps)
 })
 
+ppd_normal_all <- sapply(x_grid, function(x){
+  rpd_normal(normal_fit_all,x, n = n_samps)
+})
+
 ppd_normal <- as_tibble(as.data.frame(cbind(t(ppd_normal), x_grid)))
+
+ppd_normal_all <- as_tibble(as.data.frame(cbind(t(ppd_normal_all), x_grid)))
 
 ppd_normal_gather <- gather(ppd_normal, key = 'sample', value = 'value', -x_grid)
 
+ppd_normal_all_gather <- gather(ppd_normal_all, key = 'sample', value = 'value', -x_grid)
+
+
 normal_cred_bounds <- ppd_normal_gather %>% 
   group_by(x_grid) %>% 
-  summarize(lower = quantile(value, probs = .05), upper = quantile(value, probs = .95), Model = 'Normal')
+  summarize(lower = quantile(value, probs = .05), upper = quantile(value, probs = .95), Model = 'Normal (removed outliers)')
+
+
+normal_all_cred_bounds <- ppd_normal_all_gather %>% 
+  group_by(x_grid) %>% 
+  summarize(lower = quantile(value, probs = .05), upper = quantile(value, probs = .95), Model = 'Normal (with outliers)')
 
 
 #Mixture Model ---
@@ -168,15 +183,22 @@ mixture_cred_bounds <- ppd_mixture_gather %>%
 
 
 # combine credible bounds -----
-cred_bounds <- bind_rows(normal_cred_bounds, t_cred_bounds, mixture_cred_bounds, rl_cred_bounds) %>% 
+cred_bounds <- bind_rows(normal_cred_bounds, normal_all_cred_bounds, t_cred_bounds, mixture_cred_bounds, rl_cred_bounds) %>% 
   gather(key = 'quantile', value = 'y', -x_grid, -Model)
 
 phones_df <- bind_cols(phones)
 phones_df$Calls <- c(rep('Used for prior', n_prior), rep('Used for fit', nrow(phones_df) - n_prior))
 
+# normal theory average fit to all data ----
+
+post_mn_all <- apply(normal_fit_all$mcmc, 2, mean)
+mean_fit_all <- post_mn_all[1] + post_mn_all[2]*x
+mean_fit_all_df <- data.frame(x_grid = x, y = mean_fit_all)
+
+
 ggplot(cred_bounds, aes(x = x_grid + mean(phones$year), y = y, group = interaction(quantile,Model), col = Model )) + geom_smooth(se = FALSE, lwd = .5) +
-  geom_point(data = phones_df, mapping = aes(x = year, y = calls, group = NULL, col = NULL, shape = Calls)) + labs(x = 'year', y = 'log calls') + theme_bw() + scale_color_brewer(palette = 'Set2') #+ geom_abline(slope =  mean_mix[2]  , intercept = mean_mix[1] - mean_mix[2]*mean(phones$year))
-ggsave(file.path(fig_path, 'calls_predictive.png'))
+  geom_point(data = phones_df, mapping = aes(x = year, y = calls, group = NULL, col = NULL, shape = Calls)) + labs(x = 'year', y = 'log calls') + theme_bw() + scale_color_brewer(palette = 'Set2') #+ geom_line(mapping = aes(x = x_grid + mean(phones$year), y = y, group = NULL, col = NULL), data = mean_fit_all_df, col = 'gray', lty = 2, lwd = .5) #+ geom_abline(slope =  post_mn_all[2]  , intercept = post_mn_all[1])
+ggsave(file.path(fig_path, 'calls_predictive.png'), width = 7, height = 5)
 
 # # lengths of credible intervals
 # cred_length <- spread(cred_bounds, quantile, y) %>%  mutate(difference = upper - lower)

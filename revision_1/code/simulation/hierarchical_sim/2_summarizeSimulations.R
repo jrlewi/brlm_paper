@@ -2,8 +2,11 @@
 # Summarize the simulations ---
 #
 library('tidyverse')
+New_results <- TRUE
 
+if(New_results){
 sims <- 1:30
+
 dfs_all <- vector('list', length(sims))
 for(data_sim in sims){
 # load the data, along with the factor levels, and true values of theta
@@ -96,6 +99,11 @@ dfs_all[[data_sim]] <- bind_rows(dfs)
 
 df_estimates <- bind_rows(dfs_all, .id = 'simulation')
 
+} else {
+summarize_data_frames <- readRDS(file.path(here::here(), "summarize_data_frames.rds")) 
+ df_estimates <- summarize_data_frames[[2]]
+}
+sims <- 1:length(unique(df_estimates$simulation))
 df_mse <- df_estimates %>% dplyr::select(-p,-n,-m) %>%  
   group_by(simulation, statistic, method, a_s, scale_as, sigma2) %>% 
   summarise(MSE = mean((theta - theta_hat)^2)) %>% 
@@ -104,9 +112,17 @@ df_mse <- df_estimates %>% dplyr::select(-p,-n,-m) %>%
   summarise(mean_MSE = mean(MSE), sd_MSE = sd(MSE)) %>% ungroup() %>% 
   mutate(a_s = as.character(a_s), scale_as = as.character(scale_as))
 
-labels_vals <- scale_color_discrete(name="Method/Statistic",
-                                   breaks= c("restricted.Huber","rlm.Huber","restricted.Tukey","rlm.Tukey"),
-                                   labels=c("Restricted/Huber", "Rlm/Huber", "Restricted/Tukey", "Rlm/Tukey"))  
+labels_vals <- scale_color_discrete(
+                name="Method/Statistic",
+                breaks= c("restricted.Huber",
+                          "restricted.Tukey",
+                          "rlm.Huber",
+                          "rlm.Tukey"),
+                labels=c("Restricted/Huber", 
+                         "Restricted/Tukey", 
+                         "Rlm/Huber", 
+                         "Rlm/Tukey"))  
+
 
 theme_set(theme_bw())
 ggplot(df_mse %>%  filter(method != 'Normal' & statistic != 'Normal'), aes(x = as.factor(a_s), y = mean_MSE, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_MSE - sd_MSE/sqrt(length(sims)), ymax = mean_MSE + sd_MSE/sqrt(length(sims))), linetype = 2, width = .1, position = position_dodge(width = .5)) + geom_point(position = position_dodge(width = .5)) +
@@ -134,6 +150,8 @@ ggsave(file.path(getwd(), "..", "..", "..", "figs", 'mse_sim2_facet_as.png'))
 
 # function to compute the predictive distribution on a grid for one group
 
+
+if(New_results){
 compute_pred_dist<-function(ygrid, thetaSamples, sigma2Samples){
   #ygrid: grid of y values to evaluate the pred distribution
   #thetaSamples, sigma2Samples MCMC samples from the given group
@@ -271,11 +289,16 @@ for(ss in sig2){
 dfs_all[[data_sim]] <- bind_rows(dfs)
 print(data_sim)
 }
-
 df_kl <- bind_rows(dfs_all, .id = 'simulation')
+saveRDS(list(df_kl, df_estimates), file = 'summarize_data_frames.rds') 
+} else {
+  summarize_data_frames <- readRDS(file.path(here::here(), "summarize_data_frames.rds")) 
+  df_kl <- summarize_data_frames[[1]]
+}
 
 
-#Note - warnings are just coercion rules - variables treated as factors wihtout the same levels coerced to characters...no big deal here. 
+
+#Note - warnings are just coercion rules - variables treated as factors without the same levels coerced to characters...no big deal here. 
 
 #fctrs <- c('p', 'n', 'm', 'statistic', 'method', 'a_s', 'scale_as')
 #df_kl <- df_kl %>% mutate_at(fctrs, funs(factor))
@@ -297,6 +320,8 @@ ggplot(df_kl_mean %>% filter(method != 'Normal', statistic != 'Normal') , aes(x 
 
 ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_facet_scale.png'), width = 6, height = 4)
 
+df_kl_mean %>% filter(method == 'Normal', statistic == 'Normal') %>% ungroup() %>% 
+  summarise(min = min(mean_KL), max = max(mean_KL))
 
 
 ggplot(df_kl_mean %>% filter(method != 'Normal', statistic != 'Normal'), aes(x = as.factor(scale_as), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(length(sims)), ymax = mean_KL + sd_KL/sqrt(length(sims))), linetype = 1, width = 0, position = position_dodge(width = .5)) +
@@ -306,7 +331,7 @@ ggplot(df_kl_mean %>% filter(method != 'Normal', statistic != 'Normal'), aes(x =
 
 ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_facet_as.png'), width = 6, height = 4)
 
-saveRDS(list(df_kl, df_estimates), file = 'summarize_data_frames.rds')
+# saveRDS(list(df_kl, df_estimates), file = 'summarize_data_frames.rds')
 # investigate convergence of variance estimators in mixture model ---
 
 # Effects of n, p, or m
@@ -316,7 +341,7 @@ saveRDS(list(df_kl, df_estimates), file = 'summarize_data_frames.rds')
 df_kl %>% filter(method == 'rlm', statistic == 'Huber', simulation == '1')
 df_kl %>% filter(method == 'restricted', statistic == 'Huber', simulation == '1')
 
-
+#n ----
 df_kl_mean_n <- df_kl %>% #filter(method != 'rlm') %>% 
   group_by(simulation, n, statistic, method, sigma2) %>% 
   summarise(KL = mean(KL)) %>% 
@@ -429,9 +454,9 @@ tmp_df <- df_kl %>%
   filter(method == 'restricted', statistic == 'Tukey') %>% dplyr::select(p,n,m, KL) %>%  
   mutate(p = as.factor(p), n = as.factor(n), m = as.factor(m)) 
 
-fit_mnp <- lm(KL  ~ (m + n+ p), data = tmp_df )
+fit_mnp <- lm(log(KL)  ~ (m + n+ p)^2 + m*n*p, data = tmp_df )
 summary(fit_mnp) 
-
+plot(fit_mnp)
 
 ggplot(est_mnp_tukey, aes(x = as.factor(value), y = theta - theta_hat)) +
   geom_boxplot() + geom_hline(yintercept = 0, lty = 2) +

@@ -119,30 +119,78 @@ prior_data <- prior_data %>% dplyr::rename(Count_2008 = Ending_HH_Count2008, Cou
 
 analysis_data <- analysis_data %>% dplyr::rename(Count_2010 = Ending_HH_Count2010, Count_2012 = Ending_HH_Count2012)
 
+# Center and Scale -------- 
+
+
+cs <- function(x){
+  cs <- (x - mean(x, na.rm = TRUE))/sd(x, na.rm = TRUE)
+  cs + abs(min(cs))
+  }
+
+Count_2008 <- cs(prior_data$Count_2008)
+Count_2010 <- cs(c(prior_data$Count_2010, analysis_data$Count_2010))
+Count_2012 <- cs(analysis_data$Count_2012)
+
+prior_data2 <- prior_data
+nr_prior <- nrow(prior_data2)
+prior_data2$Count_2008 <- Count_2008
+prior_data2$Count_2010 <- Count_2010[1:nr_prior]
+
+analysis_data2 <- analysis_data
+nr_analyses <- nrow(analysis_data2)
+analysis_data2$Count_2010 <- Count_2010[(nr_prior + 1):(nr_prior + nr_analyses)]
+analysis_data2$Count_2012 <- Count_2012
+
+
+
+plot(prior_data$Count_2008, prior_data2$Count_2008)
+plot(prior_data$Count_2010, prior_data2$Count_2010)
+plot(analysis_data$Count_2010, analysis_data2$Count_2010)
+plot(analysis_data$Count_2012, analysis_data2$Count_2012)
+
+
+summary(fit1 <- lm(Count_2010 ~ Count_2008, data = prior_data))
+summary(fit2 <- lm(Count_2010 ~ Count_2008, data = prior_data2))
+plot(residuals(fit1))
+plot(residuals(fit2))
+
+summary(fit1 <- lm(Count_2012 ~ Count_2010, data = analysis_data))
+summary(fit2 <- lm(Count_2012 ~ Count_2010, data = analysis_data2))
+plot(residuals(fit1))
+plot(residuals(fit2))
+
+
+
 # plots ----
 theme_set(theme_bw())
 
 #by Agency Type
-ggplot(prior_data, aes(x = sqrt(Count_2008), y = sqrt(Count_2010), col = Type)) + geom_point(size = .3)  + xlim(c(0,150)) + ylim(c(0, 130)) + stat_smooth(method = "rlm", formula = y ~ x -1, col = 1, method.args = list(psi = psi.bisquare, scale.est = 'Huber'), size = .5, lty = 2) + scale_color_discrete(guide_legend(title = 'Agency Type')) 
+#+ xlim(c(0,150)) + ylim(c(0, 130))
+ggplot(prior_data2, aes(x = sqrt(Count_2008), y = sqrt(Count_2010), col = Type)) + geom_point(size = .3) + stat_smooth(method = "rlm", formula = y ~ x -1, col = 1, method.args = list(psi = psi.bisquare, scale.est = 'Huber'), size = .5, lty = 2) + scale_color_discrete(guide_legend(title = 'Agency Type')) 
   
-
-ggplot(analysis_data, aes(x = sqrt(Count_2010), y = sqrt(Count_2012), col = Type)) + geom_point(size = .3) + xlim(c(0,150)) +  ylim(c(0, 130)) + stat_smooth(method = "rlm", formula = y ~ x -1, col = 1, method.args = list(psi = psi.bisquare, scale.est = 'Huber'), size = .5, lty = 2) + scale_color_discrete(guide_legend(title = 'Agency Type')) 
+#+ xlim(c(0,150)) +  ylim(c(0, 130)) 
+ggplot(analysis_data2, aes(x = sqrt(Count_2010), y = sqrt(Count_2012), col = Type)) + geom_point(size = .3)+ stat_smooth(method = "rlm", formula = y ~ x -1, col = 1, method.args = list(psi = psi.bisquare, scale.est = 'Huber'), size = .5, lty = 2) + scale_color_discrete(guide_legend(title = 'Agency Type')) 
 
 
 
 # by state ---
-ggplot(prior_data, aes(x = sqrt(Count_2008), y = sqrt(Count_2010), col = State)) + geom_point(size = .3) + xlim(c(0,150)) +  ylim(c(0, 130)) + stat_smooth(method = "rlm", formula = y ~ x -1, method.args = list(psi = psi.bisquare, scale.est = 'Huber'), size = .5, lty = 2, se = FALSE) 
+ggplot(prior_data, aes(x = sqrt(Count_2008), y = sqrt(Count_2010), col = State)) + geom_point(size = .3) + xlim(c(0,150)) +  ylim(c(0, 130)) + stat_smooth(method = "rlm", formula = y ~ x -1, method.args = list(psi = psi.bisquare, scale.est = 'Huber', maxit = 100), size = .5, lty = 2, se = FALSE) 
 
 
-ggplot(analysis_data, aes(x = sqrt(Count_2010), y = sqrt(Count_2012), col = State)) + geom_point(size = .3) + xlim(c(0,150)) +  ylim(c(0, 130)) + stat_smooth(method = "rlm", formula = y ~ x -1, method.args = list(psi = psi.bisquare, scale.est = 'Huber'), size = .5, lty = 2, se = FALSE)
+ggplot(analysis_data, aes(x = sqrt(Count_2010), y = sqrt(Count_2012), col = State)) + geom_point(size = .3) + xlim(c(0,150)) +  ylim(c(0, 130)) + stat_smooth(method = "rlm", formula = y ~ x -1, method.args = list(psi = psi.bisquare, scale.est = 'Huber', maxit = 100), size = .5, lty = 2, se = FALSE)
 
 
 
 # write data to rds files in approp directory ----
 
-write_rds(prior_data, file.path('/Users/john/Dropbox/school/osu/dissertationResearch/snm/journal_papers/bayes_rest_like_methods/revision_1/code/data_analysis/data/prior_data.rds'))
+write_rds(prior_data2, file.path(getwd(), 'data','prior_data.rds'))
 
-write_rds(analysis_data, file.path('/Users/john/Dropbox/school/osu/dissertationResearch/snm/journal_papers/bayes_rest_like_methods/revision_1/code/data_analysis/data/analysis_data.rds'))
+write_rds(analysis_data2, file.path(getwd(), 'data','analysis_data.rds'))
+
+
+# write_rds(prior_data, file.path('/Users/john/Dropbox/school/osu/dissertationResearch/snm/journal_papers/bayes_rest_like_methods/revision_1/code/data_analysis/data/prior_data.rds'))
+# 
+# write_rds(analysis_data, file.path('/Users/john/Dropbox/school/osu/dissertationResearch/snm/journal_papers/bayes_rest_like_methods/revision_1/code/data_analysis/data/analysis_data.rds'))
 
 
 

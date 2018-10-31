@@ -195,7 +195,7 @@ converge <- array(NA, c(nModels, 5, reps))
   # tdensity<-function(y, mean, sigma, nu){
   #   (gamma(.5*(nu+1))/(gamma(.5*nu)*sigma*sqrt(nu*pi)))*(1+((y-mean)/sigma)^2/nu)^(-.5*(nu+1))
   # }
-  fits<-function(betahats, X){X%*%betahats}
+  fits <- function(betahats, X){X%*%betahats}
   
  
 # simulation -----
@@ -388,7 +388,7 @@ marginals[ols_ind, i, ] <- olsMarginals %>% unlist()
 ################################################
 # normal theory bayes model ----
 ################################################
-      
+swSq <- 1      
 
 #tunning parameters for MH step on bstar, mu_rho, psi_rho, and rho
       step_logbstar <- abs(log(mu_bstr/(sqrt(mu_bstr*(1-mu_bstr)/(psi_bstr+1))))) #abs log(mean/sd)
@@ -505,7 +505,7 @@ if(any(is.na(step_Z))){
                                         b0,
                                         mu_bstr,
                                         psi_bstr,
-                                        swSq=1,
+                                        swSq = 1,
                                         w1,
                                         w2, 
                                         a_psir,
@@ -605,7 +605,7 @@ if(any(is.na(step_Z))){
                                                b0,
                                                mu_bstr,
                                                psi_bstr,
-                                               swSq=1,
+                                               swSq = 1,
                                                w1,
                                                w2, 
                                                a_psir,
@@ -762,7 +762,7 @@ marginals_sd[t_ind, i,] <- t_marg_sd %>% unlist()
 ################################################
 print(i)
 end <- Sys.time() - strt
-print(end) 
+print(end)
     }
  end <- Sys.time() - strt
  print(end)  

@@ -157,10 +157,10 @@ predictive_distributions <- predictive_distributions %>%
   mutate(log_density = log(pred_dist))
 
 
-
+#xlim(c(-10, 60))
 
 # plot posterior predictive ----
-ggplot(predictive_distributions, aes(x = y_tilde, y = log_density, col = Model)) + geom_line() + xlim(c(-10, 60)) + ylim(c(-25,-2)) + theme_bw() + scale_color_brewer(palette = 'Set2') + xlab(expression(y)) + ylab(expression(log('predictive density')))
+ggplot(predictive_distributions, aes(x = y_tilde, y = log_density, col = Model)) + geom_line() + ylim(c(-25,-2)) + theme_bw() + scale_color_brewer(palette = 'Set2') + xlab(expression(y)) + ylab(expression(log('predictive density'))) + scale_x_continuous(limits = c(-10,60),breaks = c(-10,20, 25, 30, 35,60))
 ggsave(file.path(fig_path, 'speed_of_light_predictive.png'))
 
 

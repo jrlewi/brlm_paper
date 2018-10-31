@@ -142,15 +142,15 @@ overall_average <- summary_tibble %>%
   group_by(Model, n,  `Trimming Fraction`) %>% #ave/sd over reps
   summarize(mean = mean(mean_tlm), sd = sd(mean_tlm))
   
-
+K <- length(unique(summary_tibble$Repetition))
 
 theme_set(theme_bw(base_family = 'Times'))
 ggplot(overall_average %>% filter(!Model %in% c('OLS', 'Normal')), aes(x = `Trimming Fraction` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) 
-ggsave(file.path(getwd(), "..", "..", "figs", 'hier_average_tlm.png'), width = 6, height = 4)
+#ggsave(file.path(getwd(), "..", "..", "figs", 'hier_average_tlm.png'), width = 6, height = 4)
 
 
 ggplot(overall_average %>%  filter(!Model %in% c('OLS', 'Normal', 'Student-t')), aes(x = `Trimming Fraction` , y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .0))  + geom_line(position  = position_dodge(width = .0), linetype = 1) 
-ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm.png'), width = 6, height = 4)
+#ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm.png'), width = 6, height = 4)
 
 
 
@@ -169,7 +169,7 @@ average_by_state <- left_join(average_by_state, state_count, by = 'State') %>% u
 
 theme_set(theme_bw(base_family = 'Times'))
 ggplot(average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Tukey', 'Rlm - Tukey')), aes(x = `State(n)` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + theme(axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_log10()
-ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state.png'), width = 7.5, height = 5)
+#ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state.png'), width = 7.5, height = 5)
 
 
 
@@ -203,7 +203,7 @@ ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state.png'), width =
 theme_set(theme_bw(base_family = 'Times'))
 sub_df <- average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Tukey', 'Rlm - Tukey'))
 ggplot(sub_df, aes(x = `State(n)` , y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_log10()
-ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm_state.png'), width = 7.5, height = 5)
+#ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm_state.png'), width = 7.5, height = 5)
 
 # ----- 
 

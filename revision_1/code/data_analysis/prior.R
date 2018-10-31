@@ -16,7 +16,8 @@ prior_fit <- MASS::rlm(sqrt_count_2010 ~ sqrt_count_2008 - 1, scale.est = 'Huber
 # MASS::rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, scale.est = 'Huber', data =  analysis_data )
 
 theme_set(theme_bw(base_family = 'Times'))
-ggplot(prior_data, aes(x = sqrt_count_2008, y = sqrt_count_2010, col = Type)) + geom_point(size = .3) + xlim(c(0,150)) +  ylim(c(0, 130)) + stat_smooth(method = "rlm", formula = y ~ x -1, method.args = list(scale.est = 'Huber'), size = .5, lty = 2, se = FALSE, col = 1) + guides(col = guide_legend(title = 'Agency Type'))
+#+ xlim(c(0,150)) +  ylim(c(0, 130)) +
+ggplot(prior_data, aes(x = sqrt_count_2008, y = sqrt_count_2010, col = Type)) + geom_point(size = .3) + stat_smooth(method = "rlm", formula = y ~ x -1, method.args = list(scale.est = 'Huber'), size = .5, lty = 2, se = FALSE, col = 1) + guides(col = guide_legend(title = 'Agency Type'))
 
 
 summary(prior_fit)
@@ -27,7 +28,7 @@ sigma2_hat <- prior_fit$s^2
 
 a_0 <- 5
 b_0 <- sigma2_hat*(a_0 - 1)
-curve(dinvgamma(x, a_0,b_0), from=0, to=20)
+curve(dinvgamma(x, a_0,b_0), from=0, to=.01)
 
 
 parms_prior <- list(beta_0 = beta_0, se_beta_0 = se_beta_0, sigma2_hat = sigma2_hat, a_0 = a_0, b_0 = b_0, beta_var_inflate = beta_var_inflate )
@@ -61,7 +62,7 @@ var_betaHats <-
 
 sigma2Hats <-
   models %>% 
-  map(.f = function(m) summary(m)$sigma) %>%
+  map(.f = function(m) summary(m)$sigma^2) %>%
   unlist()
 
 n_is <- by_state$data %>% 
@@ -75,9 +76,12 @@ abline(h = beta_0)
 
 plot(sigma2Hats)
 abline(h = sigma2_hat)
-sigma2Hats <- sigma2Hats[-which(sigma2Hats > 4)] #get rid of large estimates
+sigma2Hats <- sigma2Hats[-which(sigma2Hats > .01)] #get rid of large estimates
+plot(sigma2Hats)
+abline(h = sigma2_hat)
 
-X <-model.matrix(prior_fit)
+
+X <- model.matrix(prior_fit)
 p <- ncol(X)
 
 
@@ -137,8 +141,8 @@ curve(dbeta(x, ab[1], ab[2]))
 #   1/x 
 # }
 
-curve(dinvgamma(x, a_0,b_0), from=0,to=30)
-points( sigma2Hats,rep(.1,length(sigma2Hats)))
+curve(dinvgamma(x, a_0,b_0), from=0,to=.01)
+points(sigma2Hats,rep(.1,length(sigma2Hats)))
 
 
 
@@ -146,10 +150,11 @@ points( sigma2Hats,rep(.1,length(sigma2Hats)))
 #idea: compute the z_i's; calculate the MLE of rho, make this the mean of mu_rho
 
 fn.compute.Z<-function(sigma2,a_0,b_0){
-  X<-integrate(function(x) {dinvgamma(x, shape=a_0, scale = b_0)},0, sigma2)$value #rate=b0
+  X<-integrate(function(x) {dinvgamma(x, shape = a_0, scale = b_0)},0, sigma2)$value #rate=b0
   qnorm(X)
 }
-Z <- sapply(sigma2Hats, FUN=fn.compute.Z, a_0, b_0)
+Z <- sapply(sort(sigma2Hats), FUN=fn.compute.Z, a_0 = a_0, b_0 = b_0)
+#Z <- c(Z, rnorm(100, Z[1], 0.0001))
 # Z <- (Z - mean(Z))/sd(Z)
 K <- length(Z)
 J <- matrix(1, K,K)
@@ -158,30 +163,42 @@ J <- matrix(1, K,K)
 #   K*log(1-rho)+log(1+K*rho/(1-rho))+(1-rho)*t(Z)%*%Z+rho*t(Z)%*%J%*%Z
 # }
 
-log.like.rho<-function(rho){
-  K*log(1-rho)+log(1+K*rho/(1-rho))+t(Z)%*%solve((1-rho)*diag(K) + rho*J)%*%Z
-}
+# K*log(1-rho)+log(1+K*rho/(1-rho))+(1-rho)*t(Z)%*%Z+rho*t(Z)%*%J%*%Z  
+# log.like.rho<-function(rho){
+#   #K*log(1-rho)+log(1+K*rho/(1-rho))+(1-rho)*t(Z)%*%Z+rho*t(Z)%*%J%*%Z  
+#   K*log(1-rho)+log(1+K*rho/(1-rho))+t(Z)%*%solve((1-rho)*diag(K) + rho*J)%*%Z
+# }
 
 
-log.like.rho <-function(rho){
-  Sigma_rho <- (1-rho)*diag(K) + rho*J
+log.like.rho2 <-function(rho){
+  Sigma_rho <- ((1-rho)*diag(K) + rho*J)
   Sigma_rho_inv <- solve(Sigma_rho)
-  .5*log(det(2*pi*Sigma_rho_inv)) + .5*t(Z)%*%Sigma_rho_inv%*%Z
+  .5*log(det(2*pi*Sigma_rho)) + .5*t(Z)%*%Sigma_rho_inv%*%(Z)
 }
-
+#curve(-log.like.rho2(x),0.001,.999)
 rho_seq <- seq(.01, .99, by = .01)
-plot(rho_seq ,sapply(rho_seq , function(rho) log.like.rho(rho)))
-lines(rho_seq ,sapply(rho_seq , function(rho) log.like.rho2(rho)))
+#plot(rho_seq ,sapply(rho_seq , function(rho) log.like.rho(rho)))
+plot(rho_seq ,sapply(rho_seq , function(rho) log.like.rho2(rho)))
+
+# log.like.rho<-function(rho){
+#   K*log(1-rho)+log(1+K*rho/(1-rho))+(1-rho)*t(Z)%*%Z+rho*t(Z)%*%J%*%Z  
+# }
 
 
+
+#curve(-log.like.rho2(x),0.001,.999)
+#maximize
+# op<-optim(.5, log.like.rho,control=list(fnscale=-1), lower=0, upper=.9999, method = c("L-BFGS-B"), hessian=TRUE)
 #MLE of rho 
-(op <- optim(.5, log.like.rho, lower=0, upper=.99, method = c("L-BFGS-B"), hessian=TRUE))
+(op <- optim(.5, log.like.rho2, lower=0, upper=.999, method = c("L-BFGS-B"), hessian=TRUE))
 
 
 mean_mu_rho <- as.numeric(op$par)
-var_mu_rho <- 2*as.numeric(op$hessian^-1)
+var_mu_rho <- -2*as.numeric(op$hessian^-1)
+#had trouble identifying any correlation in the sigma's in the prior data set
 
-#mean_mu_rho <- .5
+mean_mu_rho <- .2
+var_mu_rho <-  .01
 
 w1_plus_w2 <- mean_mu_rho*(1-mean_mu_rho)/var_mu_rho-1
 

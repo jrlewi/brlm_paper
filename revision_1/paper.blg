@@ -4,45 +4,45 @@ The top-level auxiliary file: paper.aux
 The style file: bib/ba.bst
 Database file #1: bib/refPaper1.bib
 Warning--empty journal in jung2014
-You've used 42 entries,
+You've used 44 entries,
             2760 wiz_defined-function locations,
-            855 strings with 11429 characters,
-and the built_in function-call counts, 24504 in all, are:
-= -- 2048
-> -- 927
-< -- 28
-+ -- 344
-- -- 294
-* -- 1850
-:= -- 3847
-add.period$ -- 167
-call.type$ -- 42
-change.case$ -- 269
-chr.to.int$ -- 42
-cite$ -- 43
-duplicate$ -- 1727
-empty$ -- 1839
-format.name$ -- 428
-if$ -- 4796
+            867 strings with 11617 characters,
+and the built_in function-call counts, 25513 in all, are:
+= -- 2130
+> -- 957
+< -- 30
++ -- 355
+- -- 303
+* -- 1919
+:= -- 4008
+add.period$ -- 174
+call.type$ -- 44
+change.case$ -- 280
+chr.to.int$ -- 44
+cite$ -- 45
+duplicate$ -- 1800
+empty$ -- 1925
+format.name$ -- 443
+if$ -- 4998
 int.to.chr$ -- 1
 int.to.str$ -- 1
-missing$ -- 380
-newline$ -- 262
-num.names$ -- 168
-pop$ -- 682
+missing$ -- 396
+newline$ -- 274
+num.names$ -- 176
+pop$ -- 712
 preamble$ -- 2
-purify$ -- 265
+purify$ -- 276
 quote$ -- 0
-skip$ -- 668
+skip$ -- 700
 stack$ -- 0
-substring$ -- 1289
-swap$ -- 947
+substring$ -- 1338
+swap$ -- 985
 text.length$ -- 0
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 366
+type$ -- 381
 warning$ -- 1
-while$ -- 185
+while$ -- 192
 width$ -- 0
-write$ -- 596
+write$ -- 623
 (There was 1 warning)

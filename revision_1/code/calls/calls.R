@@ -1,6 +1,7 @@
 # Analyze the Belgium Calls Data
 
 library(tidyverse)
+#devtools::install_github('jrlewi/brlm')
 library(brlm)
 library(MASS)
 
@@ -76,7 +77,7 @@ rl_fit <- rl_importance(y, X_fit, statistic = rlm_tukey, mu0 = mu0, Sigma0 = Sig
 plot(rl_fit$w, cex = .2)
 
 
-write_rds(rl_fit, path = file.path(here::here(), 'rl_fit.rds'))
+write_rds(rl_fit, path = file.path(here::here(), 'out', 'rl_fit.rds'))
 
 
 
@@ -89,16 +90,28 @@ t_fit <-bayesTdistLm(y=y, X_fit, mu0, Sigma0, a0=a0, b0=((nu-2)/nu)*b0, parInit=
 
 coda::traceplot(t_fit$mcmc)
 
-write_rds(t_fit, path = file.path(here::here(), 't_fit.rds'))
+write_rds(t_fit, path = file.path(here::here(), 'out', 't_fit.rds'))
 
 # fit normal model on subset of the data.
 nkeep <- 1e4
 nburn <- 2e3
-normal_ind <- c(4:13,21:24)
+normal_ind <- c(4:13,22:24)
 y_normal <- phones$calls[normal_ind]
 X_normal <- cbind(1, phones$year[normal_ind])
 set.seed(127)
 normal_fit <- bayesLm(y_normal, X_normal, mu0, Sigma0, a0, b0, sigma2Int = rlm_fit$s^2, nkeep = nkeep, nburn = nburn)
 
 coda::traceplot(normal_fit$mcmc,smooth = TRUE)
-write_rds(normal_fit, path = file.path(here::here(), 'normal_fit.rds'))
+write_rds(normal_fit, path = file.path(here::here(), 'out', 'normal_fit.rds'))
+
+
+
+# fit normal model to all data.
+nkeep <- 1e4
+nburn <- 2e3
+set.seed(127)
+normal_fit_all <- bayesLm(y, X_fit, mu0, Sigma0, a0, b0, sigma2Int = rlm_fit$s^2, nkeep = nkeep, nburn = nburn)
+
+coda::traceplot(normal_fit_all$mcmc,smooth = TRUE)
+write_rds(normal_fit_all, path = file.path(here::here(), 'out', 'normal_fit_all.rds'))
+
