@@ -6,21 +6,17 @@ New_results <- TRUE
 
 if(New_results){
 sims <- 1:30
-
+ass.vec <- c(1.25, 5, 10) #c(1.25, 2.5,5,10,20) 
+scale_vec <- c(0.5,1, 2) #round(c(0.5, 1/sqrt(2),1, sqrt(2), 2),2)
+sig2 <- 4
 dfs_all <- vector('list', length(sims))
+results_df <- file.path(getwd(), 'results')
 for(data_sim in sims){
 # load the data, along with the factor levels, and true values of theta
 data <- read_rds(file.path(getwd(),'data_sig2_4', paste0('data_', data_sim, '.rds')))
 n_groups <- length(data$theta)
-results_df <- file.path(getwd(), 'results')
 factor_list <- as.data.frame(do.call(rbind, data$factorsList))  
 names(factor_list) <- c('p', 'n','m')
-
-
-ass.vec <- c(1.25, 5, 10) #c(1.25, 2.5,5,10,20) 
-scale_vec <- c(0.5,1, 2) #round(c(0.5, 1/sqrt(2),1, sqrt(2), 2),2)
-sig2 <- 4
-
 
 # MSE evaluation metric -----
 
@@ -125,7 +121,7 @@ labels_vals <- scale_color_discrete(
 
 
 theme_set(theme_bw())
-ggplot(df_mse %>%  filter(method != 'Normal' & statistic != 'Normal'), aes(x = as.factor(a_s), y = mean_MSE, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_MSE - sd_MSE/sqrt(length(sims)), ymax = mean_MSE + sd_MSE/sqrt(length(sims))), linetype = 2, width = .1, position = position_dodge(width = .5)) + geom_point(position = position_dodge(width = .5)) +
+ggplot(df_mse %>%  filter(method != 'Normal' & statistic != 'Normal'), aes(x = as.factor(a_s), y = mean_MSE, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_MSE - sd_MSE/sqrt(length(sims)), ymax = mean_MSE + sd_MSE/sqrt(length(sims))), linetype = 1, width = .1, position = position_dodge(width = .5)) + geom_point(position = position_dodge(width = .5)) +
   facet_wrap(~scale_as,  labeller = label_bquote(c == .(scale_as))) +
   labs(x = expression(a[s]), y = 'Average MSE') + labels_vals + theme(text = element_text(family = 'Times')) 
   
@@ -135,7 +131,7 @@ ggsave(file.path(getwd(), "..", "..", "..", "figs", 'mse_sim2_facet_scale.png'))
 
 
 
-ggplot(df_mse, aes(x = as.factor(scale_as), y = mean_MSE, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_MSE - sd_MSE/sqrt(length(sims)), ymax = mean_MSE + sd_MSE/sqrt(length(sims))), linetype = 2, width = .1, position = position_dodge(width = .5)) +
+ggplot(df_mse, aes(x = as.factor(scale_as), y = mean_MSE, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_MSE - sd_MSE/sqrt(length(sims)), ymax = mean_MSE + sd_MSE/sqrt(length(sims))), linetype = 1, width = .1, position = position_dodge(width = .5)) +
   geom_point(position = position_dodge(width = .5)) +
   facet_wrap(~a_s,   labeller = label_bquote(a[s] == .(a_s))) +
   labs(x = expression(c),  y = 'Average MSE') + labels_vals + theme(text = element_text(family = 'Times')) 
@@ -227,12 +223,15 @@ compute_KL_each_group<-function(ngridpts, thetaTrueVect, sig2True,thetaSamplesMa
 
 sig2 <- 4
 ngridpts <- 100
-factor_list <- as.data.frame(do.call(rbind, data$factorsList))  
-names(factor_list) <- c('p', 'n','m')
+# factor_list <- as.data.frame(do.call(rbind, data$factorsList))  
+# names(factor_list) <- c('p', 'n','m')
 
 
 dfs_all <- vector('list', length(sims))
 for(data_sim in sims){
+data <- read_rds(file.path(getwd(),'data_sig2_4', paste0('data_', data_sim, '.rds')))
+factor_list <- as.data.frame(do.call(rbind, data$factorsList))  
+names(factor_list) <- c('p', 'n','m')
 dfs <- vector('list', length(ass.vec)*length(scale_vec)*length(sig2))
 i <- 1
 for(ss in sig2){
@@ -309,9 +308,6 @@ df_kl_mean <- df_kl %>%
   ungroup() %>% 
   group_by(statistic, method, a_s, scale_as, sigma2) %>% 
   summarise(mean_KL = mean(KL), sd_KL = sd(KL))
-
-
-
 
 ggplot(df_kl_mean %>% filter(method != 'Normal', statistic != 'Normal') , aes(x = as.factor(a_s), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(length(sims)), ymax = mean_KL + sd_KL/sqrt(length(sims))), linetype = 1, width = 0, position = position_dodge(width = .5)) +
   geom_point(position = position_dodge(width = .5)) +
@@ -513,6 +509,49 @@ ggplot(est_mnp_tukey, aes(x = as.factor(value), y = sqrt(sigma2_hat))) +
 #   facet_wrap(~scale_as) + theme_bw()
 
 
+# work in Steve's office ------
 
 
+ave_kl_group <- df_kl %>% filter(a_s == 10, scale_as == 1) %>%
+  group_by(simulation, statistic, method, p,m,n) %>% 
+  summarise(mean_kl = mean(KL)) %>% 
+  ungroup() %>%  
+  group_by(statistic, method, p, m, n) %>% 
+  summarise(mean = mean(mean_kl), sd = sd(mean_kl))
+  
+
+
+ave_mse_group <- df_estimates %>% filter(a_s == 10, scale_as == 1) %>% 
+  group_by(simulation, statistic, method, p, m,n) %>% 
+  summarise(MSE = mean((log(4) - log(sigma2_hat))^2)) %>% 
+  ungroup() %>% 
+  group_by(statistic, method, p, m, n) %>% 
+  summarise(mean = mean(MSE), sd = sd(MSE))
+
+
+
+ggplot(ave_kl_group %>% filter(!method == 'Normal'), aes(x = as.factor(n), y = mean, group = interaction(method, statistic), col = interaction(method, statistic))) +
+  geom_point(position = position_dodge(width = .5)) +
+  geom_errorbar(aes(ymin = mean - 2*sd/sqrt(30), ymax = mean + 2*sd/sqrt(30)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
+  facet_wrap(~ m + p)
+
+
+
+df_kl %>% filter(a_s == 10, scale_as == 1) %>%
+  group_by(simulation, statistic, method, p,m,n) %>% 
+  summarise(mean_kl = mean(KL)) %>% 
+  ungroup() %>%  
+  filter(method == 'restricted', statistic == 'Huber', m == 9, p == 0.1)
+
+
+
+
+
+
+
+kl_fun  <- function(x){
+  .5*(x^2 - 1) - log(x)
+}
+
+curve(kl_fun, from = .1, to = 2)
 

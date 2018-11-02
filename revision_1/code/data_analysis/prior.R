@@ -28,6 +28,10 @@ sigma2_hat <- prior_fit$s^2
 
 a_0 <- 5
 b_0 <- sigma2_hat*(a_0 - 1)
+
+b_0/(a_0 - 1)
+b_0^2/((a_0-1)^2*(a_0-2))
+
 curve(dinvgamma(x, a_0,b_0), from=0, to=.01)
 
 
@@ -76,7 +80,7 @@ abline(h = beta_0)
 
 plot(sigma2Hats)
 abline(h = sigma2_hat)
-sigma2Hats <- sigma2Hats[-which(sigma2Hats > .01)] #get rid of large estimates
+sigma2Hats <- sigma2Hats #[-which(sigma2Hats > .01)] #get rid of large estimates
 plot(sigma2Hats)
 abline(h = sigma2_hat)
 
@@ -159,38 +163,38 @@ Z <- sapply(sort(sigma2Hats), FUN=fn.compute.Z, a_0 = a_0, b_0 = b_0)
 K <- length(Z)
 J <- matrix(1, K,K)
 
-# log.like.rho<-function(rho){
-#   K*log(1-rho)+log(1+K*rho/(1-rho))+(1-rho)*t(Z)%*%Z+rho*t(Z)%*%J%*%Z
-# }
-
-# K*log(1-rho)+log(1+K*rho/(1-rho))+(1-rho)*t(Z)%*%Z+rho*t(Z)%*%J%*%Z  
-# log.like.rho<-function(rho){
-#   #K*log(1-rho)+log(1+K*rho/(1-rho))+(1-rho)*t(Z)%*%Z+rho*t(Z)%*%J%*%Z  
-#   K*log(1-rho)+log(1+K*rho/(1-rho))+t(Z)%*%solve((1-rho)*diag(K) + rho*J)%*%Z
-# }
-
+log.like.rho<-function(rho){
+  Sigma_rho <- ((1-rho)*diag(K) + rho*J)
+  Sigma_rho_inv <- solve(Sigma_rho)
+  K*log(1-rho)+log(1+K*rho/(1-rho))+t(Z)%*%Sigma_rho_inv%*%Z
+}
 
 log.like.rho2 <-function(rho){
   Sigma_rho <- ((1-rho)*diag(K) + rho*J)
   Sigma_rho_inv <- solve(Sigma_rho)
-  .5*log(det(2*pi*Sigma_rho)) + .5*t(Z)%*%Sigma_rho_inv%*%(Z)
+  .5*log(det(2*pi*Sigma_rho)) + .5*t(Z)%*%Sigma_rho_inv%*%Z
 }
+
+
+
 #curve(-log.like.rho2(x),0.001,.999)
-rho_seq <- seq(.01, .99, by = .01)
+rho_seq <- seq(0, .99, by = .01)
 #plot(rho_seq ,sapply(rho_seq , function(rho) log.like.rho(rho)))
 plot(rho_seq ,sapply(rho_seq , function(rho) log.like.rho2(rho)))
 
-# log.like.rho<-function(rho){
-#   K*log(1-rho)+log(1+K*rho/(1-rho))+(1-rho)*t(Z)%*%Z+rho*t(Z)%*%J%*%Z  
-# }
-
-
-
-#curve(-log.like.rho2(x),0.001,.999)
+curve(log.like.rho,0.001,.999)
 #maximize
 # op<-optim(.5, log.like.rho,control=list(fnscale=-1), lower=0, upper=.9999, method = c("L-BFGS-B"), hessian=TRUE)
 #MLE of rho 
 (op <- optim(.5, log.like.rho2, lower=0, upper=.999, method = c("L-BFGS-B"), hessian=TRUE))
+
+
+log.like.rho<-function(rho){
+  Sigma_rho <- ((1-rho)*diag(K) + rho*J)
+  Sigma_rho_inv <- solve(Sigma_rho)
+  K*log(1-rho)+log(1+K*rho/(1-rho))+t(Z)%*%Sigma_rho_inv%*%Z
+}
+(op<-optim(.5, log.like.rho, lower=0.001, upper=.9999, method = c("L-BFGS-B"), hessian=TRUE))
 
 
 mean_mu_rho <- as.numeric(op$par)
@@ -199,6 +203,7 @@ var_mu_rho <- -2*as.numeric(op$hessian^-1)
 
 mean_mu_rho <- .2
 var_mu_rho <-  .01
+
 
 w1_plus_w2 <- mean_mu_rho*(1-mean_mu_rho)/var_mu_rho-1
 
@@ -209,7 +214,7 @@ w1;w2
 curve(dbeta(x, w1,w2))
 w1/(w1+w2)
 w1*w2/((w1+w2)^2*(w1+w2+1))
-
+quantile(rbeta(1e6, w1,w2), prob = c(.1, .9))
 #prior parameters for  psi_rho ~ gamma(a_psir, b_psir)
 
 mean_psi_rho <- (mean_mu_rho*(1-mean_mu_rho))/(var_mu_rho) - 1
@@ -223,7 +228,7 @@ a_psir/b_psir^2
 
 #samples of rho...
 
-nsamps <- 1000
+nsamps <- 10000
 psi_rho_samp <- rgamma(nsamps, a_psir, b_psir)
 mu_rho_samp <- rbeta(nsamps, w1,w2)
 a_rho_samp <- mu_rho_samp*psi_rho_samp
@@ -231,6 +236,7 @@ b_rho_samp <- psi_rho_samp - a_rho_samp
 
 rho_samp <- rbeta(nsamps, a_rho_samp, b_rho_samp)
 hist(rho_samp)
+quantile(rho_samp, probs = c(.1, .9))
 #results in strong correlation amongst the sigmas. 
 
 hier_parms_prior <- list(mu_0 = beta_0,

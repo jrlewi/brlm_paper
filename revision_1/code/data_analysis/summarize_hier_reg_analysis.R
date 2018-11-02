@@ -142,7 +142,7 @@ overall_average <- summary_tibble %>%
   group_by(Model, n,  `Trimming Fraction`) %>% #ave/sd over reps
   summarize(mean = mean(mean_tlm), sd = sd(mean_tlm))
   
-K <- length(unique(summary_tibble$Repetition))
+#K <- length(unique(summary_tibble$Repetition))
 
 theme_set(theme_bw(base_family = 'Times'))
 ggplot(overall_average %>% filter(!Model %in% c('OLS', 'Normal')), aes(x = `Trimming Fraction` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) 
