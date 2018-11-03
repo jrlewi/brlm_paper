@@ -4,11 +4,14 @@
 library('tidyverse')
 New_results <- TRUE
 
-if(New_results){
+
 sims <- 1:30
 ass.vec <- c(1.25, 5, 10) #c(1.25, 2.5,5,10,20) 
 scale_vec <- c(0.5,1, 2) #round(c(0.5, 1/sqrt(2),1, sqrt(2), 2),2)
 sig2 <- 4
+
+if(New_results){
+
 dfs_all <- vector('list', length(sims))
 results_df <- file.path(getwd(), 'results')
 for(data_sim in sims){
@@ -99,7 +102,9 @@ df_estimates <- bind_rows(dfs_all, .id = 'simulation')
 summarize_data_frames <- readRDS(file.path(here::here(), "summarize_data_frames.rds")) 
  df_estimates <- summarize_data_frames[[2]]
 }
-sims <- 1:length(unique(df_estimates$simulation))
+
+#sims <- 1:length(unique(df_estimates$simulation))
+
 df_mse <- df_estimates %>% dplyr::select(-p,-n,-m) %>%  
   group_by(simulation, statistic, method, a_s, scale_as, sigma2) %>% 
   summarise(MSE = mean((theta - theta_hat)^2)) %>% 
@@ -157,7 +162,7 @@ compute_pred_dist<-function(ygrid, thetaSamples, sigma2Samples){
       mean(dnorm(x, thetaSamples, sqrt(sigma2Samples)))
     } 
     ) } else {
-      ygridN<-matrix(ygrid, nrow=length(thetaSamples), ncol=length(ygrid), byrow = TRUE)
+      ygridN <- matrix(ygrid, nrow = length(thetaSamples), ncol = length(ygrid), byrow = TRUE)
       colMeans(dnorm(ygridN, thetaSamples, sqrt(sigma2Samples)))
     }
 }
@@ -176,13 +181,12 @@ compute_KL<-function(thetaTrue,thetaSamples, sigma2Samples, sig2True, ngridpts){
   #ygrid: grid of y values for the quadrature approximation of the expectation: not used anymore
   #ngridpts: number of grid points
   
-  ygrid<-seq(thetaTrue-10*sqrt(sig2True),thetaTrue+10*sqrt(sig2True), length.out=ngridpts)
+  ygrid<-seq(thetaTrue-5*sqrt(sig2True),thetaTrue+5*sqrt(sig2True), length.out=ngridpts)
   predDist<-compute_pred_dist(ygrid,  thetaSamples, sigma2Samples)
   trueDist<-dnorm(ygrid, thetaTrue, sqrt(sig2True))
-  dif<-diff(ygrid)
-  kl<-((log(trueDist)-log(predDist))*trueDist)[-1]
-  KL<-sum((kl*dif)[kl!=Inf])
-  
+  dif <- diff(ygrid)
+  kl <- ((log(trueDist)-log(predDist))*trueDist)[-1]
+  KL <- sum((kl*dif)) #[kl!=Inf])
   KL
 }
 
@@ -278,7 +282,6 @@ for(ss in sig2){
                                       scale_as = sc,
                                       sigma2 = ss))
       
-      
       df <- bind_rows(huber_kl,huber_kl_rlm,tukey_kl,tukey_kl_rlm, normal_kl)
       dfs[[i]] <- df
       i <- i+1
@@ -316,9 +319,43 @@ ggplot(df_kl_mean %>% filter(method != 'Normal', statistic != 'Normal') , aes(x 
 
 ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_facet_scale.png'), width = 6, height = 4)
 
+# tmp <- df_kl %>% filter(scale_as == 2, a_s == 5, method == 'restricted', statistic == 'Huber')
+# plot(tmp$KL)
+#mean(tmp$KL[-c(1:1000)])
+
 df_kl_mean %>% filter(method == 'Normal', statistic == 'Normal') %>% ungroup() %>% 
   summarise(min = min(mean_KL), max = max(mean_KL))
 
+library(MCMCpack)
+invg <- function(x){
+  a <<- 10
+  cc <<- 0.5
+  b <<- 4*a*cc
+  dinvgamma(x, a, b)  
+}
+curve(invg, 0, 20, main = paste0('a = ', a, '  ', 'c = ', cc))
+abline(v = 4)
+
+invg <- function(x, a, cc){
+  # a <- a_cc[1]
+  # cc <- a_cc[2]
+  b <- 4*a*cc
+  tibble(x = x, prior = dinvgamma(x, a, b), a = a, cc = cc)
+}
+x <- seq(.01, 20, by = .01)
+
+a_cc <- expand.grid(ass.vec, scale_vec)
+
+priors <- purrr::map2(.x = a_cc[,1], .y = a_cc[,2], .f = invg, x = x) %>% bind_rows() %>% 
+  mutate(a = as.factor(a))
+
+ggplot(priors, aes(x, prior, group = a, col = a)) + 
+  geom_line() + 
+  facet_wrap(~cc,labeller = label_bquote(c == .(cc))) +
+  theme(text = element_text(family = 'Times')) + geom_vline(xintercept = 4, lty = 2, col = 'gray', lwd = .5) + 
+  labs(x = expression(sigma^2),  y = 'density')
+ggsave(file.path(getwd(), "..", "..", "..", "figs", 'priors_sigma2.png'), width = 6, height = 4) 
+ 
 
 ggplot(df_kl_mean %>% filter(method != 'Normal', statistic != 'Normal'), aes(x = as.factor(scale_as), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(length(sims)), ymax = mean_KL + sd_KL/sqrt(length(sims))), linetype = 1, width = 0, position = position_dodge(width = .5)) +
   geom_point(position = position_dodge(width = .5)) +
@@ -333,73 +370,46 @@ ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_facet_as.png'), wid
 # Effects of n, p, or m
 
 #note the rlm results are simply repeated for each a_s and scale_as - when grouping by n (or p, or m) - the averages for each simulation are computed over the repeated results too - but these averages are the same as if one result was used. The SE are computed as the sd of these averages - so it doesn't change the calculation if I subset the rlm results to get rid of the repeats
-# n ----
-df_kl %>% filter(method == 'rlm', statistic == 'Huber', simulation == '1')
-df_kl %>% filter(method == 'restricted', statistic == 'Huber', simulation == '1')
+
+
 
 #n ----
 df_kl_mean_n <- df_kl %>% #filter(method != 'rlm') %>% 
-  group_by(simulation, n, statistic, method, sigma2) %>% 
+  group_by(simulation, n, statistic, method, sigma2, a_s, scale_as) %>% 
   summarise(KL = mean(KL)) %>% 
   ungroup() %>% 
-  group_by(n, statistic, method, sigma2) %>% 
+  group_by(n, statistic, method, sigma2, a_s, scale_as) %>% 
   summarise(mean_KL = mean(KL), sd_KL = sd(KL), num = n())
 
-# df_kl_mean_n_rlm  <- df_kl %>% filter(method == 'rlm', a_s == '5', scale_as == '2') %>% group_by(simulation, n, statistic, method, sigma2) %>%
-#   summarise(KL = mean(KL)) %>%
-#   ungroup() %>%
-#   group_by(n, statistic, method, sigma2) %>%
-#   summarise(mean_KL = mean(KL), sd_KL = sd(KL), num = n())
-
-
-#bind_rows(df_kl_mean_n, df_kl_mean_n_rlm)
-ggplot(df_kl_mean_n %>% filter(method != 'Normal', statistic != 'Normal') , aes(x = as.factor(n), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + 
-  geom_point(position = position_dodge(width = .5)) +
-  geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(num), ymax = mean_KL + sd_KL/sqrt(num)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
-  # facet_wrap(~ n,   labeller = label_bquote(n == .(n))) +
-  labs(x = "n",  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_n.png'), width = 6, height = 4)
 
 
 # m----
 df_kl_mean_m <- df_kl %>% 
-  group_by(simulation, m, statistic, method, sigma2) %>% 
+  group_by(simulation, m, statistic, method, sigma2, a_s, scale_as) %>% 
   summarise(KL = mean(KL)) %>% 
   ungroup() %>% 
-  group_by(m, statistic, method, sigma2) %>% 
+  group_by(m, statistic, method, sigma2,  a_s, scale_as) %>% 
   summarise(mean_KL = mean(KL), sd_KL = sd(KL), num = n())
 
 
-ggplot(df_kl_mean_m %>% filter(method != 'Normal', statistic != 'Normal') , aes(x = as.factor(m), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + 
-  geom_point(position = position_dodge(width = .5)) +
-  geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(num), ymax = mean_KL + sd_KL/sqrt(num)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
-  # facet_wrap(~ n,   labeller = label_bquote(n == .(n))) +
-  labs(x = "m",  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_m.png'), width = 6, height = 4)
 
 # p -----
 df_kl_mean_p <- df_kl %>% 
-  group_by(simulation, p, statistic, method, sigma2) %>% 
+  group_by(simulation, p, statistic, method, sigma2,  a_s, scale_as) %>% 
   summarise(KL = mean(KL)) %>% 
   ungroup() %>% 
-  group_by(p, statistic, method, sigma2) %>% 
+  group_by(p, statistic, method, sigma2,  a_s, scale_as) %>% 
   summarise(mean_KL = mean(KL), sd_KL = sd(KL), num = n())
 
 
-ggplot(df_kl_mean_p %>% filter(method != 'Normal', statistic != 'Normal') , aes(x = as.factor(p), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + 
-  geom_point(position = position_dodge(width = .5)) +
-  geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(num), ymax = mean_KL + sd_KL/sqrt(num)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
-  # facet_wrap(~ n,   labeller = label_bquote(n == .(n))) +
-  labs(x = "p",  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_p.png'), width = 6, height = 4)
 
 
-# attempt at using facet wrap...
+# combine for a facet wrap plot
 df_nmp <- (bind_rows(df_kl_mean_n,df_kl_mean_m,df_kl_mean_p))
 df_nmp <- (df_nmp %>% gather(variable, value, n,m,p, na.rm = TRUE))
 
-
-ggplot(df_nmp %>% filter(method != 'Normal', statistic != 'Normal') , aes(x = as.factor(value), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) +
+df_mnp_sub <- df_nmp %>% filter(method != 'Normal', statistic != 'Normal', scale_as == 1, a_s == 5)
+ggplot(df_mnp_sub , aes(x = as.factor(value), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) +
   geom_point(position = position_dodge(width = .5)) +
   geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(num), ymax = mean_KL + sd_KL/sqrt(num)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
   facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") +
@@ -407,132 +417,26 @@ ggplot(df_nmp %>% filter(method != 'Normal', statistic != 'Normal') , aes(x = as
 ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_mnp.png'), width = 6, height = 4)
 
 
-#investigate behavior of KL main effects a functions of m,n,p by looking at estimates
-
-est_mnp_rlm <- df_estimates %>% 
-  filter(method == 'rlm', a_s == '1.25', scale_as == '0.5') %>% #git rid of repeated rlm data.frames
-  gather(variable, value, p,n,m)   
-names(est_mnp_rlm)
-
-View(head(filter(est_mnp_rlm, variable == 'p', value == "0.1")))
-  
-View(head(filter(est_mnp_rlm, variable == 'n', value == "25")))   
-View(df_estimates %>% 
-       filter(method == 'rlm', a_s == '1.25', scale_as == '0.5'))
-
-ggplot(est_mnp_rlm, aes(x = as.factor(value), y = theta - theta_hat, col = statistic)) +
-  geom_boxplot() +
-  facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") + labs(y = bquote(theta - widehat(theta)), x = 'Value') + geom_hline(yintercept = 0, lty = 2) +
-  theme(text = element_text(family = 'Times'))
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'rlm_mnp_theta.png'), width = 6, height = 4)
-
-ggplot(est_mnp_rlm, aes(x = as.factor(value), y = sqrt(sigma2_hat), col = statistic)) +
-  geom_boxplot() +
-  facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") + geom_hline(yintercept = 2, lty = 2) +
-  labs(y = bquote(widehat(sigma)), x = 'Value') +
-  theme(text = element_text(family = 'Times'))
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'rlm_mnp_sigma.png'), width = 6, height = 4)
-
-est_mnp_tukey <- df_estimates %>% 
-  filter(method == 'restricted', statistic == 'Tukey') %>%
-  gather(variable, value, p,n,m)   
-
-tmp_df <- df_estimates %>% 
-  filter(method == 'rlm',statistic == 'Tukey', a_s == '1.25', scale_as == '0.5') %>% dplyr::select(p,n,m, sigma2_hat) %>% mutate(sigma_hat = sqrt(sigma2_hat), p = as.factor(p), n = as.factor(n), m = as.factor(m)) %>% 
-  as_tibble()
-
-fit_mnp <- lm(sigma_hat  ~ (m + n+ p)^2, data = tmp_df )
-summary(fit_mnp) 
-
-
-
-tmp_df <- df_kl %>% 
-  filter(method == 'restricted', statistic == 'Tukey') %>% dplyr::select(p,n,m, KL) %>%  
-  mutate(p = as.factor(p), n = as.factor(n), m = as.factor(m)) 
-
-fit_mnp <- lm(log(KL)  ~ (m + n+ p)^2 + m*n*p, data = tmp_df )
-summary(fit_mnp) 
-plot(fit_mnp)
-
-ggplot(est_mnp_tukey, aes(x = as.factor(value), y = theta - theta_hat)) +
-  geom_boxplot() + geom_hline(yintercept = 0, lty = 2) +
-  facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") + labs(y = bquote(theta - widehat(theta)), x = 'Value') +
-  theme(text = element_text(family = 'Times'))
-
-ggplot(est_mnp_tukey, aes(x = as.factor(value), y = sqrt(sigma2_hat))) +
-  geom_boxplot() +
-  facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") + geom_hline(yintercept = 2, lty = 2) +
-  labs(y = bquote(widehat(sigma)), x = 'Value') +
-  theme(text = element_text(family = 'Times'))
-
-
-
-# gen_data <- function(m,n,p){
-#   ps <- rbinom(n,1,p)
-#   vars<-ifelse(ps, m, 1)*sig2
-#   rnorm(n, 0, sqrt(vars))
-# }
-# m <- 25; n <- 100; p <- .3
-# n_sims <- 100
-# s2_ests <- sapply(1:n_sims, function(sim){
-#   y <- gen_data(m,n,p)
-#   fit <- MASS::rlm(y~1, scale.est = "Huber")
-#   fit$s^2
-# })
-# 
-# s2_ests <- tibble(var_estimates = s2_ests, m = rep(m, n_sims), n = rep(n, n_sims), p = rep(p, n_sims))
-# 
-# 
-# ggplot(s2_ests, aes(x = var_estimates, col = factor(m), fill = factor(n), alpha = factor(p))) + geom_histogram() + geom_vline(xintercept = sig2)
-# ggsave(file.path(getwd(), "..", "..", "..", "figs", 'hist_sig2_ests.png'))
-# 
-# 
-# 
-# # look at individual simualtions....
-# tmp <- df_kl %>% 
-#   group_by(simulation, statistic, method, a_s, scale_as, sigma2) %>% 
-#   summarise(KL = mean(KL)) 
-# 
-# #View(tmp %>% ungroup() %>% group_by(simulation) %>%  
-# #  summarise(min = min(KL)))
-# #unique(tmp$simulation)
-# 
-# 
-# tmp <- tmp %>% filter(simulation == '10')
-# # ggplot(tmp , aes(x = as.factor(scale_as), y = KL, col = interaction(method,statistic), group = interaction(method,statistic))) +
-# #   geom_point(position = position_dodge(width = .5)) + geom_line(position = position_dodge(width = .5)) +
-# #   facet_wrap(~a_s) + theme_bw()
-# 
-# 
-# ggplot(tmp , aes(x = as.factor(a_s), y = KL, col = interaction(method,statistic), group = interaction(method,statistic))) +
-#   geom_point(position = position_dodge(width = .5)) + geom_line(position = position_dodge(width = .5)) +
-#   facet_wrap(~scale_as) + theme_bw()
-
 
 # work in Steve's office ------
 
 
-ave_kl_group <- df_kl %>% filter(a_s == 10, scale_as == 1) %>%
+ave_kl_group <- df_kl %>% filter(a_s == 5, scale_as == 1) %>%
   group_by(simulation, statistic, method, p,m,n) %>% 
   summarise(mean_kl = mean(KL)) %>% 
   ungroup() %>%  
   group_by(statistic, method, p, m, n) %>% 
   summarise(mean = mean(mean_kl), sd = sd(mean_kl))
   
-
-
-ave_mse_group <- df_estimates %>% filter(a_s == 10, scale_as == 1) %>% 
-  group_by(simulation, statistic, method, p, m,n) %>% 
-  summarise(MSE = mean((log(4) - log(sigma2_hat))^2)) %>% 
-  ungroup() %>% 
-  group_by(statistic, method, p, m, n) %>% 
-  summarise(mean = mean(MSE), sd = sd(MSE))
+ave_kl_group %>% ungroup() %>% 
+  group_by(statistic, method) %>% 
+  summarize(mn = mean(mean))
 
 
 
 ggplot(ave_kl_group %>% filter(!method == 'Normal'), aes(x = as.factor(n), y = mean, group = interaction(method, statistic), col = interaction(method, statistic))) +
   geom_point(position = position_dodge(width = .5)) +
-  geom_errorbar(aes(ymin = mean - 2*sd/sqrt(30), ymax = mean + 2*sd/sqrt(30)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
+  geom_errorbar(aes(ymin = mean - sd/sqrt(length(sims)), ymax = mean + sd/sqrt(length(sims))), linetype = 1, width = 0, position = position_dodge(width = .5)) +
   facet_wrap(~ m + p)
 
 
@@ -554,4 +458,76 @@ kl_fun  <- function(x){
 }
 
 curve(kl_fun, from = .1, to = 2)
+
+
+#Asymptotics -----
+library(MASS)
+gen_data <- function(n,m,p){
+  sigma2 <- 4
+  ps <- rbinom(n,1,p)
+  vars <- ifelse(ps, m, 1)*sigma2
+  rnorm(n, 0, sqrt(vars))
+}
+x <- gen_data(n = 1000000 ,m = 25,p = .3)
+fit <- rlm(x ~ 1, psi = psi.huber, scale.est = 'Huber')
+fit$s^2
+
+#investigate behavior of KL main effects a functions of m,n,p by looking at estimates
+
+# est_mnp_rlm <- df_estimates %>% 
+#   filter(method == 'rlm', a_s == '1.25', scale_as == '0.5') %>% #git rid of repeated rlm data.frames
+#   gather(variable, value, p,n,m)   
+# names(est_mnp_rlm)
+# 
+# View(head(filter(est_mnp_rlm, variable == 'p', value == "0.1")))
+#   
+# View(head(filter(est_mnp_rlm, variable == 'n', value == "25")))   
+# View(df_estimates %>% 
+#        filter(method == 'rlm', a_s == '1.25', scale_as == '0.5'))
+# 
+# ggplot(est_mnp_rlm, aes(x = as.factor(value), y = theta - theta_hat, col = statistic)) +
+#   geom_boxplot() +
+#   facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") + labs(y = bquote(theta - widehat(theta)), x = 'Value') + geom_hline(yintercept = 0, lty = 2) +
+#   theme(text = element_text(family = 'Times'))
+# ggsave(file.path(getwd(), "..", "..", "..", "figs", 'rlm_mnp_theta.png'), width = 6, height = 4)
+# 
+# ggplot(est_mnp_rlm, aes(x = as.factor(value), y = sqrt(sigma2_hat), col = statistic)) +
+#   geom_boxplot() +
+#   facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") + geom_hline(yintercept = 2, lty = 2) +
+#   labs(y = bquote(widehat(sigma)), x = 'Value') +
+#   theme(text = element_text(family = 'Times'))
+# ggsave(file.path(getwd(), "..", "..", "..", "figs", 'rlm_mnp_sigma.png'), width = 6, height = 4)
+# 
+# est_mnp_tukey <- df_estimates %>% 
+#   filter(method == 'restricted', statistic == 'Tukey') %>%
+#   gather(variable, value, p,n,m)   
+# 
+# tmp_df <- df_estimates %>% 
+#   filter(method == 'rlm',statistic == 'Tukey', a_s == '1.25', scale_as == '0.5') %>% dplyr::select(p,n,m, sigma2_hat) %>% mutate(sigma_hat = sqrt(sigma2_hat), p = as.factor(p), n = as.factor(n), m = as.factor(m)) %>% 
+#   as_tibble()
+# 
+# fit_mnp <- lm(sigma_hat  ~ (m + n+ p)^2, data = tmp_df )
+# summary(fit_mnp) 
+# 
+# 
+# 
+# tmp_df <- df_kl %>% 
+#   filter(method == 'restricted', statistic == 'Tukey') %>% dplyr::select(p,n,m, KL) %>%  
+#   mutate(p = as.factor(p), n = as.factor(n), m = as.factor(m)) 
+# 
+# fit_mnp <- lm(log(KL)  ~ (m + n+ p)^2 + m*n*p, data = tmp_df )
+# summary(fit_mnp) 
+# plot(fit_mnp)
+# 
+# ggplot(est_mnp_tukey, aes(x = as.factor(value), y = theta - theta_hat)) +
+#   geom_boxplot() + geom_hline(yintercept = 0, lty = 2) +
+#   facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") + labs(y = bquote(theta - widehat(theta)), x = 'Value') +
+#   theme(text = element_text(family = 'Times'))
+# 
+# ggplot(est_mnp_tukey, aes(x = as.factor(value), y = sqrt(sigma2_hat))) +
+#   geom_boxplot() +
+#   facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") + geom_hline(yintercept = 2, lty = 2) +
+#   labs(y = bquote(widehat(sigma)), x = 'Value') +
+#   theme(text = element_text(family = 'Times'))
+
 

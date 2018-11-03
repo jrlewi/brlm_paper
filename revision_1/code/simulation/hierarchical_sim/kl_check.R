@@ -87,6 +87,16 @@ ggplot(ave_results, aes(x = as.factor(n), y = mean)) +
 ggsave('six_panel_check.png')
 
 
+ave_overall <- results %>% 
+  group_by(simulation) %>% 
+  summarize(mean_kl = mean(kl)) %>% 
+  ungroup() %>% 
+  summarize(mean = mean(mean_kl), num = n(), sd = sd(mean_kl)/sqrt(num))
+
+ave_overall$mean - 3*ave_overall$sd
+
+
+
 df_kl_mean_n <- results %>% 
   group_by(simulation, n) %>% 
   summarise(KL = mean(kl)) %>% 
@@ -121,5 +131,49 @@ ggplot(df_nmp , aes(x = as.factor(value), y = mean_KL, group = 1)) + geom_point(
 ggsave('mnp_check.png')
 
 
+# -----
+thetaSamples <- c(-1,0, 1)
+sigma2Samples <- c(.5,1,2)
+ygrid <- seq(-3,3,1)
+ygridN <- matrix(ygrid, nrow = length(thetaSamples), ncol = length(ygrid), byrow = TRUE)
+tst1 <- dnorm(ygridN, thetaSamples, sqrt(sigma2Samples))
 
+tst2 <- matrix(NA,  length(thetaSamples),  length(ygrid))
+for(col in 1:length(ygrid)){
+  for(row in 1:length(thetaSamples)){
+    tst2[row, col] <- dnorm(ygrid[col], thetaSamples[row], sqrt(sigma2Samples[row]))
+  }
+}
+all.equal(tst1,tst2)
 
+thetaSamplesMat <- matrix(c(1,2,3,4), 3, 4, byrow = TRUE)
+split(thetaSamplesMat, col(thetaSamplesMat))
+
+compute_pred_dist<-function(ygrid, thetaSamples, sigma2Samples){
+  #ygrid: grid of y values to evaluate the pred distribution
+  #thetaSamples, sigma2Samples MCMC samples from the given group
+  #OR for the robust regressions, these are just the estimates of theta and sigma2 from the robust regressions
+  if(length(ygrid)>1000){
+    sapply(ygrid, FUN=function(x) {
+      mean(dnorm(x, thetaSamples, sqrt(sigma2Samples)))
+    } 
+    ) } else {
+      ygridN <- matrix(ygrid, nrow = length(thetaSamples), ncol = length(ygrid), byrow = TRUE)
+      colMeans(dnorm(ygridN, thetaSamples, sqrt(sigma2Samples)))
+    }
+}
+tst3 <- compute_pred_dist(ygrid, thetaSamples, sigma2Samples)
+all.equal(colMeans(tst1), tst3)
+
+(log(trueDist) - log(predDist))*trueDist
+((log(0)-log(0))*0)
+((log(0)-log(2))*0)
+((log(2)-log(0))*2)
+
+tmp <- dnorm(38, 0, 1)
+log(tmp)
+log(0)
+
+dif <- diff(ygrid)
+sum(c(NaN, 1,2,3, 4, 5)*dif)
+sum(c(-Inf, -Inf,2,3, 4, 5)*dif)

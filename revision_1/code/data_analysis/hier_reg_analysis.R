@@ -474,7 +474,7 @@ swSq <- 1
  
   
 #computing marginal likelihoods for each element in holdout sample
-nTheory_marg_mn_sd <-fn.compute.marginals.hierModelNormal(betal, nTheory$sigma2s, yhold,Xhold)
+nTheory_marg_mn_sd <- fn.compute.marginals.hierModelNormal(betal, nTheory$sigma2s, yhold,Xhold)
 nTheory_marg <- lapply(nTheory_marg_mn_sd, function(x) x[,1])
 marginals[norm_ind, i,] <- nTheory_marg %>% unlist() 
 nTheory_marg_sd <- lapply(nTheory_marg_mn_sd, function(x) x[,2])

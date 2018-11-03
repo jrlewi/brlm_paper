@@ -44,14 +44,18 @@ for(sig2True in sigma2True){
 #sigma2True <- 4  # SteveMod
 #sig2True <- 4    # SteveMod
 
-
 dir_to_save_data <- file.path(getwd(), paste0('data_', "sig2_", sig2True))
 dir.create(dir_to_save_data, showWarnings = FALSE)
 
 for(data_sim in sims){
 # Generate the data ----  
+dat_file <- file.path(dir_to_save_data,  paste0('data_',data_sim,'.rds')) 
+if(file.exists(dat_file)){ #checks to see if data file already exists - so that can run future sims with different priors without overwriting existing data and messing up MSE/KL calculations for already run sims. 
+YList <- readRDS(dat_file)
+} else {
 YList <- fn.gen.data(sig2True)
-saveRDS(YList, file.path(dir_to_save_data,  paste0('data_',data_sim,'.rds')))
+saveRDS(YList, dat_file)
+}
   factorsList<-YList$factorsList
   factorsMat<-matrix(unlist(factorsList), nrow=90, ncol=3, byrow = TRUE)
   p<-factorsMat[,1]
