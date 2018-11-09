@@ -89,7 +89,7 @@ hier_marginals <- ns %>% map(.f = function(n){
 
 # Finding TLM with a specific base model, by state -----
 #base_model <- 'Student-t'
-get_tlm_tibble <- function(marginals_tibble, base_model = base_model , trimming_fractions = c(0, .1, .2, .3)){
+get_tlm_tibble <- function(marginals_tibble, base_model = base_model , trimming_fractions = c(0, .1, .15, 0.2,.25, .3)){
 
 marginals_open_type1 <- marginals_tibble %>% 
   filter(Type == '1')
@@ -118,6 +118,7 @@ holdout_include_all <- c('Restricted - Huber','Rlm - Huber', 'Restricted - Tukey
 
   holdout_include_all %>%  
   group_by(Repetition, Model, State, n) %>% 
+  mutate(Marginal = log(Marginal + 1e-300)) %>% #log, avoid -Inf
   summarise(tlm = mean(Marginal), tlm_sd = sd(Marginal)) %>% 
   ungroup() %>% 
   # group_by(Model, State, n) %>% 
@@ -130,7 +131,7 @@ summary_tibble_by_trim %>%
   mutate(`Trimming Fraction` = as.factor(`Trimming Fraction`))
 }
 
-summary_tibble <- get_tlm_tibble(hier_marginals, base_model = 'Student-t', trimming_fractions = c(0, .1, .2, .3))
+summary_tibble <- get_tlm_tibble(hier_marginals, base_model = 'Student-t', trimming_fractions = c(0, .1, .15, 0.2,.25, .3))
 
 
 # overall average ------
@@ -145,12 +146,12 @@ overall_average <- summary_tibble %>%
 #K <- length(unique(summary_tibble$Repetition))
 
 theme_set(theme_bw(base_family = 'Times'))
-ggplot(overall_average %>% filter(!Model %in% c('OLS', 'Normal')), aes(x = `Trimming Fraction` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) 
-#ggsave(file.path(getwd(), "..", "..", "figs", 'hier_average_tlm.png'), width = 6, height = 4)
+ggplot(overall_average %>% filter(`Trimming Fraction` %in% c(0.1,.15,.2,.25,.3)) , aes(x = `Trimming Fraction` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + labs(y = 'Average TLM') + xlab(bquote(`Trimming Fraction`(alpha))) 
+ggsave(file.path(getwd(), "..", "..", "figs", 'hier_average_tlm.png'), width = 6, height = 4)
 
 
-ggplot(overall_average %>%  filter(!Model %in% c('OLS', 'Normal', 'Student-t')), aes(x = `Trimming Fraction` , y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .0))  + geom_line(position  = position_dodge(width = .0), linetype = 1) 
-#ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm.png'), width = 6, height = 4)
+ggplot(overall_average %>%  filter(!Model %in% c('OLS', 'Normal', 'Student-t')), aes(x = `Trimming Fraction` , y = sd, col = Model, group = Model)) + geom_point(position = position_dodge(width = .0))  + geom_line(position  = position_dodge(width = .0), linetype = 1) + xlab(bquote(`Trimming Fraction`(alpha)))
+ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm.png'), width = 6, height = 4)
 
 
 
@@ -164,12 +165,13 @@ average_by_state <- summary_tibble %>%
 state_count <- analysis_data %>% group_by(State) %>% 
   summarize(state_count = n())
 
-average_by_state <- left_join(average_by_state, state_count, by = 'State') %>% unite(col = 'State(n)', c('State', 'state_count'), sep = '(', remove = FALSE)  %>%  mutate(`State(n)` = reorder(as.factor(`State(n)`), state_count)) 
+average_by_state <- left_join(average_by_state, state_count, by = 'State') %>% unite(col = 'State(n)', c('State', 'state_count'), sep = '(', remove = FALSE) %>% 
+  mutate(')' = ')') %>% unite(col = 'State(n)', c('State(n)', ')'), sep = '', remove = FALSE) %>%  mutate(`State(n)` = reorder(as.factor(`State(n)`), state_count))
 
 
 theme_set(theme_bw(base_family = 'Times'))
-ggplot(average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Tukey', 'Rlm - Tukey')), aes(x = `State(n)` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + theme(axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_log10()
-#ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state.png'), width = 7.5, height = 5)
+ggplot(average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Tukey', 'Rlm - Tukey')), aes(x = `State(n)` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(y = "Average TLM")#+ scale_y_log10()
+ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state.png'), width = 7.5, height = 5)
 
 
 
@@ -203,7 +205,7 @@ ggplot(average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('
 theme_set(theme_bw(base_family = 'Times'))
 sub_df <- average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Tukey', 'Rlm - Tukey'))
 ggplot(sub_df, aes(x = `State(n)` , y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_log10()
-#ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm_state.png'), width = 7.5, height = 5)
+ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm_state.png'), width = 7.5, height = 5)
 
 # ----- 
 
@@ -211,81 +213,81 @@ ggplot(sub_df, aes(x = `State(n)` , y = sd/mean, col = Model, group = Model)) + 
 
 
 #relatations to state sizes ----
-state_count <- analysis_data %>% 
-  group_by(State) %>% 
-  summarise(state_count = n())
+# state_count <- analysis_data %>% 
+#   group_by(State) %>% 
+#   summarise(state_count = n())
+# n <- ns
+# hier_results <- readRDS(file.path(getwd(), paste0('hier_reg_n', n,".rds")))
+# names(hier_results )
+# ols_ind <- 1; 
+# rlm_ind <- 2; 
+# rlm_huber_ind <- 3
+# norm_ind <- 4
+# rest_ind <- 5
+# rest_hub_ind <- 6
+# t_ind <- 7
+# 
+# 
+# 
+# state_ind <- which(state_count$State == 36)
+# 
+# dim(hier_results$group_estimates)
+# plot(hier_results$group_estimates[rest_ind, 1, state_ind, ], hier_results$group_estimates[rlm_ind, 1, state_ind, ])
+# abline(0,1)
+# plot(hier_results$group_estimates[rest_ind, 2, state_ind, ], hier_results$group_estimates[rlm_ind, 2, state_ind, ])
+# abline(0,1)
+# # abline(h = b0/(a0-1), v = b0/(a0-1))
+# 
+# 
+# 
+# 
+# state_count <- left_join(average_by_state,state_count, by = "State") 
+# sub_df <- state_count  %>% filter(`Trimming Fraction.x` == '0.3', Model.x %in% c('Restricted - Tukey', 'Rlm - Tukey'))
+# 
+# ggplot(sub_df, aes(x = as.factor(state_count) , y = sd.x, col = Model.x, group = Model.x)) + geom_point(position = position_dodge(width = 0)) + geom_line() 
+# 
+# ggplot(sub_df, aes(x = state_count , y = mean, col = Model, group = Model))  + geom_point(position = position_dodge(width =  0))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.0, position  = position_dodge(width = 0), linetype = 1) + scale_x_log10()
 
-hier_results <- readRDS(file.path(getwd(), paste0('hier_reg_n', n,".rds")))
-names(hier_results )
-ols_ind <- 1; 
-rlm_ind <- 2; 
-rlm_huber_ind <- 3
-norm_ind <- 4
-rest_ind <- 5
-rest_hub_ind <- 6
-t_ind <- 7
 
 
-
-state_ind <- which(state_count$State == 36)
-
-dim(hier_results$group_estimates)
-plot(hier_results$group_estimates[rest_ind, 1, state_ind, ], hier_results$group_estimates[rlm_ind, 1, state_ind, ])
-abline(0,1)
-plot(hier_results$group_estimates[rest_ind, 2, state_ind, ], hier_results$group_estimates[rlm_ind, 2, state_ind, ])
-abline(0,1)
-abline(h = b0/(a0-1), v = b0/(a0-1))
-
-
-
-
-state_count <- left_join(average_by_state,state_count, by = "State") 
-sub_df <- state_count  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Tukey', 'Rlm - Tukey'))
-
-ggplot(sub_df, aes(x = as.factor(state_count) , y = sd, col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line() 
-
-ggplot(sub_df, aes(x = state_count , y = mean, col = Model, group = Model))  + geom_point(position = position_dodge(width =  0))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.0, position  = position_dodge(width = 0), linetype = 1) + scale_x_log10()
-
-
-
-# Convergence Diagnostics ----
+#Convergence Diagnostics ----
 tmp <- readRDS("~/Dropbox/school/osu/dissertationResearch/snm/journal_papers/brlm_paper/revision_1/code/data_analysis/hier_reg_n1590.rds")
-
-names(tmp)
-lapply(tmp, dim)
-
-
-plot(tmp$marginals[3,,],tmp$marginals[6,,], cex = .2)
-abline(0,1, col = 2)
-
-plot(as.numeric(tmp$marginals[3,1,])-as.numeric(tmp$marginals[6,1,]), cex = .2)
-
-
-plot(tmp$group_estimates[2,1,,],tmp$group_estimates[5,1,,])
-abline(0,1)
-abline(h = tmp$estimates[5,1,1])
-
-
-plot(tmp$converge, pch = 19, cex = .2)
-mean(abs(tmp$converge[7,,]) > 2, na.rm = TRUE)
-
-plot(tmp$group_converge, pch = 19, cex = .2)
-mean(abs(tmp$group_converge[-7,1,,]) > 2, na.rm = TRUE)
-mean(abs(tmp$group_converge[-7,,,]) > 2, na.rm = TRUE)
-
-mean(abs(tmp$group_converge[-7,,,]) > 2, na.rm = TRUE)
-
-which(tmp$group_converge > 5)
-dim(tmp$group_converge)
-which(tmp$group_converge[5,1,,] > 5)/22
-which(tmp$group_converge[5,2,,] > 5)/22
-
-which(tmp$group_converge[7,1,,] > 5)/ 22
-which(tmp$group_converge[7,2,,] > 5)/22
-
-dim(tmp$group_converge)
-
-
+range(tmp$acceptY)
+# names(tmp)
+# lapply(tmp, dim)
+# 
+# 
+# plot(tmp$marginals[3,,],tmp$marginals[6,,], cex = .2)
+# abline(0,1, col = 2)
+# 
+# plot(as.numeric(tmp$marginals[3,1,])-as.numeric(tmp$marginals[6,1,]), cex = .2)
+# 
+# 
+# plot(tmp$group_estimates[2,1,,],tmp$group_estimates[5,1,,])
+# abline(0,1)
+# abline(h = tmp$estimates[5,1,1])
+# 
+# 
+# plot(tmp$converge, pch = 19, cex = .2)
+# mean(abs(tmp$converge[7,,]) > 2, na.rm = TRUE)
+# 
+# plot(tmp$group_converge, pch = 19, cex = .2)
+# mean(abs(tmp$group_converge[-7,1,,]) > 2, na.rm = TRUE)
+# mean(abs(tmp$group_converge[-7,,,]) > 2, na.rm = TRUE)
+# 
+# mean(abs(tmp$group_converge[-7,,,]) > 2, na.rm = TRUE)
+# 
+# which(tmp$group_converge > 5)
+# dim(tmp$group_converge)
+# which(tmp$group_converge[5,1,,] > 5)/22
+# which(tmp$group_converge[5,2,,] > 5)/22
+# 
+# which(tmp$group_converge[7,1,,] > 5)/ 22
+# which(tmp$group_converge[7,2,,] > 5)/22
+# 
+# dim(tmp$group_converge)
+# 
+# 
 
 # Evaluate predictions for specific states ----------
 # states <- c(2, 15, 27, 36) # state we care about

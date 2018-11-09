@@ -41,7 +41,7 @@ prior_data <- prior_data %>%
 prior_fit <- MASS::rlm(sqrt_count_2010 ~ sqrt_count_2008 - 1 , scale.est = 'Huber', data =  prior_data, maxit = 100)
 
 # theme_set(theme_bw(base_family = 'Times'))
-# ggplot(prior_data, aes(x = sqrt_count_2008, y = sqrt_count_2010)) + geom_point(size = 1) + xlim(c(0,150)) +  ylim(c(0, 130)) + stat_smooth(method = "rlm", formula = y ~ x - 1, method.args = list(scale.est = 'Huber', maxit = 100), size = .5, lty = 2, se = FALSE, col = 1) + guides(col = guide_legend(title = 'Agency Type'))
+# ggplot(prior_data, aes(x = sqrt_count_2008, y = sqrt_count_2010)) + geom_point(size = 1) + stat_smooth(method = "rlm", formula = y ~ x - 1, method.args = list(scale.est = 'Huber', maxit = 100), size = .5, lty = 2, se = FALSE, col = 1) + guides(col = guide_legend(title = 'Agency Type'))
 
 #load analysis data -------
 
@@ -53,8 +53,7 @@ analysis_data <- read_rds(file.path(here::here(), 'data', 'analysis_data.rds'))
 analysis_data <- analysis_data %>% 
   mutate(sqrt_count_2010 = sqrt(Count_2010), sqrt_count_2012 = sqrt(Count_2012)) %>% filter(State == State_keep)
 
-ggplot(analysis_data) + geom_point(aes(x = sqrt_count_2010, y = sqrt_count_2012)) + xlim(c(0,100))
-
+#ggplot(analysis_data) + geom_point(aes(x = sqrt_count_2010, y = sqrt_count_2012))
 #MASS::rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1 , scale.est = 'Huber', data =  analysis_data, maxit = 100)
 
 N <- nrow(analysis_data)
@@ -200,7 +199,7 @@ v_ind <- which(beta_var_inflate == v_inflate)
             
       #normal theory bayes model ----
       
-      nTheory <- brlm::bayesLm(y, X , 
+      nTheory <- brlm::bayesLm(y, X, 
                                mu0 = beta_0, 
                                Sigma0 = var_beta_0, 
                                a0 = a_0, 

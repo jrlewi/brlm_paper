@@ -18,7 +18,7 @@ label_vals <- c('2' = 'State 2', '15' = 'State 15', '27' = 'State 27', '36' = 'S
 ggplot(analysis_data) + geom_point(aes(x = sqrt_count_2010, y = sqrt_count_2012, col = Type), size = 1, alpha = .5) +
   theme_bw() + facet_wrap(~State, labeller = labeller(State = label_vals)) + labs(x = 'square root of 2010 houshold count', y = 'square root of 2012 houshold count') +
   theme(text = element_text(family = 'Times'))
-#ggsave(file.path(getwd(), "..", "..", "figs", 'scatter_by_state.png'), width = 6, height = 4)
+ggsave(file.path(getwd(), "..", "..", "figs", 'scatter_by_state.png'), width = 6, height = 4)
 
 
 
@@ -30,7 +30,7 @@ cnts <- analysis_data %>% group_by(State) %>%
 #   theme_bw() + 
 #   labs(x = 'square root of 2010 houshold count', y = 'square root of 2012 houshold count') +
 #   theme(text = element_text(family = 'Times'))
-# #ggsave(file.path(getwd(), "..", "..", "figs", 'scatter_by_state.png'), width = 6, height = 4)
+# ggsave(file.path(getwd(), "..", "..", "figs", 'scatter_by_state.png'), width = 6, height = 4)
 # 
 
 
@@ -147,8 +147,10 @@ pooled_marginals <- bind_rows(pooled_marginals %>% filter(!is.na(var_inflate)), 
 base_model <- 'Student-t' 
 get_tlm_tibble <- function(marginals_tibble, base_model = base_model, trimming_fractions = c(0, .1, .2, .3)){
 
-marginals_open_type1 <- marginals_tibble %>% 
+marginals_open_type1 <- marginals_tibble  %>% 
   filter(Type1 == TRUE)
+
+# marginals_open_type1 <- marginals_open_type1 %>% mutate(var_inflate = ifelse(is.na(var_inflate), 'NotApp', var_inflate)) #so NA's don't get droped on splits
 
 base_model_marg <-  marginals_open_type1 %>% 
   filter(Model == base_model) 
@@ -177,7 +179,8 @@ marg_split <- marginals_open_type1 %>%
 
   marg_split %>% 
   group_by(Repetition, Model, n, State, var_inflate) %>% 
-  summarise(tlm_mean = mean(Marginal), tlm_sd = sd(Marginal)/tlm_mean) %>% 
+  mutate(Marginal = log(Marginal + 1e-300)) %>% #log scale, avoid -Inf  
+  summarise(tlm_mean = mean(Marginal), tlm_sd = sd(Marginal)) %>% 
   ungroup() %>% 
   group_by(Model, n,State, var_inflate) %>% 
   summarise(mean = mean(tlm_mean), 
@@ -191,13 +194,13 @@ summary_tibble_by_trim %>%
   mutate(`Trimming Fraction` = as.factor(`Trimming Fraction`))
 }
 
-summary_tibble <- get_tlm_tibble(pooled_marginals, base_model = 'Student-t', trimming_fractions = c(0, .1, .2, .3))
+summary_tibble <- get_tlm_tibble(pooled_marginals, base_model = base_model, trimming_fractions = c(0, .1, .15, .2, .25, .3))
 
 theme_set(theme_bw(base_family = 'Times'))
 ggplot(filter(summary_tibble, var_inflate == 100, `Trimming Fraction` == 0.3), aes(x = n, y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + #geom_line(position = position_dodge(width = .5)) +
   geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1)  + 
   facet_wrap(~State, drop = FALSE, scales = 'free', labeller = labeller(State = label_vals)) + xlab('Percent of sample used in training set') + ylab('Average TLM')
-#ggsave(file.path(getwd(), "..", "..", "figs", paste0('tlm_base_',base_model, '.png')), width = 6, height = 4)
+ggsave(file.path(getwd(), "..", "..", "figs", paste0('tlm_base_',base_model, '.png')), width = 6, height = 4)
 
 
 # ggplot(filter(summary_tibble, var_inflate == 100, `Trimming Fraction` == 0.3), aes(x = State, y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + #geom_line(position = position_dodge(width = .5)) +
@@ -221,9 +224,9 @@ ggplot(filter(summary_tibble, !Model %in% c('OLS', 'Normal'), `Trimming Fraction
 
 
 
-ggplot(filter(summary_tibble, n == 50), aes(x = as.factor(`Trimming Fraction`), y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .75)) + #geom_line(position = position_dodge(width = .5), lty = 2) +
-  geom_errorbar(mapping = aes(ymin = (mean - sd), ymax = (mean + sd)), width = 0.05, position  = position_dodge(width = .75), linetype = 1) + facet_wrap(~State, labeller = labeller(State = label_vals), scales = 'free') + xlab(bquote(`Trimming Fraction`(alpha)))
-#ggsave(file.path(getwd(), "..", "..", "figs", paste0('tlm_base_',base_model, 'byTrimming.png')), width = 6, height = 4)
+ggplot(filter(summary_tibble, n == 50, !`Trimming Fraction` == 0), aes(x = as.factor(`Trimming Fraction`), y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .75)) + #geom_line(position = position_dodge(width = .5), lty = 2) +
+  geom_errorbar(mapping = aes(ymin = (mean - sd), ymax = (mean + sd)), width = 0.05, position  = position_dodge(width = .75), linetype = 1) + facet_wrap(~State, labeller = labeller(State = label_vals), scales = 'free') + xlab(bquote(`Trimming Fraction`(alpha))) + ylab('Average TLM')
+ggsave(file.path(getwd(), "..", "..", "figs", paste0('tlm_base_',base_model, 'byTrimming.png')), width = 6, height = 4)
 
 
 

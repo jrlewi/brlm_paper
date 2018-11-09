@@ -32,8 +32,8 @@ ind_check2 <- with(priorDataSet, table(Primary_Agency_State, State))%>%
 all.equal(ind_check1, ind_check2)
 all.equal(names(ind_check1), names(ind_check2))
   
-# View(analysisSet %>% select(Primary_Agency_State, State))
-# View(priorDataSet %>% select(Primary_Agency_State, State))
+# View(analysisSet %>% dplyr::select(Primary_Agency_State, State))
+# View(priorDataSet %>% dplyr::select(Primary_Agency_State, State))
 (unique(priorDataSet$State))
 
 # Change Agency Type Level Names ----
@@ -93,11 +93,11 @@ priorDataSet %>% ungroup() %>%
 
 
 prior_data <- priorDataSet %>% 
-  select(Type, State, Ending_HH_Count2008, Ending_HH_Count2010)
+  dplyr::select(Type, State, Ending_HH_Count2008, Ending_HH_Count2010)
 prior_data$Type <- as_factor(as.character(prior_data$Type))
 
 analysis_data <- analysisSet %>% 
-  select(Type, State, Ending_HH_Count2010, Ending_HH_Count2012)
+  dplyr::select(Type, State, Ending_HH_Count2010, Ending_HH_Count2012)
 analysis_data$Type <- as_factor(as.character(analysis_data$Type))
 
 levels(prior_data$Type)
@@ -125,7 +125,7 @@ analysis_data <- analysis_data %>% dplyr::rename(Count_2010 = Ending_HH_Count201
 cs <- function(x){
   cs <- (x - mean(x, na.rm = TRUE))/sd(x, na.rm = TRUE)
   cs + abs(min(cs))
-  }
+  } # = (x -min(x))/sd(s)
 
 Count_2008 <- cs(prior_data$Count_2008)
 Count_2010 <- cs(c(prior_data$Count_2010, analysis_data$Count_2010))
