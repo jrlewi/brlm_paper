@@ -93,16 +93,14 @@
 \def\@currentlabel{#1}\label{#2}}
 \makeatother
 
-
 \title{Bayesian Restricted Likelihood Methods: Conditioning on Insufficient Statistics in Bayesian Regression}
 \author{John R. Lewis, Steven N. MacEachern and  Yoonkyung Lee \\
 {\small \it Department of Statistics, The Ohio State University, Columbus, Ohio 43210}\\
 {\small lewis.865@buckeyemail.osu.edu, snm@stat.osu.edu and yklee@stat.osu.edu}
 \thanks{This research has been supported by Nationwide Insurance Company and by the NSF under grant numbers DMS-1007682 and DMS-1209194.  The views in this paper are not necessarily those of Nationwide Insurance or the NSF.}} 
-\date{}
+%\date{}
 \begin{document}
 \maketitle
-
 
 \begin{abstract}
 Bayesian methods have proven themselves to be successful across a wide
@@ -146,7 +144,6 @@ The remainder of the paper is as follows: Section~\ref{restrictedlikelihood} int
 
 \section{Restricted Likelihood}
 \label{restrictedlikelihood}
-%\textcolor{blue}{Tried to make more concise. Commented out section describing the further examples related to randomized experiments, contingency tables, and meta-analysis. }
 
 \subsection{Examples}
 To describe the use of the restricted likelihood, 
@@ -183,7 +180,6 @@ Only the first part is retained in the analysis. Several more examples are detai
 
 
 
-
 \subsection{Generalization}
 
 To generalize the approach in \eqref{OutlyingCases} and
@@ -194,12 +190,13 @@ we write the full likelihood in two pieces with a conditioning statistic $T(\by)
 L(\bth | \by)  
 & = & f(T(\by) | \bth) \,\, f(\by |\bth, T(\by)) .  
 \end{eqnarray}
-
+%Throughout the paper, we use the convention that a function is defined by its inputs. 
 Here,  $f(T(\by) | \bth)$ is the conditional pdf of $T(\by)$ given $\bth$ and $f(\by |\bth, T(\by))$ is the conditional pdf of $\by$ given $\bth$ and $T(\by)$.  In the dropped case example, the conditioning statistic is $T(\by) = (y_1, \ldots, y_{n-k})$.  In 
 the censoring example, the conditioning statistic is $T(\by) = (c(y_1),\ldots,c(y_n))$.  We refer to 
 $f(T(\by) | \bth)$ as the restricted likelihood and $L(\bth | \by)=f(\by|\bth)$ as the full likelihood.  
 
-Bayesian methods can make use of a restricted likelihood since $T(\by)$ is a well-defined random variable with a probability distribution indexed by $\bth$.  
+Bayesian methods can make use of a restricted likelihood %in place of a complete likelihood
+since $T(\by)$ is a well-defined random variable with a probability distribution indexed by $\bth$.  
 This leads to the restricted likelihood posterior 
 \begin{eqnarray}
 \label{RestrictedPosterior}
@@ -227,8 +224,7 @@ With an approximately sufficient $T(\cdot)$ and a small enough $\epsilon$, heuri
 
 
 
-This work extends the development of Bayesian restricted likelihood by arguing that deliberate choice of an insufficient statistic $T(\by)$ guided by targeted inference is sound practice. We also expand the class of conditioning statistics for which a formal Bayesian update can be achieved.  Our methods do not rely on asymptotic properties, nor do they rely on approximate conditioning.
-
+This work extends the development of Bayesian restricted likelihood by arguing that deliberate choice of an insufficient statistic $T(\by)$ guided by targeted inference is sound practice. We also expand the class of conditioning statistics for which a formal Bayesian update can be achieved.  Our methods do not rely on asymptotic properties, nor do they rely on approximate conditioning.%, 
 
 
 
@@ -275,9 +271,6 @@ The data and  $95\%$ credible bands for the posterior predictive distribution un
 \caption{Pointwise posterior predictive intervals of log(calls) under the normal theory model fit to the non-outliers, the restricted likelihood model with Tukey's M-estimator for the slope and intercept with Huber's `proposal 2'  for scale, and a heavy-tailed t-distribution model. The first three data points were used to specify the prior with each model using the remaining 21 for fitting. The normal theory model was also fit after removing observations 14-20 (years 1963 - 1970).}
 \label{fig:calls_predictive}
 \end{figure}
-%{\bf For the figure, add fit of normal model to all cases}
-
-
 
 
 \section{Restricted Likelihood for the Linear Model}
@@ -302,7 +295,6 @@ y_i  & =  & x_i^\top \bbeta + \epsilon_i , \mbox{ for } i = 1, \ldots, n
 \end{eqnarray}
 where $x_i$ and $\bbeta \in \mathbb{R}^p$, $\sigma^2 \in \mathbb{R}^+$, 
 and the $\epsilon_i$ are independent draws from a distribution with center $0$ and scale $\sigma$. $X$ denotes the design matrix whose rows are  $x_i^\top$. For the restricted likelihood model,  conditioning statistics are assumed to be of the form $T(\by) = (\bb(X, \by), s(X, \by))$ where $\bb(X, \by)= (b_1(X,\by), \dots,b_p(X,\by))^\top\in \mathbb R^{p}$ is an estimator for the regression coefficients and $s(X, \by)\in \{0\} \cup {\mathbb R}^+$ is an estimator of the scale. Throughout, observed data and summary statistic is denoted by $\by_{obs}$ and $T(\by_{obs})=(\bb(X, \by_{obs}), s(X, \by_{obs}))$, respectively. 
-% In particular, we demonstrate the method using simultaneous M-estimators defined by \eqref{Mest} for the one-sample setting and easily extended to the linear model in \eqref{LinearModel}. The estimator of the \green{regression} coefficients is denoted by $\bb(X, \by)\in \mathbb R^{p}$ and that of the scale by \green{\sout{$s(X, \by)\in \mathbb R$} $s(X, \by)\in \{0\} \cup {\mathbb R}^+$} . Thus, $T(\by)=(\bb(X, \by), s(X, \by))$. 
 Several conditions are imposed on the model and statistic to ensure validity of the MCMC algorithm:
 \begin{itemize}
 \labitem{C1}{fullRank} The $n \times p$ design matrix, $X$, whose $i^{th}$ row is $x_i^\top$, 
@@ -324,7 +316,6 @@ Many estimators satisfy the above properties, including simultaneous M-estimator
 
 
 
-
 \subsection{Computational strategy}
 \label{highDim}
 
@@ -337,7 +328,6 @@ data given the summary statistic $T(\by_{obs})$.
 the first full conditional is the same as the full data posterior $\pi(\bth|\by)$. In this case, the condition $T(\by) = T(\by_{obs})$ is redundant.  This allows us to make use of conventional MCMC steps for generation of $\bth$ from the first full conditional.  For typical regression models, algorithms abound. Details of the recommended algorithms depend on details of
 the prior distribution and sampling density and we assume this can be done \citep[see e.g.,][]{liu1994, liang2008}.  
 
- 
 For a typical model and conditioning statistic, the second full conditional $f(\by|\bth, T(\by)=T(\by_{obs}))$ %\blue{ =f(\by|\bth, \by\in\mc A)}$ 
 is not available in closed form.  We turn to Metropolis-Hastings \citep{hastings1970},
 using the strategy of proposing full data $\by \in \mathcal{A}:=\{\by \in \mathbb{R}^n | T(\by)=T(\by_{obs})\}$ from a well defined distribution with support $\mathcal{A}$ and either accepting or rejecting the
@@ -370,16 +360,10 @@ through the transformation
 \[
 \by = h(\bz^*) := \frac{s(X,\by_{obs})}{s(X,\bz^*)} \bz^* + X\left(\bb(X,\by_{obs}) - \bb(X,\frac{s(X,\by_{obs})}{s(X,\bz^*)} \bz^*)\right) .  
 \]
-\end{theorem}  
+\end{theorem}
 
 \noindent Using the theorem, the general idea is to first start with an initial vector $\bz^*$ drawn from a known distribution, say $p(\bz^*)$, and transform via $h(\cdot)$ to $\by \in \mathcal{A}$. The proposal density $p(\by|\bth)$ is then a change-of-variables adjustment on $p(\bz^*)$ derived from $h(\cdot)$.
-%To evaluate the proposal density $p(\by|\bth)$, we need to adjust the known density of $\bz^*$, $p(\bz^*)$, with the Jacobian of the transformation $h(\cdot)$ to $\by$. We choose the
-%distribution of $\bz^*$ to have support on a subset of $\mathbb R^n$ so that
-%the transformation to $\by$ is one-to-one and the Jacobian, $\displaystyle \left|\frac{\partial h^{-1}(\by)}{\partial \by}\right|$, can be computed directly.  
 In general however, the mapping $h(\cdot)$ is many-to-one: for any $\bv\in \mathbb{R}^{n}$ and any $c\in \mathbb{R}^{+}$, $c\bz^{*} + X\bv$ map to the same $\by$. This makes the change-of-variables adjustment difficult.
-%The set $\mathcal{A}$ typically does not lie in a linear space of dimension $n - p - 1$, and 
-%so we must account for both the many-to-one nature of the mapping $h(\dot)$ and
-%a Jacobian when deriving the proposal density.  
 We handle this by first noticing that the set $\mathcal{A}$ is an $n - p - 1$ dimensional space:  there are $p$ constraints imposed by the regression coefficients and one further constraint imposed by the scale. Hence, we restrict the initial $\bz^*$ to an easily understood $n - p - 1$ dimensional space.  Specifically, this space is  the unit sphere in the orthogonal complement of the column space of the design matrix: $\mathbb{S} := \{\bz^* \in \mathcal{C}^{\perp}(X)\  |\  ||\bz^*|| = 1\}$, where $\mathcal{C}(X)$ and  $\mathcal{C}^{\perp}(X)$ are the column space of $X$ and its orthogonal complement, respectively. The mapping $h: \mathbb{S} \rightarrow \mathcal{A}$ is one-to-one and onto. A proof is provided by Theorem \ref{1to1onto} in the appendix.  The one-to-one property makes the change of variables more feasible. The onto property is important so that the support of the proposal distribution (i.e. the range of $h(\cdot)$) contains the support of the target  $f(\by | \theta, y\in \mathcal{A})$, a necessary condition for convergence of the Metroplis-Hastings algorithm (in this case the supports are both $\mathcal{A}$). 
 
 
@@ -412,9 +396,8 @@ $\mathcal{A}$ is the combination of three quarter circles, one
 \end{figure}
 
 
-%\end{enumerate}
-%
 \subsubsection{Evaluation of the proposal density} 
+
 We now explain each step in computing the Jacobian described above.
 \vskip 0.05 in
 \noindent
@@ -439,14 +422,13 @@ s(X,\by)\| \|\bz\|},
 \end{equation}
 where $\gamma$ is the angle between the two normal vectors.
 This step is visualized in Figure~\ref{fig:stretchDeform} for the notional
-location-scale example.  The figure pictures only the $\mathcal{C}^{\perp}(X)$,
+location-scale example.  The figure pictures only $\mathcal{C}^{\perp}(X)$,
 which in this case is a plane. The unit sphere (here, the
 solid circle) is stretched to the dashed sphere, contributing
 $r^{-(n-p-1)}$ to the Jacobian as seen in panel (a). In panel (b), the
 dashed circle is transformed onto $\Pi(\mc A)$, contributing
 $\cos(\gamma)$ to the Jacobian. The normal vectors in panel (b) are
 orthogonal to the tangent vectors of $\Pi(\mc A)$ and the circle. 
-
 
 \begin{figure}[t]
 \centering
@@ -455,8 +437,6 @@ orthogonal to the tangent vectors of $\Pi(\mc A)$ and the circle.
 \caption{Visualization of the scaling from $z^{*}$ to $z$. Left: the first substep scales $z^{*}$ on the unit circle to the circle of radius $r = ||z||$, resulting in a change-of-variables transformation for the unit circle to a circle of radius $r$. The contribution to the Jacobian of this transformation is $r^{-(n-p-1)}$. Right: The second substep accounts for the the change-of-variables transformation from the circle of radius $r$ to $\Pi(\mathcal{A})$. The normal vectors to these two sets are used to calculate the contribution to the Jacobian of this part of the transformation are shown in the figure.}
 \label{fig:stretchDeform}
 \end{figure}
-
-
 
 
 \vskip 0.05 in
@@ -475,7 +455,7 @@ The ratio is calculated by considering the volume of the
 projection of a unit hypercube in the tangent space of $\mathcal{A}$
 at $\by$ onto $\mc{C}^\perp(X)$.
 Computational details are
-given in the following lemmas and subsequent theorem. Proofs of the lemmas are given in the Appendix and the Theorem is a direct result of the lemmas. Throughout, let
+given in the following lemmas and subsequent theorem. Proofs of the lemmas are given in the appendix and the theorem is a direct result of the lemmas. Throughout, let
 $\mc T_{y}(\mc A)$ and $\mc T_{y}^{\perp}(\mc A)$ denote the tangent
 space to $\mc A$ at $\by$ and its orthogonal complement, respectively. %All gradients denoted by $\nabla$ are with respect to the data vector.
 \begin{lemma}
@@ -551,16 +531,7 @@ Second, the gradients of $\nabla s(X,\by), \nabla b_1(X,\by),\dots, \nabla b_p(X
  \sum_{i=1}^n \chi\left(\frac{y_i - x_{i}^{\top}\bb(\by,X)}{s(\by,X)}\right)= & 0, \nonumber 
 \end{eqnarray} 
 where $\psi$ and $\chi$ are almost surely differentiable. The gradients can be found by differentiating this system of equations with respect to each $y_{i}$. In theory, finite differences could also be used as an approximation if needed. 
-%{\bf John - for the finite differences, is this to approximate the gradient? }
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-% Applications
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%\section{Applications}
-%In this section we apply the restricted likelihood to both simulated and real data. 
 
 \section{Simulated Data}
 \label{simData}
@@ -600,7 +571,7 @@ KL^{(M)}_{ik} = \int \log \frac{f(\tilde y | \theta_{i}, \sigma^{2})}{f_{i}(\til
 \end{equation}
 where $M$ indexes the fitting model and $f(\tilde y | \theta_{i}, \sigma^{2}) = N(\tilde y | \theta_{i}, \sigma^{2})$, the normal density function with (known) mean $\theta_{i}$ and variance $\sigma^{2}$, evaluated at $\tilde y$. For the Bayesian models, ${f_{i}(\tilde y | M, \by_{k})} = \int f(\tilde y |\theta_{i}, \sigma_{i}^{2}) \pi(\theta_{i}, \sigma^{2}_{i} | M, \by_{k})d\theta_{i}d\sigma^{2}_{i}$ where $\pi(\theta_{i}, \sigma^{2}_{i} | M, \by_{k})$ is the posterior for the $i^{th}$ group model parameters under model $M$ for the $k^{th}$ data set. $M$ denotes either the full normal theory model \eqref{fullsim2} or one of the two restricted likelihood versions, along with specified $a_{s}$ and $c$. For the classical robust fits, we set $f_{i}(\tilde y | M, \by_{k}) = N(\tilde y|\hat\theta_{i}, \hat\sigma^{2}_{i})$ as a groupwise plug-in estimator for the predictive distribution. The classical fits are computed separately for each group with no consideration of the hierarchical structure between the groups. The overall mean $\overline{KL}^{(M)}_{{\cdot}{\cdot}} = \frac{1}{90K} \sum_{k = 1}^{K} \sum_{i=1}^{90} KL^{(M)}_{ik}$ is used to compare the models, where smaller means correspond to better fits. Sampling variation is summarized with the standard error between the $K=30$ replicates in the simulation:  $SE(\overline{KL}^{(M)}_{{\cdot} k}) = \sqrt{\frac{1}{K(K-1)}\sum_{k = 1}^{K} (\overline{KL}^{(M)}_{{\cdot} k} - \overline{KL}^{(M)}_{{\cdot}{\cdot}})^{2}}$ where $\overline{KL}^{(M)}_{{\cdot} k} = \frac{1}{90}\sum_{i = 1}^{90} KL^{(M)}_{ik}$.
  
-Figure \ref{kl_sim} displays $\overline{KL}^{(M)}_{{\cdot}{\cdot}}$  with error bars plus/minus one $SE(\overline{KL}^{(M)}_{{\cdot} k})$ for each $a_{s} = 1.25,  5, 10$ and $c = 0.5, 1, 2$. The values of $a_{s}$ and $c$, do not effect the classical robust linear models. The average KL for the normal theory models ranges from $0.22$ to $0.3$ which is much worse than the robust methods and hence is left out of the figure. For $c = 0.5$ and $c = 1$, the results favor the restricted likelihood methods with a slight advantage to the use of Tukey's location estimator over Huber's. This is likely due to the fact that Tukey's estimator essentially trims extreme outliers in the estimation procedure while Huber's estimator discounts them \citep{huber2009}. 
+Figure \ref{kl_sim} displays $\overline{KL}^{(M)}_{{\cdot}{\cdot}}$  with error bars plus/minus one $SE(\overline{KL}^{(M)}_{{\cdot} k})$ for each $a_{s} = 1.25,  5, 10$ and $c = 0.5, 1, 2$. The values of $a_{s}$ and $c$, do not affect the classical robust linear models. The average KL for the normal theory models ranges from $0.22$ to $0.3$ which is much worse than the robust methods and hence is left out of the figure. For $c = 0.5$ and $c = 1$, the results favor the restricted likelihood methods with a slight advantage to the use of Tukey's location estimator over Huber's. This is likely due to the fact that Tukey's estimator essentially trims extreme outliers in the estimation procedure while Huber's estimator discounts them \citep{huber2009}. 
 %{\bf John - check the KL for the normal theory models.  .22 to .3 here.  .31 to .37 in the figure caption. }
 
 The choice of $c = 2$ corresponds to a particularly poor prior distribution.  The prior has substantial mass above $\sigma^{2} = 4$, with prior means for $\sigma^2$ from $8.9$ to $32$ as $a_s$ varies.  Additionally, the tuning parameters chosen for the location and scale estimators result in an upward bias in the estimate of $\sigma^{2}$. This bias depends on $m$ and $p$. For example, for $m = 9$ and $p = .1$, Huber's version converges to roughly $4.8$ as $n$ grows.  The bias is greater for more severe levels of contamination.  The alignment of biases in prior distribution and in likelihood from the summary statistic (when applied to the contaminated data) inflates the estimate of scale.  Not surprisingly, a poor prior distribution whose weakness matches the weakness in the likelihood results in poorer inference.  In this case, poorer than the classical estimators. 
@@ -631,12 +602,6 @@ This simulation shows the potential of the restricted likelihood and conveys som
 \section{Real Data}
 \label{RealData}
 We illustrate our methods with a pair of regression models for data from Nationwide Insurance Company that concern prediction of the performance of insurance agencies.
-
-%%%%%%%%%%%%%%%%%%%%%%%%
-%%NW data
-%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%\subsection{Nationwide Data}
 Nationwide sells many of its insurance policies through agencies which provide direct service to policy holders.  
 The contractual agreements between Nationwide and these agencies vary.  Our interest is the prediction of future performance of agencies where  performance is measured by the total number of households an agency services (`household count').  
 The data are grouped by states with a varying number of agencies by state. Identifiers such as agency/agent names are removed. Likewise, state labels and agency types (identifying the varying contractual agreements) have been made generic to protect the proprietary nature of the data. Additionally, the counts were scaled to have standard deviation one before analysis. 
@@ -698,15 +663,13 @@ $\log(f_{b}(y_{(i)}^b))<\log(f_{b}(y_{(j)}^b))$. All of the methods are then sco
  distribution under the method ``A'' being scored.  In other words, the $[\alpha M]$ observations with the smallest values of $\log(f_{b}(y))$ are 
 removed from the validation sample and all of the methods are scored using only the
 remaining $M - [\alpha M]$ observations. Larger values of $TLM_b(A)$ indicate better predictive performance. This process is advantageous to the base method since the smallest scores from this method are guaranteed to be trimmed.  A method
-that performs poorly when it is the base method is discredited.  %For a complete evaluation, we allow each method
-%to appear as the base method.  For brevity, we present only a selection of results in our subsequent analyses.  
+that performs poorly when it is the base method is discredited.  
 
 \subsubsection{Comparison of predictive performance}
 %Model performance is assessed using the mean and standard deviation of the TLM 
 %across $K = 50$ different splits into training and holdout samples. 
 `Type 1' agencies are of special interest to the company and so the evaluation of the TLM is done on only holdout samples of `Type 1', whereas the training is done on agencies of all types. This is intended to demonstrate the robustness properties of the various methods. 
 Models are fit to four states labelled State 2, 15, 27, and 36, with $n = 222, 40, 117,$ and $46$, representing a range of sample sizes. Fitting is done on $K = 50$ training samples with training sample sizes taken to be $0.25n$ and $0.50n$. Holdout evaluation is done on the remaining (`Type 1') samples. For the data augmentation MCMC step under the restricted likelihood models, the acceptance rates range from  $0.16$ to $0.76$ across the states, repetitions, and two versions of the model. The average $TLM_b(A)$ over the $K = 50$ training/holdout samples for the four states and seven methods are shown in Figure \ref{fig:tlm} where the base model is the Student-t model and $\alpha = 0.3$. Similar results are observed for other base models. The error bars are plus/minus one standard deviation of the average $TLM_b(A)$ over the $K = 50$  training/holdout samples. It is clear that the normal Bayesian model used as the full model (Normal) and the classical ordinary least squares fits (OLS) have poor performance due to the significant amount of outlier contamination in the data. In comparing our restricted methods to their corresponding classical methods, there is small, but consistent improvement across the states and training sample size. For state 2, the largest state with $n = 222$, the restricted and classical robust methods have similar performance especially for larger training sample size. This reflects the diminishing effect of the prior as the sample size grows. Notably, the Student-t model performs poorly in comparison for this state. The predictive distribution explicitly accounts for heavy-tailed values, resulting in poorer predictions of the `good' data (i.e., the Type 1 agencies). Likewise, for State 27, another larger state, the Student-t model is outperformed by our restricted methods.   For the other states (State 15 and 36), the Student-t performs similarly to our restricted methods for smaller training sample size (25\% of the sample). However, the performance is slightly worse for the larger training sample size (50\% of the sample). Intuitively, as more data is available for fitting, more outliers appear and the heavy-tailed model compensates for them by assuming they come from the tails of the model; an assumption which is detrimental for prediction. Comparisons of the models depend on $\alpha$ as seen in Figure \ref{fig:tlmbyAlpha} which shows results for different $\alpha$ for training sample size $0.5n$. For smaller $\alpha$ (in this case $\alpha = 0.1$), many outliers are left untrimmed resulting in lower TLM  for all methods and noticeably larger standard deviation for the classical robust methods and our restricted likelihood. Larger values of $\alpha$ ensure that the predictive performance assessment excludes the majority of outliers. The proportion of $0$ counts in the data is roughly $0.14$, suggesting that $\alpha$ should be at least this large. 
-
 
 
 
@@ -723,7 +686,6 @@ Models are fit to four states labelled State 2, 15, 27, and 36, with $n = 222, 4
 \caption{Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples for several values of the trimming fraction $\alpha$. The training sample size used is $0.5n$.  Larger values of TLM are better.}
 \label{fig:tlmbyAlpha}
 \end{figure}
-
  
 \subsection{Hierarchical regression model}
 \label{hierRegNW}
@@ -784,18 +746,25 @@ It is also interesting to examine the results within each state. Figure \ref{fig
 \end{figure}
 
 
-
 \section{Discussion}
 \label{Conclusions}
 
-This paper discusses the restricted likelihood where posterior inference is conducted by conditioning on a summary statistic rather than the complete data. 
-The framework leads us to blend classical estimation with Bayesian methods.
-Here, we concentrate on outlier-prone settings where natural choices for conditioning statistic are classical robust estimators targeting the mean of the non-outlying data (e.g., M-estimators).  The likelihood conditioned on these estimators is used to move from prior to posterior. The update follows Bayes' Theorem, conditioning on the observed estimators exactly.   Computation is driven by MCMC methods, requiring only a supplement to existing algorithms by adding a Gibbs step to sample from the space of data sets satisfying the observed statistic. This step has additional computation costs driven by  the need to compute the estimator and an orthonormal basis derived from gradients of the estimator at each iteration. The cost of finding the basis can be driven down by an understanding of the geometric space from which the samples are drawn as described in Section~\ref{highDim}. Additionally, we have seen good mixing of the MCMC chains across a wide-variety of examples. 
 
-Outside of outlier-prone settings, we might condition on the results of a set of estimating equations, designed to enforce lexical preferences for those features of the analysis considered most important, yet still producing inferences for secondary aspects of the problem. For example, the computational strategies we devised here allow us to apply the method to inference on quantiles of a regression model by, for example, conditioning on estimates of these quantiles. This leads to questions regarding the choice of summary statistic to apply. For outliers, we have applied some obvious choices (M-estimators, LMS, LTS) which have shown value in classical robust estimation. Properties of such estimators are well known and can be used as a basis for selecting one. In general, great ingenuity has been used to create a wide variety of estimators designed to handle specific manifestations of a misspecified model; where outliers are just a specific case.  The estimators are typically accompanied by asymptotic results on consistency and distribution.  These results can be used as starting point for choosing appropriate statistics in specific settings. In general, we recommend a choice based on the analyst's understanding of the problem, model, reality, deficiencies in the model,  inferences to be made, and the relative importance of various inferences.  
+This paper develops a Bayesian version of restricted likelihood where posterior inference is conducted by conditioning on a summary statistic rather than the complete data.  The framework blends classical estimation with Bayesian methods.  
+%Many routine choices in an analysis react to the gap between reality and the
+%statistical model, where a bit of set-up work improves inferential
+%performance.  Often, these choices can be recast in the framework of
+%restricted likelihood presented here, lending them more formality and facilitating
+%development of theoretical results. 
+%A greater benefit of our framework is that it leads us to blend classical estimation with Bayesian methods. 
+Here, we concentrate on outlier-prone settings where natural choices for the conditioning statistic are classical robust estimators targeting the mean of the non-outlying data (e.g., M-estimators).  The likelihood conditioned on these estimators is used to move from prior to posterior. The update follows Bayes' Theorem, conditioning on the observed estimators exactly.   Computation is driven by MCMC methods, requiring only a supplement to existing algorithms by adding a Gibbs step to sample from the space of data sets satisfying the observed statistic. This step has additional computation costs arising from the need to compute the estimator and an orthonormal basis derived from gradients of the estimator at each iteration. The cost of finding the basis can be reduced by exploiting properties of the geometric space from which the samples are drawn as described in Section~\ref{highDim}. We have seen good mixing of the MCMC chains across a wide-variety of examples. 
+
  
-In general, this framework can be used to address model misspecification, of which the presence of outliers is an example. The traditional view is that, if the model is inadequate, one should build a better model. In our empirical work, as data sets have become larger and more complex, we have bumped into settings where we cannot realistically build the perfect model. We ask the question ``by attempting to improve our model through elaboration, will the overall performance of the model suffer?'' If yes, we avoid the elaboration, retaining a model with some level of misspecification. Acknowledging that the model is misspecified implies acknowledging that the sampling density is incorrect, exactly as we do when outliers are present. In this sense, misspecified models and outliers are reflections of the same phenomenon, and we see the restricted likelihood as a method for dealing with this more general problem. The framework allows us to retain many benefits of Bayesian methods:  it requires a complete model for the data; it lets us combine various sources of information both through the use of a prior distribution and through creation of a hierarchical model; it guarantees admissibility of our decision rules among the class based on the summary statistic $T(\by)$; and it naturally leads us to focus on predictive inference.  The work does open a number of questions for further work, including a need to investigate restricted likelihood methods as they relate to model selection, model averaging for predictive performance, and model diagnostics. 
+The Bayesian restricted likelihood framework can be used to address model misspecification, of which the presence of outliers is but one example. The traditional view is that, if the model is inadequate, one should build a better model. In our empirical work, as data sets have become larger and more complex, we have bumped into settings where we cannot realistically build the perfect model. We ask the question ``by attempting to improve our model through elaboration, will the overall performance of the model suffer?'' If yes, we avoid the elaboration, retaining a model with some level of misspecification. Acknowledging that the model is misspecified implies acknowledging that the sampling density is incorrect, exactly as we do when outliers are present. In this sense, misspecified models and outliers are reflections of the same phenomenon, and we see restricted likelihood as a method for dealing with this more general problem. 
 
+Outside of outlier-prone settings, we might condition on the results of a set of estimating equations designed to enforce a lexical preference for those features of the analysis considered most important, yet still producing inferences for secondary aspects of the problem. This leads to questions regarding the choice of summary statistic to apply. In the literature, great ingenuity has been used to create a wide variety of estimators designed to handle specific manifestations of a misspecified model.  The estimators are typically accompanied by asymptotic results on consistency and limiting distribution.  These results can be used as a starting point to choose appropriate conditioning statistics in specific settings.  For example, a set of regression quantiles may be judged the most important feature of a model.  It would then be natural to condition on the estimated regression quantiles and to use a flexible prior distribution to allow for nonlinearities in the quantiles.  The computational strategies we have devised allow us to apply our methods in this setting and to make full predictive inference.  In general, we recommend a choice of conditioning statistic based on the analyst's understanding of the problem, model, reality, deficiencies in the model,  inferences to be made, and the relative importance of various inferences.  
+
+The framework we develop here allows us to retain many benefits of Bayesian methods:  it requires a complete model for the data; it lets us combine various sources of information both through the use of a prior distribution and through creation of a hierarchical model; it guarantees admissibility of our decision rules among the class based on the summary statistic $T(\by)$; and it naturally leads us to focus on predictive inference.  The work does open a number of questions for further work, including a need to investigate restricted likelihood methods as they relate to model selection, model averaging for predictive performance, and model diagnostics. 
 
 
 
@@ -821,7 +790,7 @@ The mapping $h:  \mathbb{S} \rightarrow \mathcal{A}$ with $h$ defined in Theorem
 \end{theorem}
 \begin{proof} 
 \noindent 
-\textit{one-to-one}: Let $z_{1}, z_{2} \in \mathbb{S}$ with $h(z_{1}) = h(z_{2})$. Rearrangement implies $z_{1} = cz_{2} + Xv$ for known $c\in \mathbb{R}$ and $v\in \mathbb{R}^{p}$ depending on $\bb(X,\by_{obs})$, $s(X,\by_{obs})$, $\bb(X,z_{1})$, $s(X,z_{1})$, $\bb(X,z_{2})$, $s(X,z_{2})$. Given $z_{2}\in \mathbb{S}$, $v\neq 0$ implies $z_{1}\notin \mathcal{C}^{\perp}(X)$ and $c\neq 1$ implies $||z_{1}|| \neq 1$. Thus $z_{1} \in \mathbb{S}$ implies $c=1$ and $v =0$. 
+\textit{One-to-one}: Let $z_{1}, z_{2} \in \mathbb{S}$ with $h(z_{1}) = h(z_{2})$. Rearrangement implies $z_{1} = cz_{2} + Xv$ for known $c\in \mathbb{R}$ and $v\in \mathbb{R}^{p}$ depending on $\bb(X,\by_{obs})$, $s(X,\by_{obs})$, $\bb(X,z_{1})$, $s(X,z_{1})$, $\bb(X,z_{2})$, $s(X,z_{2})$. Given $z_{2}\in \mathbb{S}$, $v\neq 0$ implies $z_{1}\notin \mathcal{C}^{\perp}(X)$ and $c\neq 1$ implies $||z_{1}|| \neq 1$. Thus $z_{1} \in \mathbb{S}$ implies $c=1$ and $v =0$. 
 
 \noindent \textit{Onto:} Let $\by \in \mathcal{A}$ and consider its projection onto $\mathcal{C}^{\perp}(X)$: $Q\by$ where $Q = I - XX^{\top}$. It is easy to show that $\bz^{*} = Q\by/||Q\by|| \in \mathbb{S}$ and $h(\bz^{*}) = \by$.
 \end{proof}
@@ -925,18 +894,22 @@ same as the non-unit singular values of $U^\top B$.
 \end{proof}
 
 \subsection{Setting the hierarchical prior values}
-
+%In setting the priors we use the same previous data set used to set the priors for the non-hierarchical model (Section \ref{regModelNW}) and several heuristic arguments. While the analyses in Section \ref{hierRegNW} set the hyper-parameters using what is described here, the results were not sensitive to these choices.  
 This section describes the how the prior parameters are set in  Section \ref{hierRegNW}. Using the previous data set from two years prior, we fit separate (robust) regressions to each state and a  regression to the entirety of the data at once. Let the estimates for the fits to each state be $\hat{\beta_{1}}, \dots, \hat \beta_{J}, \hat \sigma_{1}, \dots, \hat \sigma_{J}$ and the estimates from the single regression be $\hat \beta$ and $\hat \sigma$. These are classical robust estimates using Tukey's regression and Huber's scale. For this sections, let $n_{j}$ denote the number of observations in the $j^{th}$ state (of the previous data set) and set $n_{p}=\sum n_{j}$. 
 
 First, consider $v_{1}$ and $v_{2}$ in the prior $b\sim\text{beta}(v_{1},v_{2})$.  In the hierarchical model \eqref{eq:hierModel}, $b=0$ implies all the $\beta_{j}'s$ are equal (no variation between states) and $b=1$ implies the $\beta_{j}'s$ vary about $\mu_{0}$ according to $\Sigma_{0}=n_{p}\cdot \mbox{se}(\hat\beta)^{2}$ (see Section \ref{regModelNW}). We seek a prior measure for what we think $b$ should be. Using the prior fit, a measure for  uncertainty for $\beta$ is $\Sigma_{\hat\beta}=\mbox{se}(\hat\beta)^{2}$, the estimate of the variance from the single regression. For the $\beta_{j}'s$, take $\delta_{j}=\hat\beta_{j}-\hat\beta$ and set the prior uncertainty to $\Sigma_{\delta}=n_{p}^{-1}\sum_{j} n_{j}\delta_{j}^{2}$. Consider  $g= \Sigma_{\delta}/\Sigma_{\hat\beta}$ measuring of the amount of uncertainty between the $\beta_{j}'s$ relative to that of $\beta$. Now in the prior, we heuristically set the uncertainty in the $\beta_{j}'s$ ($b\Sigma_{0}$) to be approximately equal to $g\cdot\Sigma_{\hat\beta}$. That is, $b\Sigma_{0}\approx g\cdot\Sigma_{\hat\beta}= \frac{g}{n} \Sigma_{0}$, suggesting $b\approx  \frac{g}{n}$.  Thus, we set $E[b]=\frac{g}{n}$. The precision, $v_{1}+v_{2}$, is set to $10$, completing the specification for the prior on $b$. 
 
 Finally, recall $\rho\sim\text{beta}(a_\rho,b_\rho)$ with mean $\mu_\rho=a_\rho/(a_\rho+b_\rho)$ given a beta prior and precision
 $\psi_\rho=a_\rho+b_\rho$ given a gamma prior. There is little evidence of any strong correlation amongst estimates of $\sigma^{2}_{j}$ in the prior data set and we set the prior mean of $\mu_{\rho}$ equal to $0.2$ and prior variance to $.01$. Noting $\text{var}(\rho|\mu_{\rho}, \psi_{\rho})=\mu_{\rho} (1-\mu_{p})/(\psi_{\rho}+1)$ we plug in $\mu_{\rho} = 0.2$ and $\text{var}(\rho|\mu_{\rho}, \psi_{\rho}) = 0.01$. Solving for $\psi_{\rho}$ results in a value of $15$. This is taken to be the mean of the gamma prior on $\psi_{\rho}$. Finally, we  set the rate parameter for to 1 implying the variance of the gamma prior is equal to its the mean. With this specification, the prior on $\rho$ has 80\% of the central mass between roughly $0.03$ and $0.42$ and reflects our prior belief that there is likely only weak positive correlation amongst the $\sigma^{2}_{j}$'s.
+%%The variance was set to twice the inverse Fisher information evaluated at $\hat\rho_{mle}$
+
+
 
 \bibliographystyle{apa}
 \bibliography{refPaper1}
 
 \end{document}
+
 
 
 
