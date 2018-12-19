@@ -1,12 +1,12 @@
 This is BibTeX, Version 0.99d (TeX Live 2015)
 Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
-The top-level auxiliary file: paper.aux
+The top-level auxiliary file: paper Nov 19.aux
 The style file: bib/ba.bst
 Database file #1: bib/refPaper1.bib
 Warning--empty journal in jung2014
 You've used 44 entries,
             2760 wiz_defined-function locations,
-            866 strings with 11599 characters,
+            867 strings with 11631 characters,
 and the built_in function-call counts, 25513 in all, are:
 = -- 2130
 > -- 957

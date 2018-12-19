@@ -1,9 +1,9 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  7 DEC 2018 10:08
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  19 NOV 2018 04:45
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
-**paper.tex
-(./paper.tex
+**"paper Nov 19.tex"
+(./paper Nov 19.tex
 LaTeX2e <2015/01/01>
 Babel <3.9l> and hyphenation patterns for 79 languages loaded.
 (/usr/local/texlive/2015/texmf-dist/tex/latex/etoolbox/etoolbox.sty
@@ -344,8 +344,9 @@ File: dvipsnam.def 2014/10/14 v3.0j Driver-dependent file (DPC,SPQR)
 \ULC@box=\box36
 Package: ulem 2012/05/18
 \ULdepth=\dimen126
-) (./paper.aux)
-\openout1 = `paper.aux'.
+)
+(./paper Nov 19.aux)
+\openout1 = `"paper Nov 19.aux"'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 183.
 LaTeX Font Info:    ... okay on input line 183.
@@ -388,12 +389,12 @@ LaTeX Info: Redefining \ref on input line 183.
 LaTeX Info: Redefining \pageref on input line 183.
 LaTeX Info: Redefining \nameref on input line 183.
 
-(./paper.out) (./paper.out
+(./paper Nov 19.out) (./paper Nov 19.out
 pdfTeX warning (Object streams): \pdfobjcompresslevel > 0 requires \pdfminorver
 sion > 4. Object streams disabled now.
 )
 \@outlinefile=\write4
-\openout4 = `paper.out'.
+\openout4 = `"paper Nov 19.out"'.
 
  (/usr/local/texlive/2015/texmf-dist/tex/context/base/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
@@ -575,16 +576,25 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1155 \begin{equation}
-                        <./figs/priors_sigma2.png>] [22]
-<figs/kl_sim2_facet_scale.png, id=496, 1806.75pt x 1204.5pt>
+l.1158 \end{equation}
+                      <./figs/priors_sigma2.png>]
+Overfull \hbox (56.29887pt too wide) in paragraph at lines 1158--1160
+\OT1/cmr/m/n/10 mean $\OML/cmm/m/it/10 ^^R[]$ \OT1/cmr/m/n/10 and vari-ance $\O
+ML/cmm/m/it/10 ^^[[]$\OT1/cmr/m/n/10 , eval-u-ated at $[]$. For the Bayesian mo
+d-els $[] = [] \OML/cmm/m/it/10 f\OT1/cmr/m/n/10 ([]\OMS/cmsy/m/n/10 j\OML/cmm/
+m/it/10 ^^R[]; ^^[[]\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 ^^Y\OT1/cmr/m/n/10 (\OML/
+cmm/m/it/10 ^^R[]; ^^[[]\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 M; [][]\OT1/cmr/m/n/
+10 )\OML/cmm/m/it/10 d^^R[]d^^[[]$
+ []
+
+[22] <figs/kl_sim2_facet_scale.png, id=495, 1806.75pt x 1204.5pt>
 File: figs/kl_sim2_facet_scale.png Graphic file (type png)
 
 <use figs/kl_sim2_facet_scale.png>
 Package pdftex.def Info: figs/kl_sim2_facet_scale.png used on input line 1168.
 (pdftex.def)             Requested size: 289.07999pt x 192.70555pt.
 
-<figs/kl_sim2_mnp.png, id=498, 1806.75pt x 1204.5pt>
+<figs/kl_sim2_mnp.png, id=497, 1806.75pt x 1204.5pt>
 File: figs/kl_sim2_mnp.png Graphic file (type png)
 
 <use figs/kl_sim2_mnp.png>
@@ -615,16 +625,20 @@ File: figs/scatter_by_state.png Graphic file (type png)
 <use figs/scatter_by_state.png>
 Package pdftex.def Info: figs/scatter_by_state.png used on input line 1236.
 (pdftex.def)             Requested size: 361.34999pt x 240.89574pt.
- [25]
+
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [26pdfTeX warning (ext4): destination with the same identifier (name{figure.8}
+ [25pdfTeX warning (ext4): destination with the same identifier (name{figure.8}
 ) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1267 
-        <./figs/scatter_by_state.png>] [27]
+l.1248 \end{equation}
+                      <./figs/scatter_by_state.png>]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [26]
+[27]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [28]
@@ -694,9 +708,9 @@ l.1515
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [34]
-[35] [36] [37] (./paper.bbl (./paper.brf)
+[35] [36] [37] (./paper Nov 19.bbl (./paper Nov 19.brf)
 \tf@brf=\write5
-\openout5 = `paper.brf'.
+\openout5 = `"paper Nov 19.brf"'.
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -721,23 +735,23 @@ e.12}) has been already used, duplicate ignored
 l.1671 \end{document}
                       <./figs/hier_ave_tlm_state.png>]
 Package atveryend Info: Empty hook `AfterLastShipout' on input line 1671.
- (./paper.aux)
+ (./paper Nov 19.aux)
 Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1671.
 Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1671.
 
-Package rerunfilecheck Info: File `paper.out' has not changed.
+Package rerunfilecheck Info: File `"paper Nov 19".out' has not changed.
 (rerunfilecheck)             Checksum: FA27F8B1C6C4FB82404441F5C65B8CBE;1427.
-Package rerunfilecheck Info: File `paper.brf' has not changed.
-(rerunfilecheck)             Checksum: 3E3F84DBD291AF70A5F4BBED03A2B871;2525.
+Package rerunfilecheck Info: File `"paper Nov 19".brf' has not changed.
+(rerunfilecheck)             Checksum: 828C456A817638681741C4B5D7B48401;2525.
  ) 
 Here is how much of TeX's memory you used:
  8919 strings out of 493089
- 129442 string characters out of 6134842
- 225398 words of memory out of 5000000
+ 129563 string characters out of 6134842
+ 225119 words of memory out of 5000000
  12082 multiletter control sequences out of 15000+600000
  21637 words of font info for 81 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 32i,17n,34p,2955b,518s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 32i,17n,34p,2956b,518s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb><
 /usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbxsl10.pfb>
@@ -766,7 +780,7 @@ ist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2015/texmf-di
 st/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2015/texmf-dis
 t/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2015/texmf-dist/
 fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on paper.pdf (43 pages, 2251009 bytes).
+Output written on "paper Nov 19.pdf" (43 pages, 2251541 bytes).
 PDF statistics:
  843 PDF objects out of 1000 (max. 8388607)
  163 named destinations out of 1000 (max. 500000)

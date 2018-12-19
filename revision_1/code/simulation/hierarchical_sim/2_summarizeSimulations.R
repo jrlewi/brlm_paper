@@ -2,7 +2,7 @@
 # Summarize the simulations ---
 #
 library('tidyverse')
-New_results <- TRUE
+New_results <- FALSE
 
 
 sims <- 1:30
