@@ -7,12 +7,18 @@ analysisSet <- as_tibble(analysisSet)
 priorDataSet <-  as_tibble(priorDataSet)
 
 analysisSet <- analysisSet %>% 
-  dplyr::select(Agency_Type, Primary_Agency_State, Ending_HH_Count2010, Ending_HH_Count2012)
+  dplyr::select(Agency_Type, Primary_Agency_State, 
+                Ending_HH_Count2010, Ending_HH_Count2012, 
+                Associate_Count,
+                Office_Employee_Count)
 
 
 
 priorDataSet <- priorDataSet %>% 
-  dplyr::select(Agency_Type, Primary_Agency_State, Ending_HH_Count2008, Ending_HH_Count2010)
+  dplyr::select(Agency_Type, Primary_Agency_State, 
+                Ending_HH_Count2008, Ending_HH_Count2010,
+                Associate_Count,
+                Office_Employee_Count)
 
 
 #Change State Level Names -----
@@ -37,7 +43,8 @@ all.equal(names(ind_check1), names(ind_check2))
 (unique(priorDataSet$State))
 
 # Change Agency Type Level Names ----
-types <- unique(c(levels(analysisSet$Agency_Type),levels(priorDataSet$Agency_Type)))
+types <- unique(c(levels(analysisSet$Agency_Type),
+                  levels(priorDataSet$Agency_Type)))
 
 type1 <- which(types == 'CAREER')
 type12 <- which(types == 'PASPORT2')
@@ -93,11 +100,15 @@ priorDataSet %>% ungroup() %>%
 
 
 prior_data <- priorDataSet %>% 
-  dplyr::select(Type, State, Ending_HH_Count2008, Ending_HH_Count2010)
+  dplyr::select(Type, State, Ending_HH_Count2008, Ending_HH_Count2010,
+                Associate_Count,
+                Office_Employee_Count)
 prior_data$Type <- as_factor(as.character(prior_data$Type))
 
 analysis_data <- analysisSet %>% 
-  dplyr::select(Type, State, Ending_HH_Count2010, Ending_HH_Count2012)
+  dplyr::select(Type, State, Ending_HH_Count2010, Ending_HH_Count2012,
+                Associate_Count,
+                Office_Employee_Count)
 analysis_data$Type <- as_factor(as.character(analysis_data$Type))
 
 levels(prior_data$Type)
@@ -109,15 +120,21 @@ order_numeric_levels <- function(x) {
 }
 
 prior_data <- prior_data %>% ungroup() %>% 
-  mutate(Type  = order_numeric_levels(Type), State = order_numeric_levels(State))
+  mutate(Type  = order_numeric_levels(Type), 
+         State = order_numeric_levels(State))
 
 analysis_data <- analysis_data %>% ungroup() %>% 
-  mutate(Type  = order_numeric_levels(Type), State = order_numeric_levels(State))
+  mutate(Type  = order_numeric_levels(Type), 
+         State = order_numeric_levels(State))
 
 # rename some vars ----
-prior_data <- prior_data %>% dplyr::rename(Count_2008 = Ending_HH_Count2008, Count_2010 = Ending_HH_Count2010)
+prior_data <- prior_data %>% 
+  dplyr::rename(Count_2008 = Ending_HH_Count2008, 
+                Count_2010 = Ending_HH_Count2010)
 
-analysis_data <- analysis_data %>% dplyr::rename(Count_2010 = Ending_HH_Count2010, Count_2012 = Ending_HH_Count2012)
+analysis_data <- analysis_data %>% 
+  dplyr::rename(Count_2010 = Ending_HH_Count2010, 
+                Count_2012 = Ending_HH_Count2012)
 
 # Center and Scale -------- 
 
@@ -130,32 +147,53 @@ cs <- function(x){
 Count_2008 <- cs(prior_data$Count_2008)
 Count_2010 <- cs(c(prior_data$Count_2010, analysis_data$Count_2010))
 Count_2012 <- cs(analysis_data$Count_2012)
+Associate_Count <- cs(c(prior_data$Associate_Count, 
+                        analysis_data$Associate_Count))
+Office_Employee_Count <- cs(c(prior_data$Office_Employee_Count, 
+                        analysis_data$Office_Employee_Count))
 
 prior_data2 <- prior_data
 nr_prior <- nrow(prior_data2)
 prior_data2$Count_2008 <- Count_2008
 prior_data2$Count_2010 <- Count_2010[1:nr_prior]
+prior_data2$Associate_Count <- Associate_Count[1:nr_prior]
+prior_data2$Office_Employee_Count <- Office_Employee_Count[1:nr_prior]
 
 analysis_data2 <- analysis_data
 nr_analyses <- nrow(analysis_data2)
-analysis_data2$Count_2010 <- Count_2010[(nr_prior + 1):(nr_prior + nr_analyses)]
+an_ind <- (nr_prior + 1):(nr_prior + nr_analyses)
+
+analysis_data2$Count_2010 <- Count_2010[an_ind]
 analysis_data2$Count_2012 <- Count_2012
+analysis_data2$Associate_Count <- 
+  Associate_Count[an_ind]
+analysis_data2$Office_Employee_Count <- 
+  Office_Employee_Count[an_ind]
+
 
 
 
 plot(prior_data$Count_2008, prior_data2$Count_2008)
 plot(prior_data$Count_2010, prior_data2$Count_2010)
+plot(prior_data$Office_Employee_Count, prior_data2$Office_Employee_Count)
+plot(prior_data$Associate_Count, prior_data2$Associate_Count)
 plot(analysis_data$Count_2010, analysis_data2$Count_2010)
 plot(analysis_data$Count_2012, analysis_data2$Count_2012)
+plot(analysis_data$Office_Employee_Count, analysis_data2$Office_Employee_Count)
+plot(analysis_data$Associate_Count, analysis_data2$Associate_Count)
 
 
-summary(fit1 <- lm(Count_2010 ~ Count_2008, data = prior_data))
-summary(fit2 <- lm(Count_2010 ~ Count_2008, data = prior_data2))
+summary(fit1 <- lm(Count_2010 ~ Count_2008 + Associate_Count +
+                     Office_Employee_Count, data = prior_data))
+summary(fit2 <- lm(Count_2010 ~ Count_2008 + Associate_Count +
+                     Office_Employee_Count, data = prior_data2))
 plot(residuals(fit1))
 plot(residuals(fit2))
 
-summary(fit1 <- lm(Count_2012 ~ Count_2010, data = analysis_data))
-summary(fit2 <- lm(Count_2012 ~ Count_2010, data = analysis_data2))
+summary(fit1 <- lm(Count_2012 ~ Count_2010  + Associate_Count +
+                     Office_Employee_Count, data = analysis_data))
+summary(fit2 <- lm(Count_2012 ~ Count_2010  + Associate_Count +
+                     Office_Employee_Count, data = analysis_data2))
 plot(residuals(fit1))
 plot(residuals(fit2))
 
@@ -166,18 +204,44 @@ theme_set(theme_bw())
 
 #by Agency Type
 #+ xlim(c(0,150)) + ylim(c(0, 130))
-ggplot(prior_data2, aes(x = sqrt(Count_2008), y = sqrt(Count_2010), col = Type)) + geom_point(size = .3) + stat_smooth(method = "rlm", formula = y ~ x -1, col = 1, method.args = list(psi = psi.bisquare, scale.est = 'Huber'), size = .5, lty = 2) + scale_color_discrete(guide_legend(title = 'Agency Type')) 
+ggplot(prior_data2, aes(x = sqrt(Count_2008), 
+                        y = sqrt(Count_2010), col = Type)) + 
+  geom_point(size = .3) + 
+  stat_smooth(method = "rlm", formula = y ~ x -1, col = 1, 
+              method.args = list(psi = psi.bisquare, scale.est = 'Huber'), 
+              size = .5, lty = 2) + 
+              scale_color_discrete(guide_legend(title = 'Agency Type')) 
   
 #+ xlim(c(0,150)) +  ylim(c(0, 130)) 
-ggplot(analysis_data2, aes(x = sqrt(Count_2010), y = sqrt(Count_2012), col = Type)) + geom_point(size = .3)+ stat_smooth(method = "rlm", formula = y ~ x -1, col = 1, method.args = list(psi = psi.bisquare, scale.est = 'Huber'), size = .5, lty = 2) + scale_color_discrete(guide_legend(title = 'Agency Type')) 
+ggplot(analysis_data2, aes(x = sqrt(Count_2010), y = sqrt(Count_2012), 
+                           col = Type)) + 
+              geom_point(size = .3) + 
+              stat_smooth(method = "rlm", formula = y ~ x -1, col = 1, 
+              method.args = list(psi = psi.bisquare, scale.est = 'Huber'), 
+              size = .5, lty = 2) + 
+              scale_color_discrete(guide_legend(title = 'Agency Type')) 
 
 
 
 # by state ---
-ggplot(prior_data, aes(x = sqrt(Count_2008), y = sqrt(Count_2010), col = State)) + geom_point(size = .3) + xlim(c(0,150)) +  ylim(c(0, 130)) + stat_smooth(method = "rlm", formula = y ~ x -1, method.args = list(psi = psi.bisquare, scale.est = 'Huber', maxit = 100), size = .5, lty = 2, se = FALSE) 
+ggplot(prior_data, aes(x = sqrt(Count_2008), y = sqrt(Count_2010), 
+                       col = State)) + 
+  geom_point(size = .3) + 
+  xlim(c(0,150)) +  ylim(c(0, 130)) + 
+  stat_smooth(method = "rlm", formula = y ~ x -1, 
+              method.args = list(psi = psi.bisquare, 
+              scale.est = 'Huber', maxit = 100), 
+              size = .5, lty = 2, se = FALSE) 
 
 
-ggplot(analysis_data, aes(x = sqrt(Count_2010), y = sqrt(Count_2012), col = State)) + geom_point(size = .3) + xlim(c(0,150)) +  ylim(c(0, 130)) + stat_smooth(method = "rlm", formula = y ~ x -1, method.args = list(psi = psi.bisquare, scale.est = 'Huber', maxit = 100), size = .5, lty = 2, se = FALSE)
+ggplot(analysis_data, aes(x = sqrt(Count_2010), y = sqrt(Count_2012), 
+        col = State)) + 
+  geom_point(size = .3) + 
+  xlim(c(0,150)) +  ylim(c(0, 130)) + 
+  stat_smooth(method = "rlm", formula = y ~ x -1, 
+              method.args = list(psi = psi.bisquare, 
+              scale.est = 'Huber', maxit = 100), 
+              size = .5, lty = 2, se = FALSE)
 
 
 
