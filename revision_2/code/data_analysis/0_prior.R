@@ -51,15 +51,20 @@ parms_prior <- list(beta_0 = beta_0, sigma_beta_0 = sigma_beta_0,
 write_rds(parms_prior, "parms_prior.rds")
 
 
-
+droplevels(prior_data$State)
 #hierarchcical regression analysis -----
 by_state <- prior_data %>% 
   group_by(State) %>% 
-  filter(n() >= 40) %>% #use state with plenty of data
-  nest() 
+  filter(n() >= 40) %>% ungroup() %>% #use state with plenty of data
+  mutate(State = droplevels(State)) %>% 
+  group_by(State) %>% 
+  tidyr::nest() 
   
 state_model <- function(df){
-  MASS::rlm(sqrt_count_2010 ~ sqrt_count_2008 - 1, scale.est = 'Huber', data = df, maxit = 100)
+  MASS::rlm(sqrt_count_2010 ~ sqrt_count_2008 - 1 + 
+              Associate_Count +
+              Office_Employee_Count, scale.est = 'Huber', 
+            data = df, maxit = 100)
 }
 
 models <- by_state$data %>% 
@@ -67,13 +72,13 @@ models <- by_state$data %>%
 
 betaHats <-
   models %>% 
-  map(coef) %>%
-  unlist()
+  map(as.data.frame(coef)) 
+
 
 var_betaHats <-
   models %>% 
-  map(.f = function(m) vcov(m)) %>%
-  unlist()
+  map(.f = function(m) vcov(m)) 
+
 
 
 
@@ -85,9 +90,9 @@ sigma2Hats <-
 n_is <- by_state$data %>% 
   map(nrow) %>% unlist()
 
-
-plot(betaHats)
-abline(h = beta_0)
+betahats_1 <- sapply(betaHats, function(a) a[1,1])
+plot(betahats_1)
+abline(h = beta_0[1])
 
 
 
@@ -102,7 +107,6 @@ X <- model.matrix(prior_fit)
 p <- ncol(X)
 
 
-
 nStates <- nrow(by_state)
 
 
@@ -111,11 +115,11 @@ nStates <- nrow(by_state)
 wts <- n_is/sum(n_is)
 p <- nrow(vcov(prior_fit))
 
-delta_is <- sapply(betaHats, FUN=function(x) x - beta_0)
+delta_is <- sapply(betaHats, FUN=function(x) t(x) - beta_0)
 delta_is <- matrix(delta_is, p, nStates)
 dList<-list()
 for(i in 1:ncol(delta_is)){
-  dList[[i]]<-delta_is[,i]%*%t(delta_is[,i])
+  dList[[i]] <- delta_is[,i]%*%t(delta_is[,i])
 }
 
 SigmaDelta<-matrix(rep(0, p*p), p,p)
@@ -126,7 +130,7 @@ for(i in 1:length(dList)){
 SigmaDelta  
 K <-length(n_is)
 
-vcov(prior_fit)
+vcov(prior_fit) 
 
 g <- (det(SigmaDelta)/(det(vcov(prior_fit))))^(1/p)
 swSq <- sum(wts^2)
@@ -233,7 +237,7 @@ quantile(rbeta(1e6, w1,w2), prob = c(.1, .9))
 mean_psi_rho <- (mean_mu_rho*(1-mean_mu_rho))/(var_mu_rho) - 1
 
 a_psir <- mean_psi_rho 
-b_psir<- 1 
+b_psir <- 1 
 
 curve(dgamma(x, a_psir, b_psir), from=0, to=100)
 a_psir/b_psir
@@ -250,10 +254,9 @@ b_rho_samp <- psi_rho_samp - a_rho_samp
 rho_samp <- rbeta(nsamps, a_rho_samp, b_rho_samp)
 hist(rho_samp)
 quantile(rho_samp, probs = c(.1, .9))
-#results in strong correlation amongst the sigmas. 
 
 hier_parms_prior <- list(mu_0 = beta_0,
-                         Sigma_0 = nrow(prior_data)*se_beta_0^2,
+                         Sigma_0 = nrow(prior_data)*sigma_beta_0,
                          sigma2_hat = sigma2_hat,
                          a_0 = a_0, 
                          b_0 = b_0,
