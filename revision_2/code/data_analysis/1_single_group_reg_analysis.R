@@ -15,7 +15,7 @@ states <- c(2, 15, 27, 36)
 ns <- c(25, 50) 
 v_inflate <- c(100)
 
-sims <-1:50
+sims <- 1:50
 reps <-  length(sims)# number of training sets
 
 nburn <- 1e4 #set length of mcmc chains
@@ -25,6 +25,14 @@ nburnt <- 2e4 #for the t-model.
 nu <- 5
 #set seed 
 set.seed(min(sims))
+
+trend_prior <- sqrt_count_2010 ~ sqrt_count_2008 - 1 + 
+  Associate_Count +
+  Office_Employee_Count
+
+trend <- sqrt_count_2012 ~ sqrt_count_2010 - 1 + 
+  Associate_Count +
+  Office_Employee_Count
 
 for(State_keep in states){
   
@@ -41,10 +49,7 @@ prior_data <- prior_data %>%
 # ggplot(prior_data) + geom_point(aes(x = sqrt_count_2008, y = sqrt_count_2010)) + xlim(c(0,100)) +ylim(c(0,100))
 
 # pooled regression analysis ----
-prior_fit <- MASS::rlm(sqrt_count_2010 ~ 
-                         sqrt_count_2008 - 1 +
-                         Associate_Count +
-                         Office_Employee_Count, 
+prior_fit <- MASS::rlm(trend_prior, 
                         scale.est = 'Huber', 
                         data =  prior_data, maxit = 100)
 
@@ -69,7 +74,7 @@ p <- length(coef(prior_fit))
 
 for(n_percent in ns){ # percent to use as training set. 
   
-  converge_matrix <- array(NA, c(4, 2, length(v_inflate), length(sims))) 
+  converge_matrix <- array(NA, c(4, p + 1, length(v_inflate), length(sims))) 
   
   n <- floor(n_percent*N/100)
   # Set storing objects -----
@@ -158,19 +163,15 @@ for(n_percent in ns){ # percent to use as training set.
       
       #get model matrix from holdoutset
       #fit1 is on the holdoutset
-      fit1 <- lm(sqrt_count_2012 ~ sqrt_count_2010 - 1 +
-                   Associate_Count +
-                   Office_Employee_Count,
+      fit1 <- lm(trend,
                    data = hold)
       Xholdout <- model.matrix(fit1)
       
       
       #rlm on training:Tukey -----
-      rlmfit <- rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1 + 
-                      Associate_Count +
-                      Office_Employee_Count, 
+      rlmfit <- rlm(trend, 
                       psi=psi.bisquare, 
-                      scale.est='Huber',data = train, maxit=1000)
+                      scale.est='Huber',data = train, maxit = 1000)
       X <- model.matrix(rlmfit) #model matrix for all regressions
       # p <- ncol(X) #number of regression coefs
       sigma2Int <- rlmfit$s^2 #to start mcmc
@@ -182,7 +183,9 @@ for(n_percent in ns){ # percent to use as training set.
      
       
       #rlm on training: Huber ----
-      rlmfitHuber <- rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, psi=psi.huber, scale.est='Huber',data = train, maxit=1000)
+      rlmfitHuber <- rlm(trend, psi=psi.huber, 
+                         scale.est='Huber',
+                         data = train, maxit=1000)
       
       rlmEstimatesHuber[,i]<-c(coef(rlmfitHuber),rlmfitHuber$s^2)
       rlmPredsHuber<-Xholdout%*%coef(rlmfitHuber)
@@ -191,7 +194,7 @@ for(n_percent in ns){ # percent to use as training set.
       
       
       #ols on training ----
-      olsFit <- lm(sqrt_count_2012 ~ sqrt_count_2010 - 1,data=train)
+      olsFit <- lm(trend, data=train)
       olsEstimates[,i] <- c(coef(olsFit),summary(olsFit)$sigma^2)
       olsPreds <- Xholdout%*%coef(olsFit)
       olsPredMat[i,] <- olsPreds
@@ -203,9 +206,9 @@ for(beta_var_inflate in v_inflate){
 v_ind <- which(beta_var_inflate == v_inflate)   
         #summary(prior_fit)
         beta_0 <- coef(prior_fit)
-        se_beta_0 <- vcov(prior_fit)^.5
+        sigma_beta_0 <- vcov(prior_fit)
         var_scalar <- floor(nrow(prior_data)*beta_var_inflate/100)
-        var_beta_0 <- var_scalar*se_beta_0^2 
+        var_beta_0 <- var_scalar*sigma_beta_0
         sigma2_hat <- prior_fit$s^2
         
         a_0 <- 5
