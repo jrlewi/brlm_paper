@@ -9,11 +9,11 @@ prior_data <- prior_data %>%
   mutate(sqrt_count_2008 = sqrt(Count_2008), 
          sqrt_count_2010 = sqrt(Count_2010))  %>% filter(Type == 1)
 
-
+trend <- sqrt_count_2010 ~ sqrt_count_2008 - 1 + 
+  Associate_Count +
+  Office_Employee_Count
 # pooled regression analysis ----
-prior_fit <- MASS::rlm(sqrt_count_2010 ~ sqrt_count_2008 - 1 + 
-                         Associate_Count +
-                         Office_Employee_Count, 
+prior_fit <- MASS::rlm(trend, 
                        scale.est = 'Huber', data =  prior_data)
 
 
@@ -47,7 +47,8 @@ curve(dinvgamma(x, a_0,b_0), from=0, to=.01)
 parms_prior <- list(beta_0 = beta_0, sigma_beta_0 = sigma_beta_0, 
                     sigma2_hat = sigma2_hat, 
                     a_0 = a_0, b_0 = b_0, 
-                    beta_var_inflate = beta_var_inflate )
+                    beta_var_inflate = beta_var_inflate,
+                    trend = trend)
 write_rds(parms_prior, "parms_prior.rds")
 
 
@@ -61,9 +62,7 @@ by_state <- prior_data %>%
   tidyr::nest() 
   
 state_model <- function(df){
-  MASS::rlm(sqrt_count_2010 ~ sqrt_count_2008 - 1 + 
-              Associate_Count +
-              Office_Employee_Count, scale.est = 'Huber', 
+  MASS::rlm(trend, scale.est = 'Huber', 
             data = df, maxit = 100)
 }
 
@@ -267,6 +266,7 @@ hier_parms_prior <- list(mu_0 = beta_0,
                          a_psir = a_psir,
                          b_psir = b_psir,
                          beta_var_inflate = nrow(prior_data), #beta_var_inflate,
-                         prior_fit = prior_fit)
+                         prior_fit = prior_fit,
+                         trend = trend)
 write_rds(hier_parms_prior, "hier_parms_prior.rds")
 

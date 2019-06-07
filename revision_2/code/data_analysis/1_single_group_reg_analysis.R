@@ -29,32 +29,40 @@ set.seed(min(sims))
 for(State_keep in states){
   
 #prior -----
-prior_data <- read_rds(file.path(here::here(), 'data', 'prior_data.rds'))
+prior_data <- read_rds(file.path(here::here(), 'data', 
+                                 'prior_data.rds'))
 # cnts <- prior_data %>%  group_by(State) %>% summarize(n = n())
 # View(cnts)
 prior_data <- prior_data %>% 
-  mutate(sqrt_count_2008 = sqrt(Count_2008), sqrt_count_2010 = sqrt(Count_2010))  %>% filter(State == State_keep, Type == 1, Count_2010 > 0)
+  mutate(sqrt_count_2008 = sqrt(Count_2008), 
+         sqrt_count_2010 = sqrt(Count_2010))  %>% 
+    filter(State == State_keep, Type == 1, Count_2010 > 0)
 
 # ggplot(prior_data) + geom_point(aes(x = sqrt_count_2008, y = sqrt_count_2010)) + xlim(c(0,100)) +ylim(c(0,100))
 
 # pooled regression analysis ----
-prior_fit <- MASS::rlm(sqrt_count_2010 ~ sqrt_count_2008 - 1 , scale.est = 'Huber', data =  prior_data, maxit = 100)
+prior_fit <- MASS::rlm(sqrt_count_2010 ~ 
+                         sqrt_count_2008 - 1 +
+                         Associate_Count +
+                         Office_Employee_Count, 
+                        scale.est = 'Huber', 
+                        data =  prior_data, maxit = 100)
 
 # theme_set(theme_bw(base_family = 'Times'))
 # ggplot(prior_data, aes(x = sqrt_count_2008, y = sqrt_count_2010)) + geom_point(size = 1) + stat_smooth(method = "rlm", formula = y ~ x - 1, method.args = list(scale.est = 'Huber', maxit = 100), size = .5, lty = 2, se = FALSE, col = 1) + guides(col = guide_legend(title = 'Agency Type'))
 
 #load analysis data -------
 
-analysis_data <- read_rds(file.path(here::here(), 'data', 'analysis_data.rds'))
+analysis_data <- read_rds(file.path(here::here(), 
+                                    'data', 'analysis_data.rds'))
 # cnts <- analysis_data %>%  group_by(State) %>% summarize(n = n()) 
 # 
 # View(cnts)
 
 analysis_data <- analysis_data %>% 
-  mutate(sqrt_count_2010 = sqrt(Count_2010), sqrt_count_2012 = sqrt(Count_2012)) %>% filter(State == State_keep)
-
-#ggplot(analysis_data) + geom_point(aes(x = sqrt_count_2010, y = sqrt_count_2012))
-#MASS::rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1 , scale.est = 'Huber', data =  analysis_data, maxit = 100)
+  mutate(sqrt_count_2010 = sqrt(Count_2010), 
+         sqrt_count_2012 = sqrt(Count_2012)) %>% 
+         filter(State == State_keep)
 
 N <- nrow(analysis_data)
 p <- length(coef(prior_fit))
@@ -150,12 +158,19 @@ for(n_percent in ns){ # percent to use as training set.
       
       #get model matrix from holdoutset
       #fit1 is on the holdoutset
-      fit1 <- lm(sqrt_count_2012 ~ sqrt_count_2010 - 1,data = hold)
+      fit1 <- lm(sqrt_count_2012 ~ sqrt_count_2010 - 1 +
+                   Associate_Count +
+                   Office_Employee_Count,
+                   data = hold)
       Xholdout <- model.matrix(fit1)
       
       
       #rlm on training:Tukey -----
-      rlmfit <- rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, psi=psi.bisquare, scale.est='Huber',data = train, maxit=1000)
+      rlmfit <- rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1 + 
+                      Associate_Count +
+                      Office_Employee_Count, 
+                      psi=psi.bisquare, 
+                      scale.est='Huber',data = train, maxit=1000)
       X <- model.matrix(rlmfit) #model matrix for all regressions
       # p <- ncol(X) #number of regression coefs
       sigma2Int <- rlmfit$s^2 #to start mcmc
