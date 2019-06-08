@@ -88,6 +88,11 @@ analysis_data <- analysis_data %>%
   mutate(State = factor(State)) %>% #filter(!State %in% c(14, 30)) %>% 
   arrange(State)
 
+analysis_data <- analysis_data %>% 
+  filter(!State %in% c('14', '30')) %>% 
+  mutate(State = droplevels(State))
+
+
 #defined globally.
 nGroups <- length(unique(analysis_data$State))
 
@@ -109,9 +114,13 @@ a_psir <- parms_prior$a_psir
 b_psir <- parms_prior$b_psir
 
 
+trend <- sqrt_count_2012 ~ sqrt_count_2010 - 1 + 
+  Associate_Count +
+  Office_Employee_Count
+
 nu <- 5 #df for t-model
 ns <- floor(nrow(analysis_data)*.5)  #c(1000, 2000) #sample size for training set
-reps <- 50 # number of training sets
+reps <- 2 #50 # number of training sets
 
 nburn <- 1e4 #set length of mcmc chains
 nkeep <- 1e4
@@ -187,7 +196,7 @@ acceptY <- array(NA, c(2, nGroups, reps)) #acceptance rates for augmented y's in
 # convergence diagnostics ----
 group_converge <- array(NA, c(nModels, p+1, nGroups, reps))
 #order: Beta, bstar, mu_rho, psi_rho, rho
-converge <- array(NA, c(nModels, 5, reps))
+converge <- array(NA, c(nModels, p + 4, reps))
 
 
 #auxilary functions and constants ---- 
@@ -201,8 +210,12 @@ converge <- array(NA, c(nModels, 5, reps))
 # simulation -----
  strt <- Sys.time()
     for(i in 1:reps){
-
-    strat_sample <- sampling::strata(analysis_data, "State", strata_sizes, method = c('srswor'))
+    resample <- TRUE
+    
+    while(resample){  
+    strat_sample <- sampling::strata(analysis_data, "State", 
+                                     strata_sizes, 
+                                     method = c('srswor'))
       
       holdIndices <- c(1:N)[-strat_sample$ID_unit]
       holdIndicesMatrix[i,] <- holdIndices
@@ -213,6 +226,17 @@ converge <- array(NA, c(nModels, 5, reps))
       yholdout <- hold$sqrt_count_2012
       y_hold[i,] <- yholdout
   
+      #make sure sample has at least 2 unique values
+      #for additional variables so regressions can be fit
+      chk <- hold %>% 
+        group_by(State) %>% 
+        summarise(sd_1  = sd(Associate_Count), 
+                  sd_2 = sd(Office_Employee_Count)) %>% 
+        select(-State)
+     any_0_sd <- map(chk,.f = function(s) any(s == 0)) %>% unlist() %>% 
+       any()
+     if(!any_0_sd){resample <- FALSE}
+    }
       
       #type 1, open agencies to predict in holdout set
       open <- hold$Count_2012 > 0 
@@ -233,7 +257,7 @@ converge <- array(NA, c(nModels, 5, reps))
         nest() 
       nis <- apply(by_state,1, function(dd) dd$data %>% nrow())
       state_lm <- function(df){
-        lm(sqrt_count_2012 ~ sqrt_count_2010 - 1, y = TRUE, x = TRUE, data = df)
+        lm(trend, y = TRUE, x = TRUE, data = df)
       }
       
       models_lm <- by_state$data %>% 
@@ -247,8 +271,10 @@ converge <- array(NA, c(nModels, 5, reps))
         map(.f = function(m) m$x)
       
       betaHats <- models_lm %>% 
-        map(.f = function(m) coef(m)) %>% 
-        unlist()
+        map(.f = function(m) as.data.frame(coef(m))) %>% 
+        bind_cols() %>% 
+        as.matrix()
+      
       group_estimates[ols_ind, 1:p, , i] <- betaHats
     
       sigHats <- models_lm %>% 
@@ -310,7 +336,8 @@ marginals[ols_ind, i, ] <- olsMarginals %>% unlist()
     
   #RLM Tukey on training -----
       state_rlm <- function(df){
-        rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, psi=psi.bisquare, scale.est='Huber', data = df, maxit=1000)
+        rlm(trend, psi=psi.bisquare, scale.est='Huber', 
+            data = df, maxit=1000)
       }
       
       models_rlm <- by_state$data %>% 
@@ -318,8 +345,9 @@ marginals[ols_ind, i, ] <- olsMarginals %>% unlist()
       names(models_rlm) <- by_state$State
       
       betaHats <- models_rlm %>% 
-        map(.f = function(m) coef(m)) %>% 
-        unlist()
+        map(.f = function(m) as.data.frame(coef(m))) %>% 
+        bind_cols() %>% 
+        as.matrix()
       group_estimates[rlm_ind, 1:p, , i] <- betaHats
       
       sigHats <- models_rlm %>% 
@@ -350,7 +378,8 @@ marginals[ols_ind, i, ] <- olsMarginals %>% unlist()
     #rlm on training: Huber ----
       
       state_rlm <- function(df){
-        rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, psi=psi.huber, scale.est='Huber', data = df, maxit=1000)
+        rlm(trend, psi=psi.huber, 
+            scale.est='Huber', data = df, maxit=1000)
       }
       
       models_rlm <- by_state$data %>% 
@@ -358,8 +387,9 @@ marginals[ols_ind, i, ] <- olsMarginals %>% unlist()
       names(models_rlm) <- by_state$State
       
       betaHats <- models_rlm %>% 
-        map(.f = function(m) coef(m)) %>% 
-        unlist()
+        map(.f = function(m) as.data.frame(coef(m))) %>% 
+        bind_cols() %>% 
+        as.matrix()
       group_estimates[rlm_huber_ind, 1:p, , i] <- betaHats
       
       sigHats <- models_rlm %>% 
@@ -427,15 +457,22 @@ swSq <- 1
                                         rho_step,
                                         step_Z)
       #betal
-      betal <- array(NA, c(p,nkeep, nGroups))
-      betal[p,,] <- t(nTheory$betal) #format expected for marginals computation
+      #betal <- array(NA, c(p,nkeep, nGroups))
+      betal <- aperm(nTheory$betal, c(1,3,2)) #format expected for marginals computation
       postMeansBetal <- apply(betal,c(1,3) , mean)
       group_estimates[norm_ind, 1:p,,i]  <- postMeansBetal
       
-      postSDsBetal <- apply(nTheory$betal,c(1) , sd)
+      postSDsBetal <- apply(betal,c(1,3) , sd)
       group_estimates_sds[norm_ind, 1:p,,i]  <- postSDsBetal
       
-      group_converge[norm_ind, 1:p, ,i] <- abs(geweke.diag(mcmc(t(nTheory$betal)))$z)
+    
+      
+      mcmc_format <- 
+        lapply(seq(dim(betal)[3]), function(x) betal[ , , x]) 
+      mcmc_format <- do.call(rbind, mcmc_format) %>% t() %>% 
+        mcmc()
+      group_converge[norm_ind, 1:p, ,i] <- 
+        abs(geweke.diag(mcmc_format)$z)
       
       #sigma2s
       postMeansSigma2s <- colMeans(nTheory$sigma2s)
@@ -444,37 +481,46 @@ swSq <- 1
       postSDsSigma2s <- apply(nTheory$sigma2s,2,sd)
       group_estimates_sds[norm_ind, p+1,,i] <- postSDsSigma2s
       
-      group_converge[norm_ind, p+1, ,i] <- abs(geweke.diag(mcmc(nTheory$sigma2s))$z)
+      group_converge[norm_ind, p+1, ,i] <- 
+        abs(geweke.diag(mcmc(nTheory$sigma2s))$z)
       
       
       #Beta
-      postMeansBETA <- mean(nTheory$Beta) #colMeans(nTheory$Beta)
+      postMeansBETA <- colMeans(nTheory$Beta)
       estimates[norm_ind, 1:p, i] <-  postMeansBETA
       
-      postSDsBeta <- sd(nTheory$Beta) #apply(nTheory$Beta,2 , sd)
+      postSDsBeta <- apply(nTheory$Beta,2 , sd)
       estimates_sd[norm_ind, 1:p, i] <- postSDsBeta  
       
-      converge[norm_ind, 1, i] <- abs(geweke.diag(mcmc(nTheory$Beta))$z)
+      converge[norm_ind, 1:p, i] <- 
+        abs(geweke.diag(mcmc(nTheory$Beta))$z)
       
      
       #bstar converge
-      converge[norm_ind, 2, i] <- abs(geweke.diag(mcmc(nTheory$bstar))$z)
+      converge[norm_ind, p+1, i] <- 
+        abs(geweke.diag(mcmc(nTheory$bstar))$z)
       #mu_rho converge
-      converge[norm_ind, 3, i] <- abs(geweke.diag(mcmc(nTheory$mu_rho))$z)
+      converge[norm_ind, p+2, i] <- 
+        abs(geweke.diag(mcmc(nTheory$mu_rho))$z)
       #psi_rho_converge 
-      converge[norm_ind, 4, i] <- abs(geweke.diag(mcmc(nTheory$psi_rho))$z)
+      converge[norm_ind, p+3, i] <- 
+        abs(geweke.diag(mcmc(nTheory$psi_rho))$z)
       #rho_converge
-      converge[norm_ind, 5, i] <- abs(geweke.diag(mcmc(nTheory$rho))$z)
+      converge[norm_ind, p + 4, i] <- 
+        abs(geweke.diag(mcmc(nTheory$rho))$z)
       
 #predictions on holdout set
-      postMeansBetalList <- split(postMeansBetal, rep(1:ncol(postMeansBetal), each = nrow(postMeansBetal)))
+      postMeansBetalList <- 
+        split(postMeansBetal, rep(1:ncol(postMeansBetal), 
+                                  each = nrow(postMeansBetal)))
       # sigs <- split(postMeansSigma2s^.5, rep(1:length(postMeansSigma2s), each = 1))
       nTheoryPreds <- mapply(fits, postMeansBetalList,Xhold)
       predictions[norm_ind, i, ] <- nTheoryPreds %>% unlist()
  
   
 #computing marginal likelihoods for each element in holdout sample
-nTheory_marg_mn_sd <- fn.compute.marginals.hierModelNormal(betal, nTheory$sigma2s, yhold,Xhold)
+nTheory_marg_mn_sd <- fn.compute.marginals.hierModelNormal(betal, 
+                        nTheory$sigma2s, yhold,Xhold)
 nTheory_marg <- lapply(nTheory_marg_mn_sd, function(x) x[,1])
 marginals[norm_ind, i,] <- nTheory_marg %>% unlist() 
 nTheory_marg_sd <- lapply(nTheory_marg_mn_sd, function(x) x[,2])
@@ -518,16 +564,24 @@ if(any(is.na(step_Z))){
                                         step_Z)
 
 #betal
-betal <- array(NA, c(p,nkeep, nGroups))
-betal[p,,] <- t(restricted$betal) #get in format expected for marginals computation
+#betal <- array(NA, c(p,nkeep, nGroups))
+# betal[p,,] <- t(restricted$betal) #get in format expected for marginals computation
 
+      betal <- aperm(restricted$betal, c(1,3,2)) #format expected for marginals computation
+      
+      
+      mcmc_format <- 
+        lapply(seq(dim(betal)[3]), function(x) betal[ , , x]) 
+      mcmc_format <- do.call(rbind, mcmc_format) %>% t() %>% 
+        mcmc()
+      group_converge[rest_ind, 1:p, ,i] <- 
+        abs(geweke.diag(mcmc_format)$z)
+      
+      
 postMeansBetal <- apply(betal,c(1,3) , mean)
 group_estimates[rest_ind, 1:p,,i] <-postMeansBetal
 postSDsBetal<-apply(betal,c(1,3) , sd)
 group_estimates_sds[rest_ind, 1:p,,i] <- postSDsBetal
-
-diagnostic_betal <- geweke.diag(mcmc(t(restricted$betal)))
-group_converge[rest_ind, 1:p,,i] <- abs(diagnostic_betal$z)
 
 #sigma2s
 postMeansSigma2s <- colMeans(restricted$sigma2s)
@@ -536,37 +590,41 @@ group_estimates[rest_ind, p+1,,i] <- postMeansSigma2s
 postSDsSigma2s<-apply(restricted$sigma2s,2,sd)
 group_estimates_sds[rest_ind, p+1,,i] <- postSDsSigma2s
 
-group_converge[rest_ind, p+1, ,i] <- abs(geweke.diag(mcmc(restricted$sigma2s))$z)
+group_converge[rest_ind, p+1, ,i] <- 
+  abs(geweke.diag(mcmc(restricted$sigma2s))$z)
 
 #Beta
-postMeansBETA <- mean(restricted$Beta) #colMeans(restricted$Beta)
+postMeansBETA <- colMeans(restricted$Beta)
 estimates[rest_ind, 1:p, i] <-  postMeansBETA 
 
-postSDsBeta <- sd(restricted$Beta) #apply(restricted$Beta,2 , sd)
+postSDsBeta <- apply(restricted$Beta,2 , sd)
 estimates_sd[rest_ind, 1:p, i] <- postSDsBeta
 
-converge[rest_ind, 1, i] <- abs(geweke.diag(mcmc(restricted$Beta))$z)
+converge[rest_ind, 1:p, i] <- abs(geweke.diag(mcmc(restricted$Beta))$z)
 
 #bstar converge
-converge[rest_ind, 2, i] <- abs(geweke.diag(mcmc(restricted$bstar))$z)
+converge[rest_ind, p + 1, i] <- abs(geweke.diag(mcmc(restricted$bstar))$z)
 #mu_rho converge
-converge[rest_ind, 3, i] <- abs(geweke.diag(mcmc(restricted$mu_rho))$z)
+converge[rest_ind, p + 2, i] <- abs(geweke.diag(mcmc(restricted$mu_rho))$z)
 #psi_rho_converge 
-converge[rest_ind, 4, i] <- abs(geweke.diag(mcmc(restricted$psi_rho))$z)
+converge[rest_ind, p + 3, i] <- abs(geweke.diag(mcmc(restricted$psi_rho))$z)
 #rho_converge
-converge[rest_ind, 5, i] <- abs(geweke.diag(mcmc(restricted$rho))$z)
+converge[rest_ind, p + 4, i] <- abs(geweke.diag(mcmc(restricted$rho))$z)
 
 #Acceptance rates for new y's
-acceptY[1,,i] <- restricted$yAccept #just the column means
+acceptY[1,,i] <- restricted$yAccept 
 
 #predictionss on holdout set
-postMeansBetalList <- split(postMeansBetal, rep(1:ncol(postMeansBetal), each = nrow(postMeansBetal)))
+postMeansBetalList <- split(postMeansBetal, 
+                        rep(1:ncol(postMeansBetal), 
+                            each = nrow(postMeansBetal)))
 restrictedPreds <- mapply(fits, postMeansBetalList,Xhold)
 
 predictions[rest_ind, i, ] <- restrictedPreds %>% unlist()
 
 #computing marginal likelihoods for each element in holdout sample
-rest_marg_mn_sd <- fn.compute.marginals.hierModelNormal(betal, restricted$sigma2s, yhold,Xhold)
+rest_marg_mn_sd <- 
+  fn.compute.marginals.hierModelNormal(betal, restricted$sigma2s, yhold,Xhold)
 rest_marg <- lapply(rest_marg_mn_sd, function(x) x[,1])
 marginals[rest_ind, i,] <- rest_marg %>% unlist() 
 rest_marg_sd <- lapply(rest_marg_mn_sd, function(x) x[,2])
@@ -617,16 +675,20 @@ if(any(is.na(step_Z))){
                                                rho_step,
                                                step_Z)
 #betal
-betal <- array(NA, c(p,nkeep, nGroups))
-betal[p,,] <- t(restricted_huber$betal) #get in format expected for marginals computation
-
+      betal <- aperm(restricted_huber$betal, c(1,3,2)) #format expected for marginals computation
+      
+      
+      mcmc_format <- 
+        lapply(seq(dim(betal)[3]), function(x) betal[ , , x]) 
+      mcmc_format <- do.call(rbind, mcmc_format) %>% t() %>% 
+        mcmc()
+      group_converge[rest_hub_ind, 1:p, ,i] <- 
+        abs(geweke.diag(mcmc_format)$z)
+      
 postMeansBetal <- apply(betal,c(1,3) , mean)
 group_estimates[rest_hub_ind, 1:p,,i] <-postMeansBetal
 postSDsBetal<-apply(betal,c(1,3) , sd)
 group_estimates_sds[rest_hub_ind, 1:p,,i] <- postSDsBetal
-
-diagnostic_betal <- geweke.diag(mcmc(t(restricted_huber$betal)))
-group_converge[rest_hub_ind, 1:p,,i] <- abs(diagnostic_betal$z)
 
 #sigma2s
 postMeansSigma2s <- colMeans(restricted_huber$sigma2s)
@@ -635,28 +697,29 @@ group_estimates[rest_hub_ind, p+1,,i] <- postMeansSigma2s
 postSDsSigma2s<-apply(restricted_huber$sigma2s,2,sd)
 group_estimates_sds[rest_hub_ind, p+1,,i] <- postSDsSigma2s
 
-group_converge[rest_hub_ind, p+1, ,i] <- abs(geweke.diag(mcmc(restricted_huber$sigma2s))$z)
+group_converge[rest_hub_ind, p+1, ,i] <- 
+  abs(geweke.diag(mcmc(restricted_huber$sigma2s))$z)
 
 #Beta
-postMeansBETA <- mean(restricted_huber$Beta) #colMeans(restricted_huber$Beta)
+postMeansBETA <- colMeans(restricted_huber$Beta)
 estimates[rest_hub_ind, 1:p, i] <-  postMeansBETA 
 
-postSDsBeta <- sd(restricted_huber$Beta) #apply(restricted_huber$Beta,2 , sd)
+postSDsBeta <- apply(restricted_huber$Beta,2 , sd)
 estimates_sd[rest_hub_ind, 1:p, i] <- postSDsBeta
 
-converge[rest_hub_ind, 1, i] <- abs(geweke.diag(mcmc(restricted_huber$Beta))$z)
+converge[rest_hub_ind, 1:p, i] <- abs(geweke.diag(mcmc(restricted_huber$Beta))$z)
 
 #bstar converge
-converge[rest_hub_ind, 2, i] <- abs(geweke.diag(mcmc(restricted_huber$bstar))$z)
+converge[rest_hub_ind, p + 1, i] <- abs(geweke.diag(mcmc(restricted_huber$bstar))$z)
 #mu_rho converge
-converge[rest_hub_ind, 3, i] <- abs(geweke.diag(mcmc(restricted_huber$mu_rho))$z)
+converge[rest_hub_ind, p + 2, i] <- abs(geweke.diag(mcmc(restricted_huber$mu_rho))$z)
 #psi_rho_converge 
-converge[rest_hub_ind, 4, i] <- abs(geweke.diag(mcmc(restricted_huber$psi_rho))$z)
+converge[rest_hub_ind, p + 3, i] <- abs(geweke.diag(mcmc(restricted_huber$psi_rho))$z)
 #rho_converge
-converge[rest_hub_ind, 5, i] <- abs(geweke.diag(mcmc(restricted_huber$rho))$z)
+converge[rest_hub_ind, p + 4, i] <- abs(geweke.diag(mcmc(restricted_huber$rho))$z)
 
 #Acceptance rates for new y's
-acceptY[2,,i] <- restricted_huber$yAccept #just the column means
+acceptY[2,,i] <- restricted_huber$yAccept 
 
 #predictionss on holdout set
 postMeansBetalList <- split(postMeansBetal, rep(1:ncol(postMeansBetal), each = nrow(postMeansBetal)))
@@ -705,16 +768,20 @@ marginals_sd[rest_hub_ind, i,] <- rest_marg_sd %>% unlist()
                             step_Z)
   
 #betal
-betal <- array(NA, c(p,nkeep, nGroups))
-betal[p,,] <- t(tModel$betal) #get in format expected for marginals computation
+betal <- aperm( tModel$betal, c(1,3,2)) #format expected for marginals computation
+
+  mcmc_format <- 
+    lapply(seq(dim(betal)[3]), function(x) betal[ , , x]) 
+  mcmc_format <- do.call(rbind, mcmc_format) %>% t() %>% 
+      mcmc()
+  group_converge[t_ind, 1:p, ,i] <- 
+  abs(geweke.diag(mcmc_format)$z)
 
 postMeansBetal <- apply(betal,c(1,3) , mean)
 group_estimates[t_ind, 1:p,,i] <- postMeansBetal
 postSDsBetal <- apply(betal,c(1,3) , sd)
 group_estimates_sds[t_ind, 1:p,,i] <- postSDsBetal
 
-diagnostic_betal <- geweke.diag(mcmc(t(tModel$betal)))
-group_converge[t_ind, 1:p,,i] <- abs(diagnostic_betal$z)
 
 
 #sigma2s
@@ -729,25 +796,26 @@ group_converge[t_ind, p+1, ,i] <- abs(geweke.diag(mcmc(tModel$sigma2s))$z)
 
 
 #Beta
-postMeansBETA <- mean(tModel$Beta) #colMeans(tModel$Beta)
+postMeansBETA <- colMeans(tModel$Beta)
 estimates[t_ind, 1:p, i] <-  postMeansBETA 
 
-postSDsBeta <- sd(tModel$Beta) #apply(tModel$Beta,2 , sd)
+postSDsBeta <- apply(tModel$Beta,2 , sd)
 estimates_sd[t_ind, 1:p, i] <- postSDsBeta
 
-converge[t_ind, 1, i] <- abs(geweke.diag(mcmc(tModel$Beta))$z)
+converge[t_ind, 1:p, i] <- abs(geweke.diag(mcmc(tModel$Beta))$z)
 
 #bstar converge
-converge[t_ind, 2, i] <- abs(geweke.diag(mcmc(tModel$bstar))$z)
+converge[t_ind, p + 1, i] <- abs(geweke.diag(mcmc(tModel$bstar))$z)
 #mu_rho converge
-converge[t_ind, 3, i] <- abs(geweke.diag(mcmc(tModel$mu_rho))$z)
+converge[t_ind, p + 2, i] <- abs(geweke.diag(mcmc(tModel$mu_rho))$z)
 #psi_rho_converge 
-converge[t_ind, 4, i] <- abs(geweke.diag(mcmc(tModel$psi_rho))$z)
+converge[t_ind, p + 3, i] <- abs(geweke.diag(mcmc(tModel$psi_rho))$z)
 #rho_converge
-converge[t_ind, 5, i] <- abs(geweke.diag(mcmc(tModel$rho))$z)
+converge[t_ind, p + 4, i] <- abs(geweke.diag(mcmc(tModel$rho))$z)
 
 #preds on holdout set
-postMeansBetalList <- split(postMeansBetal, rep(1:ncol(postMeansBetal), each = nrow(postMeansBetal)))
+postMeansBetalList <- split(postMeansBetal, rep(1:ncol(postMeansBetal), 
+                                                each = nrow(postMeansBetal)))
 tModelPreds <- mapply(fits, postMeansBetalList,Xhold)
 predictions[t_ind, i, ]  <- tModelPreds %>% unlist()
 
@@ -764,8 +832,8 @@ print(i)
 end <- Sys.time() - strt
 print(end)
     }
- end <- Sys.time() - strt
- print(end)  
+end <- Sys.time() - strt
+print(end)  
 ###############################
   #save output for each n
   out <- list(y_hold = y_hold,

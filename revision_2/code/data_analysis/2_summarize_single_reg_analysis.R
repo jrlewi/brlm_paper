@@ -8,15 +8,23 @@ states <- c(2, 15, 27, 36)
 v_inflate <- c(100)
 
 # plots ---- 
-analysis_data <- read_rds(file.path(here::here(), 'data', 'analysis_data.rds'))
+analysis_data <- read_rds(file.path(here::here(), 'data', 
+                                    'analysis_data.rds'))
 
 analysis_data <- analysis_data %>% 
-  mutate(sqrt_count_2010 = sqrt(Count_2010), sqrt_count_2012 = sqrt(Count_2012)) %>% filter(State %in% states) %>% 
+  mutate(sqrt_count_2010 = sqrt(Count_2010), 
+         sqrt_count_2012 = sqrt(Count_2012)) %>% 
+  filter(State %in% states) %>% 
   mutate(State = droplevels(State))
 
-label_vals <- c('2' = 'State 2', '15' = 'State 15', '27' = 'State 27', '36' = 'State 36')
-ggplot(analysis_data) + geom_point(aes(x = sqrt_count_2010, y = sqrt_count_2012, col = Type), size = 1, alpha = .5) +
-  theme_bw() + facet_wrap(~State, labeller = labeller(State = label_vals)) + labs(x = 'square root of 2010 houshold count', y = 'square root of 2012 houshold count') +
+label_vals <- c('2' = 'State 2', '15' = 'State 15', 
+                '27' = 'State 27', '36' = 'State 36')
+ggplot(analysis_data) + geom_point(aes(x = sqrt_count_2010, y = sqrt_count_2012, 
+                        col = Type), size = 1, alpha = .5) + 
+  theme_bw() + 
+  facet_wrap(~State, labeller = labeller(State = label_vals)) + 
+  labs(x = 'square root of 2010 houshold count', 
+       y = 'square root of 2012 houshold count') +
   theme(text = element_text(family = 'Times'))
 ggsave(file.path(getwd(), "..", "..", "figs", 'scatter_by_state.png'), width = 6, height = 4)
 
@@ -115,6 +123,14 @@ bind_rows(list_1)
 
 pooled_marginals <- pooled_marginals_all(ns, states)
 # anyNA(pooled_marginals)
+
+#remove case with very low acceptance rate:
+# makes essentially no difference
+
+pooled_marginals <- pooled_marginals %>% 
+  filter(!(Repetition == 46 & State == 15 & n == 50 & 
+           Model == 'Restricted - Tukey' ))
+
 pooled_marginals <- pooled_marginals %>% 
   mutate(n = as.factor(n), State = as.factor(State))
 # var_inflate = as.factor(var_inflate)
@@ -129,10 +145,12 @@ pooled_marginals <- pooled_marginals %>%
 
 
 p0 <- map(as.character(v_inflate), .f = function(v){
-  pooled_marginals %>% filter(is.na(var_inflate)) %>% dplyr::select(-var_inflate) %>% mutate(var_inflate = v)
+  pooled_marginals %>% filter(is.na(var_inflate)) %>% 
+    dplyr::select(-var_inflate) %>% mutate(var_inflate = v)
 })
 
-pooled_marginals <- bind_rows(pooled_marginals %>% filter(!is.na(var_inflate)), p0) 
+pooled_marginals <- bind_rows(pooled_marginals %>% 
+                                filter(!is.na(var_inflate)), p0) 
 # Trimmed log marginal distribution 
 # tlm <- function(marginals, fun = mean, trimming_fraction = 0.3){
 #   log_marg <- log(marginals)
@@ -145,7 +163,9 @@ pooled_marginals <- bind_rows(pooled_marginals %>% filter(!is.na(var_inflate)), 
 
 
 base_model <- 'Student-t' 
-get_tlm_tibble <- function(marginals_tibble, base_model = base_model, trimming_fractions = c(0, .1, .2, .3)){
+get_tlm_tibble <- function(marginals_tibble, 
+                           base_model = base_model, 
+                           trimming_fractions = c(0, .1, .2, .3)){
 
 marginals_open_type1 <- marginals_tibble  %>% 
   filter(Type1 == TRUE)
@@ -245,7 +265,18 @@ list_1 <- lapply(states, function(State_keep){
     })
      })
 
-range(sapply(list_1, function(x){
-  sapply(x, function(y) range(c(y$acceptYHuber, y$acceptY)))
-}))
+accept_rts <- sapply(list_1, function(x){
+  sapply(x, function(y) c(y$acceptYHuber, y$acceptY))
+})
+plot(accept_rts, pch = 19)
+summary(accept_rts)
+mean(accept_rts[accept_rts > .003])
+summary(accept_rts[accept_rts > .003])
 
+
+tmp <- read_rds(paste0('single_reg_state_', '15', '_n_', '50', '.rds' ))
+tmp_df <- analysis_data %>% filter(State == '15') %>% 
+  .[tmp$holdIndicesMatrix[46,],]
+
+
+plot(tmp_df$sqrt_count_2010, tmp_df$sqrt_count_2012)
