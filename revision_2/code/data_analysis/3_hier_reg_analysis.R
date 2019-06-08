@@ -9,6 +9,13 @@ library(MASS)
 library(brlm)
 library(tidyverse)
 
+reps <- 10 #50 # number of training sets
+sim_number <- 3 #for batch processing
+nburn <- 1e4 #set length of mcmc chains
+nkeep <- 1e4
+nburnt <- 1.5e4
+nkeept <- 1e4 #for the t-model.
+maxit <- 1000 #parameter in MASS::rlm
 
 # aux funcitons ----
 
@@ -94,7 +101,7 @@ analysis_data <- analysis_data %>%
 
 
 #defined globally.
-nGroups <- length(unique(analysis_data$State))
+nGroups <<- length(unique(analysis_data$State))
 
 state_sizes <- analysis_data %>% 
   group_by(State) %>% 
@@ -102,31 +109,31 @@ state_sizes <- analysis_data %>%
 
 #Set prior parameters ----
 parms_prior <- read_rds(file.path(here::here(), 'hier_parms_prior.rds'))
-mu0 <- parms_prior$mu_0
-Sigma0 <- parms_prior$Sigma_0
-a0 <- parms_prior$a_0
-b0 <- parms_prior$b_0
-mu_bstr <- parms_prior$mu_bstr
-psi_bstr <- parms_prior$psi_bstr
-w1 <- parms_prior$w1
-w2 <- parms_prior$w2
-a_psir <- parms_prior$a_psir
-b_psir <- parms_prior$b_psir
+mu0 <<- parms_prior$mu_0
+Sigma0 <<- parms_prior$Sigma_0
+a0 <<- parms_prior$a_0
+b0 <<- parms_prior$b_0
+mu_bstr <<- parms_prior$mu_bstr
+psi_bstr <<- parms_prior$psi_bstr
+w1 <<- parms_prior$w1
+w2 <<- parms_prior$w2
+a_psir <<- parms_prior$a_psir
+b_psir <<- parms_prior$b_psir
 
 
 trend <- sqrt_count_2012 ~ sqrt_count_2010 - 1 + 
   Associate_Count +
   Office_Employee_Count
 
-nu <- 5 #df for t-model
+nu <<- 5 #df for t-model
 ns <- floor(nrow(analysis_data)*.5)  #c(1000, 2000) #sample size for training set
-reps <- 2 #50 # number of training sets
-
-nburn <- 1e4 #set length of mcmc chains
-nkeep <- 1e4
-nburnt <- 1.5e4
-nkeept <- 1e4 #for the t-model.
-maxit <- 1000 #parameter in MASS::rlm
+# reps <- 10 #50 # number of training sets
+# sim_number <- 1 #for batch processing
+# nburn <- 1e4 #set length of mcmc chains
+# nkeep <- 1e4
+# nburnt <- 1.5e4
+# nkeept <- 1e4 #for the t-model.
+# maxit <- 1000 #parameter in MASS::rlm
 
 # reps <- 50
 # nburn <- 1e3 #set length of mcmc chains
@@ -137,9 +144,9 @@ maxit <- 1000 #parameter in MASS::rlm
 
 
 #set seed 
-set.seed(123)
+set.seed(123 + sim_number)
 N <- nrow(analysis_data)
-p <- length(mu0)
+p <<- length(mu0)
 nModels <- 7
 # indices to id models in the arrays
 ols_ind <- 1; 
@@ -231,8 +238,7 @@ converge <- array(NA, c(nModels, p + 4, reps))
       chk <- hold %>% 
         group_by(State) %>% 
         summarise(sd_1  = sd(Associate_Count), 
-                  sd_2 = sd(Office_Employee_Count)) %>% 
-        select(-State)
+                  sd_2 = sd(Office_Employee_Count)) %>% select(-State)
      any_0_sd <- map(chk,.f = function(s) any(s == 0)) %>% unlist() %>% 
        any()
      if(!any_0_sd){resample <- FALSE}
@@ -418,7 +424,7 @@ marginals[ols_ind, i, ] <- olsMarginals %>% unlist()
 ################################################
 # normal theory bayes model ----
 ################################################
-swSq <- 1      
+swSq <<- 1      
 
 #tunning parameters for MH step on bstar, mu_rho, psi_rho, and rho
       step_logbstar <- abs(log(mu_bstr/(sqrt(mu_bstr*(1-mu_bstr)/(psi_bstr+1))))) #abs log(mean/sd)
@@ -852,6 +858,6 @@ print(end)
               converge = converge
               )
   
-  write_rds(out, file.path(here::here(), paste0('hier_reg_n', n, '.rds' )))
+  write_rds(out, file.path(here::here(), paste0('hier_reg_n', n, '_sim_number_', sim_number, '.rds' )))
   
 }
