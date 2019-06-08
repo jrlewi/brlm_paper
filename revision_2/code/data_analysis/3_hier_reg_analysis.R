@@ -9,12 +9,12 @@ library(MASS)
 library(brlm)
 library(tidyverse)
 
-reps <- 10 #50 # number of training sets
-sim_number <- 3 #for batch processing
-nburn <- 1e4 #set length of mcmc chains
-nkeep <- 1e4
-nburnt <- 1.5e4
-nkeept <- 1e4 #for the t-model.
+reps <- 10 # number of training sets
+sim_number <- 2 #for batch processing
+nburn <- 2e3 #set length of mcmc chains
+nkeep <- 2e3
+nburnt <- 1e4
+nkeept <- 2e3 #for the t-model.
 maxit <- 1000 #parameter in MASS::rlm
 
 # aux funcitons ----
