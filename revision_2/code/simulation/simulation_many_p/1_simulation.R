@@ -232,6 +232,10 @@ mcmc_samples[i,j,,] <- result$rest_mcmc
 Sys.time() - strt
 
 # Save output -----
+
+# make plots ----
+
+
 mean((rlm_estimates - truth)^2)
 mean((rest_estimates - truth)^2)
 mean((t_estimates - truth)^2)
