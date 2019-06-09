@@ -6,16 +6,16 @@ library(brlm)
 library(MCMCpack)
 
 #Simulation Parameters ----- 
-n_sims <- 3
-n <- 100 #sample size
+n_sims <- 2
+n <- 500 #sample size
 p <- 3 #active covariates
-p_extra <- 10 - p #inactive covariates
+p_extra <- 20 - p #inactive covariates
 a_0 <- 5
 b_0 <- 5 
 prob_outlier <- .2
 outlier_contam <- 10
 mu_0 <-  rep(0, p+p_extra)
-prior_sd <- seq(.2, 1, by = .2) 
+prior_sd <- c(.5, 1) #seq(.2, 1, by = .2) 
 # Sigma_0 = diag(p+p_extra),
 nkeep <- 1000
 nburn <- 1000
@@ -102,7 +102,7 @@ one_sim <- function(n, p, p_extra,
   X_extra <- matrix(runif(n*p_extra), n, p_extra)
   X_all <- cbind(X, X_extra)
   
-  #model fits-----
+  #model fits -----
   
   #rlm_tukey ---
   rlm_tukey <- rlm(X_all, y, 
@@ -123,6 +123,7 @@ one_sim <- function(n, p, p_extra,
                           nkeep = nkeep,
                           nburn = nburn,
                           maxit = maxit)
+  
   rest_estimates <- colMeans(rest_tukey$mcmc)   
   rest_sig2_est <- rest_estimates[p+p_extra+1]
   rest_estimates <- rest_estimates[1:(p + p_extra)]
@@ -171,7 +172,8 @@ one_sim <- function(n, p, p_extra,
   list(estimates = estimates_all, 
        marginals = marginals_all, 
        sigma2 = params[p + 1], 
-       y_accept = y_accept )
+       y_accept = y_accept, 
+       rest_mcmc = rest_tukey$mcmc)
 }
 
 
@@ -180,16 +182,24 @@ I_mat <- diag(p + p_extra)
 
 rlm_estimates <- rest_estimates <- t_estimates <- 
   truth <-
-  rlm_marginals <- rest_marginals <- 
-  t_marginals <- 
   array(NA, c(n_sims, length(prior_sd), p + p_extra))
+
+rlm_marginals <- rest_marginals <- 
+  t_marginals <- y_accept <- 
+  array(NA, c(n_sims, length(prior_sd)))
+
+mcmc_samples <- array(NA, 
+                      c(n_sims, length(prior_sd), 
+                        nkeep, p + p_extra + 1))
+
+strt <- Sys.time()
 
 for(i in 1:n_sims){
   for(j in seq_along(prior_sd)){
 
     p_sd <- prior_sd[j]
     prior_cov <- p_sd^2 * I_mat  
-
+#strt <- Sys.time()
     result <- one_sim(n, p, p_extra,
           a_0,
           b_0,
@@ -201,14 +211,31 @@ for(i in 1:n_sims){
           nburn = nburn,
           maxit = maxit,
           nu)
-
+#Sys.time() - strt
 rlm_estimates[i,j,] <- result$estimates[1,]
 rest_estimates[i,j,] <- result$estimates[2,]
 t_estimates[i,j,] <- result$estimates[3,]
 truth[i,j,] <- result$estimates[4,]
 
-rlm_marginals[i,j,] <- result$marginals[1,]
-rest_marginals[i,j,] <- result$marginals[2,]
-t_marginals[i,j,] <- result$marginals[3,]
+rlm_marginals[i,j] <- mean(result$marginals[1,])
+rest_marginals[i,j] <- mean(result$marginals[2,])
+t_marginals[i,j] <- mean(result$marginals[3,])
 
+y_accept[i,j] <- result$y_accept
 
+mcmc_samples[i,j,,] <- result$rest_mcmc
+
+  }
+  print(i)
+}
+
+Sys.time() - strt
+
+# Save output -----
+mean((rlm_estimates - truth)^2)
+mean((rest_estimates - truth)^2)
+mean((t_estimates - truth)^2)
+
+mean(rlm_marginals)
+mean(rest_marginals)
+mean(t_marginals)
