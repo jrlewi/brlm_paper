@@ -10,7 +10,7 @@ library(brlm)
 library(tidyverse)
 
 reps <- 10 # number of training sets
-sim_number <- 2 #for batch processing
+sim_number <- 5 #for batch processing
 nburn <- 2e3 #set length of mcmc chains
 nkeep <- 2e3
 nburnt <- 1e4

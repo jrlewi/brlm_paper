@@ -15,7 +15,7 @@ b_0 <- 5
 prob_outlier <- .2
 outlier_contam <- 10
 mu_0 <-  rep(0, p+p_extra)
-prior_sd <- seq(.2, 1.4, by = .2) 
+prior_sd <- seq(.2, 1, by = .2) 
 # Sigma_0 = diag(p+p_extra),
 nkeep <- 1000
 nburn <- 1000
@@ -48,17 +48,6 @@ data_generation <- function(n, p,
   outlier <- unlist(y[2,])
   list(data = data, params = params, outlier = outlier)
 }
-# 
-# data <- data_generation(1000, 3,
-#                 10,
-#                 10,
-#                 .1,
-#                 10)
-# 
-# # pairs(data$data)
-# data$params
-# fit <- rlm(data$data[,-1], data$data[,1], psi = psi.bisquare)
-# summary(fit)
 
 #marginal computations ----
 get_marginal_rest <- function(y_gen, X_gen, mcmc){
@@ -137,8 +126,9 @@ one_sim <- function(n, p, p_extra,
   rest_estimates <- colMeans(rest_tukey$mcmc)   
   rest_sig2_est <- rest_estimates[p+p_extra+1]
   rest_estimates <- rest_estimates[1:(p + p_extra)]
+  y_accept <- mean(rest_tukey$yAccept)
   
-   t_fit <- brlm::bayesTdistLm(y, 
+  t_fit <- brlm::bayesTdistLm(y, 
                                X_all,
                                mu0 = mu_0,
                                Sigma0 = Sigma_0,
@@ -178,15 +168,29 @@ one_sim <- function(n, p, p_extra,
                          rest_marginals, 
                          t_marginals)
   
-  list(estimates_all, marginals_all, sigma2 = params[p + 1])
+  list(estimates = estimates_all, 
+       marginals = marginals_all, 
+       sigma2 = params[p + 1], 
+       y_accept = y_accept )
 }
 
 
 # Start Simulation ------
+I_mat <- diag(p + p_extra) 
 
-prior_cov <- diag(p + p_extra) * prior_sd[4]^2
-sim_results <- lapply(1:n_sims, function(a){
-  one_sim(n, p, p_extra,
+rlm_estimates <- rest_estimates <- t_estimates <- 
+  truth <-
+  rlm_marginals <- rest_marginals <- 
+  t_marginals <- 
+  array(NA, c(n_sims, length(prior_sd), p + p_extra))
+
+for(i in 1:n_sims){
+  for(j in seq_along(prior_sd)){
+
+    p_sd <- prior_sd[j]
+    prior_cov <- p_sd^2 * I_mat  
+
+    result <- one_sim(n, p, p_extra,
           a_0,
           b_0,
           prob_outlier,
@@ -197,4 +201,14 @@ sim_results <- lapply(1:n_sims, function(a){
           nburn = nburn,
           maxit = maxit,
           nu)
-})
+
+rlm_estimates[i,j,] <- result$estimates[1,]
+rest_estimates[i,j,] <- result$estimates[2,]
+t_estimates[i,j,] <- result$estimates[3,]
+truth[i,j,] <- result$estimates[4,]
+
+rlm_marginals[i,j,] <- result$marginals[1,]
+rest_marginals[i,j,] <- result$marginals[2,]
+t_marginals[i,j,] <- result$marginals[3,]
+
+
