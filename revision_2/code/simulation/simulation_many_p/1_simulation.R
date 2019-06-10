@@ -32,11 +32,11 @@ data_generation <- function(n, p, p_extra,
   X <- matrix(runif(n*p), n, p)
   beta <- rnorm(p, 0, 1)
   sigma2 <- rinvgamma(1, a_0, b_0)
-  expected <- X%*%beta
+  expected <- X %*% beta
+  vr_out <- (outlier_contam)*sigma2
   y <- sapply(expected, function(mn){
     outlier <- rbinom(1,1, prob_outlier)
-    vr_out <- (outlier_contam)*sigma2
-    err <- if(outlier){
+    err <- if (outlier) {
       rnorm(1, 0, sd = sqrt(vr_out))
     } else {
       rnorm(1, 0, sd = sqrt(sigma2))
@@ -78,8 +78,8 @@ get_marginal_t <- function(y_gen, X_gen, mcmc){
 one_sim <- function(
                     a_0,
                     b_0,
-                    mu_0 = rep(0, p+p_extra),
-                    Sigma_0 = diag(p+p_extra),
+                    mu_0 = rep(0, p + p_extra),
+                    Sigma_0 = diag(p + p_extra),
                     nkeep,
                     nburn,
                     maxit,
@@ -289,7 +289,7 @@ write_rds(out,
 
 # make plots ----
 
-mse <-out$estimates %>%
+mse  <- out$estimates %>%
       mutate(sq_error = (true_value - estimates)^2) %>% 
       group_by(prior_sd, method) %>% 
       summarize(mse = mean(sq_error)) %>% 
