@@ -12,7 +12,7 @@ p <- 3 #active covariates
 p_extra <- 20 - p #inactive covariates
 a_0 <- 5
 b_0 <- 5 
-prob_outlier <- .2
+prob_outlier <- .1
 outlier_contam <- 10
 mu_0 <-  rep(0, p+p_extra)
 prior_sd <- seq(.2, 1, by = .2) 
@@ -289,25 +289,25 @@ write_rds(out,
 
 # make plots ----
 
-mse  <- out$estimates %>%
-      mutate(sq_error = (true_value - estimates)^2) %>% 
-      group_by(prior_sd, method) %>% 
-      summarize(mse = mean(sq_error)) %>% 
-      ungroup() %>% 
-      mutate(prior_sd = as_factor(as.character(prior_sd)))
-  
-ggplot(mse, aes(prior_sd, mse, group = method, col = method)) +
-  geom_line()
-
-
-
-ave_margs <- out$marginals %>% 
-  group_by(prior_sd, method) %>% 
-  summarise(mean = mean(mean_log_predictive),
-            se = sd(mean_log_predictive)/sqrt(n()))
-
-
-ggplot(ave_margs, aes(prior_sd, mean, group = method, 
-                      col = method)) +
-  geom_line() +
-  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0)
+# mse  <- out$estimates %>%
+#       mutate(sq_error = (true_value - estimates)^2) %>% 
+#       group_by(prior_sd, method) %>% 
+#       summarize(mse = mean(sq_error)) %>% 
+#       ungroup() %>% 
+#       mutate(prior_sd = as_factor(as.character(prior_sd)))
+#   
+# ggplot(mse, aes(prior_sd, mse, group = method, col = method)) +
+#   geom_line()
+# 
+# 
+# 
+# ave_margs <- out$marginals %>% 
+#   group_by(prior_sd, method) %>% 
+#   summarise(mean = mean(mean_log_predictive),
+#             se = sd(mean_log_predictive)/sqrt(n()))
+# 
+# 
+# ggplot(ave_margs, aes(prior_sd, mean, group = method, 
+#                       col = method)) +
+#   geom_line() +
+#   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0)

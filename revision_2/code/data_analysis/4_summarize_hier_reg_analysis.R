@@ -1,8 +1,38 @@
 # Summarize the output from pooled regression analysis.
 library(tidyverse)
 library(MASS)
+library(abind)
 
-ns <- c(1590)
+ns <- c(1547)
+#process in batches? combine results first
+num_batch <- 5
+rds_path <- "~/Dropbox/school/osu/dissertationResearch/snm/journal_papers/brlm_paper/revision_2/code/data_analysis/hier_reg_n1547_sim_number_"
+tmp1 <- readRDS(file.path(paste0(rds_path, 1, '.rds')))
+
+#combine results into one
+for(i in 2:num_batch){
+  tmp <-  readRDS(file.path(paste0(rds_path, i, '.rds')))
+  
+  tmp1$y_hold <- rbind(tmp1$y_hold, tmp$y_hold)
+  tmp1$y_open <- rbind(tmp1$y_open, tmp$y_open)
+  tmp1$y_type1 <- rbind(tmp1$y_hold, tmp$y_type1)
+  tmp1$holdIndices <- rbind(tmp1$holdIndices, tmp$holdIndices)
+  tmp1$group_estimates <- abind(tmp1$group_estimates, tmp$group_estimates, along = 4)
+  tmp1$group_estimates_sds <- abind(tmp1$group_estimates_sds, tmp$group_estimates_sds, along = 4)
+  tmp1$estimates <- abind(tmp1$estimates, tmp$estimates, along = 3)
+  tmp1$estimates_sd <- abind(tmp1$estimates_sd, tmp$estimates_sd, along = 3)
+  tmp1$marginals <- abind(tmp1$marginals, tmp$marginals, along = 2)
+  tmp1$marginals_sd <- abind(tmp1$marginals_sd, tmp$marginals_sd, along = 2)
+  tmp1$predictions <- abind(tmp1$predictions, tmp$predictions, along = 2)
+  tmp1$acceptY <- abind(tmp1$acceptY, tmp$acceptY, along = 3)
+  tmp1$group_converge <- abind(tmp1$group_converge, tmp$group_converge, along = 4) 
+  tmp1$converge <- abind(tmp1$converge, tmp$converge, along = 3) 
+  
+  }
+
+#write combined results to rds.
+write_rds(tmp1, file.path(file.path(getwd(), paste0('hier_reg_n', ns,".rds"))))
+
 
 analysis_data <- read_rds(file.path(here::here(), 'data', 'analysis_data.rds'))
 analysis_data <- analysis_data %>% 
@@ -11,6 +41,11 @@ analysis_data <- analysis_data %>%
   filter(n() >= 25) %>% ungroup() %>% 
   mutate(State = factor(State)) %>% #filter(!State %in% c(14, 30)) %>% 
   arrange(State)
+
+analysis_data <- analysis_data %>% 
+  filter(!State %in% c('14', '30')) %>% 
+  mutate(State = droplevels(State))
+
 
 # tmp <- readRDS("~/Dropbox/school/osu/dissertationResearch/snm/journal_papers/brlm_paper/revision_1/code/data_analysis/hier_reg_n1590.rds")
 # holdIndices <- tmp$holdIndices
@@ -79,6 +114,11 @@ margs_sd <- bind_rows(margs_sd, .id = 'Model') %>%
   mutate(n = factor(n, levels = ns))
 full_join(margs, margs_sd,  by = c("Model", "holdout sample", "Repetition", "holdout index", "State", "Type", "Open", "n"))
 }
+
+
+# combine hier results in batch to one hier results
+
+
 
 hier_marginals <- ns %>% map(.f = function(n){
   hier_results <- readRDS(file.path(getwd(), paste0('hier_reg_n', n,".rds")))
