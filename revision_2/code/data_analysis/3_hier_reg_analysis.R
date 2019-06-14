@@ -98,6 +98,10 @@ analysis_data <- analysis_data %>%
   filter(!State %in% c('14', '30')) %>% 
   mutate(State = droplevels(State))
 
+# analysis_data %>%  group_by(State) %>% 
+#   summarize(sd1 = sd(Associate_Count), u1 = length(unique(Associate_Count)),  sd2 = sd(Office_Employee_Count),
+#             u2 = length(unique(Office_Employee_Count)),
+#             n())
 
 #defined globally.
 nGroups <<- length(unique(analysis_data$State))

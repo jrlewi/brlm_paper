@@ -5,7 +5,7 @@ out <- read_rds(file.path(here::here(),
                     '1_simulation_out.rds'))
 
 
-mse  <- out$estimates %>%
+mse  <- out$estimates %>% filter(variable != 'sigma2') %>% 
   mutate(sq_error = (true_value - estimates)^2) %>% 
   group_by(simulation, prior_sd, method) %>% 
   summarize(mse_sim = mean(sq_error)) %>% 

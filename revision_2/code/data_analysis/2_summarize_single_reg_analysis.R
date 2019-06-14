@@ -272,7 +272,7 @@ plot(accept_rts, pch = 19)
 summary(accept_rts)
 mean(accept_rts[accept_rts > .003])
 summary(accept_rts[accept_rts > .003])
-
+apply(accept_rts, 2, function(x) which(x < .003))
 
 tmp <- read_rds(paste0('single_reg_state_', '15', '_n_', '50', '.rds' ))
 tmp_df <- analysis_data %>% filter(State == '15') %>% 

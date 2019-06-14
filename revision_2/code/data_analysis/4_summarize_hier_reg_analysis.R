@@ -210,8 +210,13 @@ average_by_state <- left_join(average_by_state, state_count, by = 'State') %>% u
 
 
 theme_set(theme_bw(base_family = 'Times'))
-ggplot(average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Tukey', 'Rlm - Tukey')), aes(x = `State(n)` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(y = "Average TLM")#+ scale_y_log10()
+ggplot(average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Tukey', 'Rlm - Tukey'), State != '28'), aes(x = `State(n)` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(y = "Average TLM") #+ scale_y_log10() + 
 ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state.png'), width = 7.5, height = 5)
+
+
+theme_set(theme_bw(base_family = 'Times'))
+ggplot(average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Huber', 'Rlm - Huber'), State != '28'), aes(x = `State(n)` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(y = "Average TLM") #+ scale_y_log10() + 
+ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state_huber.png'), width = 7.5, height = 5)
 
 
 
@@ -244,7 +249,7 @@ ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state.png'), width =
 
 theme_set(theme_bw(base_family = 'Times'))
 sub_df <- average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Tukey', 'Rlm - Tukey'))
-ggplot(sub_df, aes(x = `State(n)` , y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_log10()
+ggplot(sub_df, aes(x = `State(n)` , y = sd/abs(mean), col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_log10()
 ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm_state.png'), width = 7.5, height = 5)
 
 # ----- 
@@ -291,8 +296,10 @@ ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm_state.png'), width = 
 
 
 #Convergence Diagnostics ----
-tmp <- readRDS("~/Dropbox/school/osu/dissertationResearch/snm/journal_papers/brlm_paper/revision_1/code/data_analysis/hier_reg_n1590.rds")
-range(tmp$acceptY)
+# tmp <- readRDS("~/Dropbox/school/osu/dissertationResearch/snm/journal_papers/brlm_paper/revision_1/code/data_analysis/hier_reg_n1590.rds")
+range(tmp1$acceptY)
+summary(tmp1$acceptY)
+sum(tmp1$acceptY<.1)
 # names(tmp)
 # lapply(tmp, dim)
 # 

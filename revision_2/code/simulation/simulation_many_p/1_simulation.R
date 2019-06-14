@@ -6,19 +6,19 @@ library(brlm)
 library(MCMCpack)
 
 #Simulation Parameters ----- 
-n_sims <- 50
+n_sims <- 30
 n <- 500 #sample size
 p <- 3 #active covariates
-p_extra <- 20 - p #inactive covariates
+p_extra <- 30 - p #inactive covariates
 a_0 <- 5
 b_0 <- 5 
 prob_outlier <- .1
-outlier_contam <- 10
-mu_0 <-  rep(0, p+p_extra)
+outlier_contam <- 25
+mu_0 <-  rep(0, p + p_extra)
 prior_sd <- seq(.2, 1, by = .2) 
 # Sigma_0 = diag(p+p_extra),
 nkeep <- 1000
-nburn <- 2000
+nburn <- 1500
 maxit <- 1000
 nu <- 5 #df for t_fit
 
@@ -37,7 +37,7 @@ data_generation <- function(n, p, p_extra,
   y <- sapply(expected, function(mn){
     outlier <- rbinom(1,1, prob_outlier)
     err <- if (outlier) {
-      rnorm(1, 0, sd = sqrt(vr_out))
+      abs(rnorm(1, 0, sd = sqrt(vr_out)))
     } else {
       rnorm(1, 0, sd = sqrt(sigma2))
     }
@@ -52,26 +52,44 @@ data_generation <- function(n, p, p_extra,
 }
 
 #marginal computations ----
-get_marginal_rest <- function(y_gen, X_gen, mcmc){
+get_marginal_rest <- function(y_gen, X_gen, mcmc, point_est = FALSE){
   samps_coef <- t(mcmc[, 1:ncol(X_gen)])
-  mns <- X_gen%*%samps_coef
   samps_sigma <- as.numeric(mcmc[, (ncol(X_gen) + 1)])^0.5
+  if(!point_est){
+  mns <- X_gen %*% samps_coef
   sds <- matrix(samps_sigma, ncol = nkeep, nrow = nrow(X_gen),
                 byrow = TRUE) 
   
   pdfs <- dnorm(y_gen, mns, sds)
-  log(rowMeans(pdfs))
+  out <- log(rowMeans(pdfs))
+  } 
+  if(point_est){
+    post_mean_betas <- apply(samps_coef, 1, mean)
+    post_mn <- X_gen %*% post_mean_betas
+    post_mean_sigma <- mean(samps_sigma)
+    out <- log(dnorm(y_gen, post_mn, post_mean_sigma))
+  }
+  out
 }
 
-get_marginal_t <- function(y_gen, X_gen, mcmc){
+get_marginal_t <- function(y_gen, X_gen, mcmc, point_est = FALSE, nu){
   samps_coef <- t(mcmc[, 1:ncol(X_gen)])
-  mns <- X_gen%*%samps_coef
   samps_sigma <- as.numeric(mcmc[, (ncol(X_gen) + 1)])^0.5
+  if(!point_est){
+  mns <- X_gen%*%samps_coef
   sds <- matrix(samps_sigma, ncol = nkeep, nrow = nrow(X_gen),
                 byrow = TRUE) 
   
   pdfs <- brlm::tdensity(y_gen, mns, sds, nu = nu)
-  log(rowMeans(pdfs))
+  out <- log(rowMeans(pdfs))
+  }
+  if(point_est){
+    post_mean_betas <- apply(samps_coef, 1, mean)
+    post_mn <- X_gen %*%  post_mean_betas
+    post_mean_sigma <- mean(samps_sigma)
+    out <- log(brlm::tdensity(y_gen, post_mn, post_mean_sigma, nu = nu))
+  }
+  as.numeric(out)
 }
 
 
@@ -141,37 +159,50 @@ one_sim <- function(
   t_estimates <- t_estimates[1:(p + p_extra)]
   
   truth <- c(params[1:p], rep(0, p_extra))
-  
+  truth_sigma2 <- params[p+1]
   estimates_all <- rbind(rlm_estimates, 
                          rest_estimates, 
                          t_estimates,
                          truth)
+  estimates_sigma2 <- c(rlm_sig2_hat,
+                        rest_sig2_est,
+                        t_sig2_est,
+                        truth_sigma2)
+  
   
   #compute marginals for non-outliers
   y_gen <- y[!outlier]
   X_gen <- X_all[!outlier, ] 
   
   #rlm ----
-  mn <- X_gen%*%rlm_estimates
+  mn <- X_gen %*% rlm_estimates
   rlm_margninals <- 
-    dnorm(y_gen, mn, sd = rlm_sig2_hat^.5, log = TRUE)
+    dnorm(y_gen, as.numeric(mn), sd = rlm_sig2_hat^.5, log = TRUE)
   
   #restricted ---
   rest_marginals <-
     get_marginal_rest(y_gen, X_gen, mcmc = rest_tukey$mcmc)
   
+  rest_marginals_point <-
+    get_marginal_rest(y_gen, X_gen, mcmc = rest_tukey$mcmc, point_est = TRUE)
+  
   #t-dist
-  t_marginals <- get_marginal_t(y_gen, X_gen, mcmc = t_fit$mcmc)
-
-  marginals_all <- rbind(rlm_margninals,
+  t_marginals <- get_marginal_t(y_gen, X_gen, mcmc = t_fit$mcmc, nu = nu)
+  t_marginals_point <- get_marginal_t(y_gen, X_gen, mcmc = t_fit$mcmc, point_est = TRUE, nu = nu)
+  
+  
+  marginals_all <- rbind(rlm_margninals, 
                          rest_marginals, 
-                         t_marginals)
+                         rest_marginals_point,
+                         t_marginals, 
+                         t_marginals_point)
   
   list(estimates = estimates_all, 
+       estimates_sigma2 = estimates_sigma2,
        marginals = marginals_all, 
-       sigma2 = params[p + 1], 
        y_accept = y_accept, 
-       rest_mcmc = rest_tukey$mcmc)
+       rest_mcmc = rest_tukey$mcmc,
+       t_mcmc = t_fit$mcmc)
 }
 
 
@@ -182,22 +213,30 @@ rlm_estimates <- rest_estimates <- t_estimates <-
   truth <-
   array(NA, c(n_sims, length(prior_sd), p + p_extra))
 
-rlm_marginals <- rest_marginals <- 
-  t_marginals <- y_accept <- 
+rlm_marginals <- rest_marginals <- rest_marginals_point <- 
+  t_marginals <- t_marginals_point <- y_accept <- 
   array(NA, c(n_sims, length(prior_sd)))
 
-mcmc_samples <- array(NA, 
+mcmc_samples <- mcmc_samples_t <- array(NA, 
                       c(n_sims, length(prior_sd), 
                         nkeep, p + p_extra + 1))
 
-strt <- Sys.time()
+estimates_sigma2 <- array(NA, c(n_sims, length(prior_sd), 4))
 
+strt <- Sys.time()
+data_save <- outlier_save <- X_extra_save <- vector('list', n_sims)
 for(i in 1:n_sims){
   data <- data_generation(n, p,p_extra,
                           a_0,
                           b_0,
                           prob_outlier,
                           outlier_contam)
+  
+  data_save[[i]] <- data$data
+  X_extra_save[[i]] <- data$X_extra
+  outlier_save[[i]] <- data$outlier
+  
+
   for(j in seq_along(prior_sd)){
 
     p_sd <- prior_sd[j]
@@ -219,15 +258,22 @@ rest_estimates[i,j,] <- result$estimates[2,]
 t_estimates[i,j,] <- result$estimates[3,]
 truth[i,j,] <- result$estimates[4,]
 
+estimates_sigma2[i,j,] <- result$estimates_sigma2
+
+
 rlm_marginals[i,j] <- mean(result$marginals[1,])
 rest_marginals[i,j] <- mean(result$marginals[2,])
-t_marginals[i,j] <- mean(result$marginals[3,])
+rest_marginals_point[i,j] <- mean(result$marginals[3,])
+t_marginals[i,j] <- mean(result$marginals[4,])
+t_marginals_point[i,j] <- mean(result$marginals[5,])
 
 y_accept[i,j] <- result$y_accept
 
 mcmc_samples[i,j,,] <- result$rest_mcmc
+mcmc_samples_t[i,j,,] <- result$t_mcmc
   print(j)
   }
+  
   print(i)
 }
 
@@ -246,14 +292,14 @@ for(i in 1:n_sims){
     
     estimates_list[[k]] <- tibble(simulation = i, 
            prior_sd = prior_sd[j], 
-           variable = rep(1:n_variables, n_methods),
-           estimates = c(rlm_estimates[i,j,],
-                         rest_estimates[i,j,],
-                         t_estimates[i,j,]),
-           method = c(rep('rlm', n_variables),
-                      rep('restricted', n_variables),
-                      rep('t', n_variables)),
-           true_value = rep(truth[i,j,], n_methods))
+           variable = rep(c(1:n_variables, 'sigma2'), n_methods),
+           estimates = c(rlm_estimates[i,j,], estimates_sigma2[i,j,1],
+                         rest_estimates[i,j,], estimates_sigma2[i,j,2],
+                         t_estimates[i,j,], estimates_sigma2[i,j,3]),
+           method = c(rep('rlm', n_variables + 1),
+                      rep('restricted', n_variables + 1),
+                      rep('t', n_variables + 1)),
+           true_value = rep(c(truth[i,j,], estimates_sigma2[i,j,4]), n_methods))
     
     marginals_list[[k]] <- tibble(simulation = i, 
             prior_sd = prior_sd[j],
@@ -261,9 +307,12 @@ for(i in 1:n_sims){
               rlm_marginals[i,j],
               rest_marginals[i,j],
               t_marginals[i,j]),
-              method = c('rlm', 'restricted', 't')
-            )
-    k <- k + 1    
+            mean_log_predictive_point = c(
+              rlm_marginals[i,j],
+              rest_marginals_point[i,j],
+              t_marginals_point[i,j]),
+              method = c('rlm', 'restricted', 't'))
+      k <- k + 1    
   }
 }
 
@@ -279,35 +328,54 @@ y_accept_tibble <- bind_cols(
 
 out <- list(estimates = estimates, marginals = marginals,
             y_accept = y_accept_tibble, 
-            mcmc_samples = mcmc_samples)
+            mcmc_samples = mcmc_samples, 
+            mcmc_samples_t = mcmc_samples_t,
+            mcmc_samples =  mcmc_samples,
+            mcmc_samples_t = mcmc_samples_t,
+            data_save = data_save,
+            X_extra_save = X_extra_save,
+            outlier_save = outlier_save
+            )
 
-write_rds(out, 
-          file.path(here::here(), 
-                    '1_simulation_out.rds'))
+write_rds(out,
+          file.path(here::here(),
+                    '1_simulation_out_2.rds'))
 
 
 
 # make plots ----
 
-# mse  <- out$estimates %>%
-#       mutate(sq_error = (true_value - estimates)^2) %>% 
-#       group_by(prior_sd, method) %>% 
-#       summarize(mse = mean(sq_error)) %>% 
-#       ungroup() %>% 
-#       mutate(prior_sd = as_factor(as.character(prior_sd)))
-#   
-# ggplot(mse, aes(prior_sd, mse, group = method, col = method)) +
-#   geom_line()
+mse  <- out$estimates %>% filter(variable != 'sigma2') %>% 
+      mutate(sq_error = (true_value - estimates)^2) %>%
+      group_by(prior_sd, method) %>%
+      summarize(mse = mean(sq_error)) %>%
+      ungroup() %>%
+      mutate(prior_sd = as_factor(as.character(prior_sd)))
+
+ggplot(mse, aes(prior_sd, mse, group = method, col = method)) +
+  geom_line()
+
+
+mse_sub <- out$estimates %>% filter(variable %in% c('1', '2', '3')) %>% 
+  mutate(sq_error = (true_value - estimates)^2) %>%
+  group_by(prior_sd, method) %>%
+  summarize(mse = mean(sq_error)) %>%
+  ungroup() %>%
+  mutate(prior_sd = as_factor(as.character(prior_sd)))
+ggplot(mse_sub, aes(prior_sd, mse, group = method, col = method)) +
+  geom_line()
+
+
 # 
 # 
 # 
-# ave_margs <- out$marginals %>% 
-#   group_by(prior_sd, method) %>% 
-#   summarise(mean = mean(mean_log_predictive),
-#             se = sd(mean_log_predictive)/sqrt(n()))
-# 
-# 
-# ggplot(ave_margs, aes(prior_sd, mean, group = method, 
-#                       col = method)) +
-#   geom_line() +
-#   geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0)
+ave_margs <- out$marginals %>%
+  group_by(prior_sd, method) %>%
+  summarise(mean = mean(mean_log_predictive_point),
+            se = sd(mean_log_predictive)/sqrt(n()))
+
+
+ggplot(ave_margs, aes(prior_sd, mean, group = method,
+                      col = method)) +
+  geom_line() +
+  geom_errorbar(aes(ymin = mean - se, ymax = mean + se), width = 0)
