@@ -19,6 +19,11 @@
 \citation{garthwaite2005,ohagan2006}
 \citation{berger2006}
 \citation{kass1995}
+\citation{yuan1999minimally}
+\citation{zhu2011}
+\citation{clyde2004}
+\citation{bernardo2000,clyde2013,clarke2013Complete}
+\citation{lee2014}
 \gdef\hy@title{Bayesian Restricted Likelihood Methods: Conditioning on Insufficient Statistics in Bayesian Regression}
 \thanksnewlabel{T1thanks}{{\TextOrMath  {\textasteriskcentered }{*}}{1}}
 \thanksnewlabel{e1@email}{{lewis.865@buckeyemail.osu.edu}{1}}
@@ -29,11 +34,6 @@
 \gdef\hy@subject{Bayesian Analysis0000 0001}
 \gdef\hy@keywords{Markov chain Monte Carlo, M-estimation, Robust regression}
 \gdef\author@num{3}
-\citation{yuan1999minimally}
-\citation{zhu2011}
-\citation{clyde2004}
-\citation{bernardo2000,clyde2013,clarke2013Complete}
-\citation{lee2014}
 \@writefile{toc}{\contentsline {section}{\numberline {1}Introduction}{2}{section.1}}
 \@writefile{brf}{\backcite{garthwaite2005}{{2}{1}{section.1}}}
 \@writefile{brf}{\backcite{ohagan2006}{{2}{1}{section.1}}}
@@ -45,7 +45,7 @@
 \@writefile{brf}{\backcite{bernardo2000}{{2}{1}{section.1}}}
 \@writefile{brf}{\backcite{clyde2013}{{2}{1}{section.1}}}
 \@writefile{brf}{\backcite{clarke2013Complete}{{2}{1}{section.1}}}
-\@writefile{brf}{\backcite{lee2014}{{3}{1}{section.1}}}
+\@writefile{brf}{\backcite{lee2014}{{2}{1}{section.1}}}
 \citation{ratcliff1993}
 \@writefile{toc}{\contentsline {section}{\numberline {2}Restricted Likelihood}{4}{section.2}}
 \newlabel{restrictedlikelihood}{{2}{4}{Restricted Likelihood}{section.2}{}}
@@ -53,6 +53,11 @@
 \newlabel{OutlyingCases}{{1}{4}{Examples}{equation.2.1}{}}
 \@writefile{brf}{\backcite{ratcliff1993}{{4}{2.1}{equation.2.1}}}
 \citation{lewis2014}
+\newlabel{Censoring}{{2}{5}{Examples}{equation.2.2}{}}
+\@writefile{brf}{\backcite{lewis2014}{{5}{2.1}{equation.2.2}}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Generalization}{5}{subsection.2.2}}
+\newlabel{FullLikelihood}{{3}{5}{Generalization}{equation.2.3}{}}
+\newlabel{RestrictedPosterior}{{4}{5}{Generalization}{equation.2.4}{}}
 \citation{wong2004}
 \citation{savage1969}
 \citation{pettitt1983,pettitt1982}
@@ -62,15 +67,10 @@
 \citation{clarke1995}
 \citation{yuan2004}
 \citation{hwang2005}
-\newlabel{Censoring}{{2}{5}{Examples}{equation.2.2}{}}
-\@writefile{brf}{\backcite{lewis2014}{{5}{2.1}{equation.2.2}}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2}Generalization}{5}{subsection.2.2}}
-\newlabel{FullLikelihood}{{3}{5}{Generalization}{equation.2.3}{}}
-\newlabel{RestrictedPosterior}{{4}{5}{Generalization}{equation.2.4}{}}
-\newlabel{RestrictedpredDist}{{5}{5}{Generalization}{equation.2.5}{}}
 \citation{pratt1965}
 \citation{tavare1997,pritchard1999,marjoram2003,fearnhead2012}
 \citation{joyce2008}
+\newlabel{RestrictedpredDist}{{5}{6}{Generalization}{equation.2.5}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.3}Literature review}{6}{subsection.2.3}}
 \@writefile{brf}{\backcite{wong2004}{{6}{2.3}{subsection.2.3}}}
 \@writefile{brf}{\backcite{savage1969}{{6}{2.3}{subsection.2.3}}}
@@ -87,172 +87,172 @@
 \@writefile{brf}{\backcite{pritchard1999}{{6}{2.3}{subsection.2.3}}}
 \@writefile{brf}{\backcite{marjoram2003}{{6}{2.3}{subsection.2.3}}}
 \@writefile{brf}{\backcite{fearnhead2012}{{6}{2.3}{subsection.2.3}}}
-\@writefile{brf}{\backcite{joyce2008}{{6}{2.3}{subsection.2.3}}}
 \citation{stigler1977}
 \citation{lee2014}
 \citation{huber2009}
 \citation{huber2009}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}An Illustrative Example}{7}{subsection.2.4}}
-\newlabel{illustrations}{{2.4}{7}{An Illustrative Example}{subsection.2.4}{}}
+\@writefile{brf}{\backcite{joyce2008}{{7}{2.3}{subsection.2.3}}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4}Illustrative Examples}{7}{subsection.2.4}}
+\newlabel{illustrations}{{2.4}{7}{Illustrative Examples}{subsection.2.4}{}}
 \@writefile{brf}{\backcite{stigler1977}{{7}{2.4}{subsection.2.4}}}
 \@writefile{brf}{\backcite{lee2014}{{7}{2.4}{subsection.2.4}}}
 \@writefile{brf}{\backcite{huber2009}{{7}{2.4}{equation.2.6}}}
-\citation{huber1964}
-\citation{lewis2014}
+\citation{rousseeuw1987}
+\citation{kass1995reference}
 \@writefile{brf}{\backcite{huber2009}{{8}{2.4}{equation.2.6}}}
-\@writefile{toc}{\contentsline {section}{\numberline {3}Restricted Likelihood for the Linear Model}{8}{section.3}}
-\newlabel{BayesLinMod}{{3}{8}{Restricted Likelihood for the Linear Model}{section.3}{}}
+\@writefile{brf}{\backcite{rousseeuw1987}{{8}{2.4}{figure.1}}}
 \@writefile{lof}{\contentsline {figure}{\numberline {1}{\ignorespaces Results from the analysis of the speed of light data. Top: Posterior distributions of $\beta $ under each model. Bottom: Log posterior predictive distributions under each model. The differences in the tails are emphasized in the bottom plot. The horizontal axis is strategically labeled to help compare the centers of the distributions in each of the plots.}}{9}{figure.1}}
 \newlabel{fig:newcomb_post}{{1}{9}{Results from the analysis of the speed of light data. Top: Posterior distributions of $\beta $ under each model. Bottom: Log posterior predictive distributions under each model. The differences in the tails are emphasized in the bottom plot. The horizontal axis is strategically labeled to help compare the centers of the distributions in each of the plots}{figure.1}{}}
-\@writefile{brf}{\backcite{huber1964}{{9}{3}{section.3}}}
-\@writefile{brf}{\backcite{lewis2014}{{9}{3}{section.3}}}
+\@writefile{brf}{\backcite{kass1995reference}{{9}{2.4}{equation.2.7}}}
+\citation{huber1964}
+\citation{lewis2014}
+\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces Pointwise posterior predictive intervals of log(calls) under the normal theory model fit to the non-outliers, the restricted likelihood model with Tukey's M-estimator for the slope and intercept with Huber's `proposal 2' for scale, and a heavy-tailed t-distribution model. The first three data points were used to specify the prior with each model using the remaining 21 for fitting. The normal theory model was also fit after removing observations 14-20 (years 1963 - 1970).}}{11}{figure.2}}
+\newlabel{fig:calls_predictive}{{2}{11}{Pointwise posterior predictive intervals of log(calls) under the normal theory model fit to the non-outliers, the restricted likelihood model with Tukey's M-estimator for the slope and intercept with Huber's `proposal 2' for scale, and a heavy-tailed t-distribution model. The first three data points were used to specify the prior with each model using the remaining 21 for fitting. The normal theory model was also fit after removing observations 14-20 (years 1963 - 1970)}{figure.2}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3}Restricted Likelihood for the Linear Model}{11}{section.3}}
+\newlabel{BayesLinMod}{{3}{11}{Restricted Likelihood for the Linear Model}{section.3}{}}
+\@writefile{brf}{\backcite{huber1964}{{11}{3}{section.3}}}
+\@writefile{brf}{\backcite{lewis2014}{{11}{3}{section.3}}}
 \citation{huber2009,maronna2006}
 \citation{lewis2014}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}The Bayesian linear model}{10}{subsection.3.1}}
-\newlabel{LinearModel}{{7}{10}{The Bayesian linear model}{equation.3.7}{}}
-\newlabel{fullRank}{{C1}{10}{The Bayesian linear model}{equation.3.7}{}}
-\newlabel{supReal}{{C2}{10}{The Bayesian linear model}{equation.3.7}{}}
-\newlabel{asb}{{C3}{10}{The Bayesian linear model}{equation.3.7}{}}
-\newlabel{as}{{C4}{10}{The Bayesian linear model}{equation.3.7}{}}
-\newlabel{regEq}{{C5}{10}{The Bayesian linear model}{equation.3.7}{}}
-\newlabel{scaleEqReg}{{C6}{10}{The Bayesian linear model}{equation.3.7}{}}
-\newlabel{regIn}{{C7}{10}{The Bayesian linear model}{equation.3.7}{}}
-\newlabel{scaleEq2Reg}{{C8}{10}{The Bayesian linear model}{equation.3.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1}The Bayesian linear model}{12}{subsection.3.1}}
+\newlabel{LinearModel}{{8}{12}{The Bayesian linear model}{equation.3.8}{}}
+\newlabel{fullRank}{{C1}{12}{The Bayesian linear model}{equation.3.8}{}}
+\newlabel{supReal}{{C2}{12}{The Bayesian linear model}{equation.3.8}{}}
+\newlabel{asb}{{C3}{12}{The Bayesian linear model}{equation.3.8}{}}
+\newlabel{as}{{C4}{12}{The Bayesian linear model}{equation.3.8}{}}
+\newlabel{regEq}{{C5}{12}{The Bayesian linear model}{equation.3.8}{}}
+\newlabel{scaleEqReg}{{C6}{12}{The Bayesian linear model}{equation.3.8}{}}
+\newlabel{regIn}{{C7}{12}{The Bayesian linear model}{equation.3.8}{}}
+\newlabel{scaleEq2Reg}{{C8}{12}{The Bayesian linear model}{equation.3.8}{}}
+\@writefile{brf}{\backcite{huber2009}{{12}{3.1}{equation.3.8}}}
 \citation{gelfand1990}
 \citation{liu1994,liang2008}
 \citation{hastings1970}
-\@writefile{brf}{\backcite{huber2009}{{11}{3.1}{equation.3.7}}}
-\@writefile{brf}{\backcite{maronna2006}{{11}{3.1}{equation.3.7}}}
-\@writefile{brf}{\backcite{lewis2014}{{11}{3.1}{equation.3.7}}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Computational strategy}{11}{subsection.3.2}}
-\newlabel{highDim}{{3.2}{11}{Computational strategy}{subsection.3.2}{}}
-\@writefile{brf}{\backcite{gelfand1990}{{11}{3.2}{subsection.3.2}}}
-\@writefile{brf}{\backcite{liu1994}{{11}{3.2}{subsection.3.2}}}
-\@writefile{brf}{\backcite{liang2008}{{11}{3.2}{subsection.3.2}}}
-\@writefile{brf}{\backcite{hastings1970}{{11}{3.2}{subsection.3.2}}}
-\newlabel{MHRatio}{{8}{12}{Computational strategy}{equation.3.8}{}}
-\@writefile{toc}{\contentsline {subsubsection}{Construction of the proposal}{12}{section*.1}}
-\newlabel{Transformation}{{3.1}{12}{}{theorem.3.1}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2}{\ignorespaces A depiction of $\mathcal  {A}$, $\Pi (\mathcal  {A})$, and the unit circle for the illustrative example where $b_{1}(\mathbf  {1},\unhbox \voidb@x \hbox {\relax \mathversion  {bold}$y$})=\qopname  \relax m{min}(\unhbox \voidb@x \hbox {\relax \mathversion  {bold}$y$})=0$ and $s(\mathbf  {1},\unhbox \voidb@x \hbox {\relax \mathversion  {bold}$y$})=\DOTSB \sum@ \slimits@ (y_i -b_{1}(\mathbf  {1},\unhbox \voidb@x \hbox {\relax \mathversion  {bold}$y$}))^2 =1$. $\mathcal  {A}$ is the combination of three quarter circles, one on each plane defined by $y_i=0$. The projection of this manifold onto the deviation space is depicted by the bowed triangular shape in the plane defined by $\DOTSB \sum@ \slimits@ y_i=0$. The circle in this plane represents the sample space for the intermediate sample $\unhbox \voidb@x \hbox {\relax \mathversion  {bold}$z$}^*$. Also depicted is the vector $\mathbf  {1}$, the design matrix for the location and scale setting.}}{14}{figure.2}}
-\newlabel{fig:sampSpace}{{2}{14}{A depiction of $\mathcal {A}$, $\Pi (\mathcal {A})$, and the unit circle for the illustrative example where $b_{1}(\mathbf {1},\by )=\min (\by )=0$ and $s(\mathbf {1},\by )=\sum (y_i -b_{1}(\mathbf {1},\by ))^2 =1$. $\mathcal {A}$ is the combination of three quarter circles, one on each plane defined by $y_i=0$. The projection of this manifold onto the deviation space is depicted by the bowed triangular shape in the plane defined by $\sum y_i=0$. The circle in this plane represents the sample space for the intermediate sample $\bz ^*$. Also depicted is the vector $\mathbf {1}$, the design matrix for the location and scale setting}{figure.2}{}}
-\@writefile{toc}{\contentsline {subsubsection}{Evaluation of the proposal density}{15}{section*.2}}
-\newlabel{gradSTheoremReg}{{3.2}{15}{}{theorem.3.2}{}}
-\newlabel{cosine}{{11}{15}{Evaluation of the proposal density}{equation.3.11}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces Visualization of the scaling from $z^{*}$ to $z$. Left: the first substep scales $z^{*}$ on the unit circle to the circle of radius $r = ||z||$, resulting in a change-of-variables transformation for the unit circle to a circle of radius $r$. The contribution to the Jacobian of this transformation is $r^{-(n-p-1)}$. Right: The second substep accounts for the the change-of-variables transformation from the circle of radius $r$ to $\Pi (\mathcal  {A})$. The normal vectors to these two sets are used to calculate the contribution to the Jacobian of this part of the transformation are shown in the figure.}}{16}{figure.3}}
-\newlabel{fig:stretchDeform}{{3}{16}{Visualization of the scaling from $z^{*}$ to $z$. Left: the first substep scales $z^{*}$ on the unit circle to the circle of radius $r = ||z||$, resulting in a change-of-variables transformation for the unit circle to a circle of radius $r$. The contribution to the Jacobian of this transformation is $r^{-(n-p-1)}$. Right: The second substep accounts for the the change-of-variables transformation from the circle of radius $r$ to $\Pi (\mathcal {A})$. The normal vectors to these two sets are used to calculate the contribution to the Jacobian of this part of the transformation are shown in the figure}{figure.3}{}}
-\newlabel{lem:basis}{{3.3}{16}{}{theorem.3.3}{}}
+\@writefile{brf}{\backcite{maronna2006}{{13}{3.1}{equation.3.8}}}
+\@writefile{brf}{\backcite{lewis2014}{{13}{3.1}{equation.3.8}}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2}Computational strategy}{13}{subsection.3.2}}
+\newlabel{highDim}{{3.2}{13}{Computational strategy}{subsection.3.2}{}}
+\@writefile{brf}{\backcite{gelfand1990}{{13}{3.2}{subsection.3.2}}}
+\@writefile{brf}{\backcite{liu1994}{{13}{3.2}{subsection.3.2}}}
+\@writefile{brf}{\backcite{liang2008}{{13}{3.2}{subsection.3.2}}}
+\@writefile{brf}{\backcite{hastings1970}{{13}{3.2}{subsection.3.2}}}
+\newlabel{MHRatio}{{9}{14}{Computational strategy}{equation.3.9}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Construction of the proposal}{14}{section*.1}}
+\newlabel{Transformation}{{3.1}{14}{}{theorem.3.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3}{\ignorespaces A depiction of $\mathcal  {A}$, $\Pi (\mathcal  {A})$, and the unit circle for the illustrative example where $b_{1}(\mathbf  {1},\unhbox \voidb@x \hbox {\relax \mathversion  {bold}$y$})=\qopname  \relax m{min}(\unhbox \voidb@x \hbox {\relax \mathversion  {bold}$y$})=0$ and $s(\mathbf  {1},\unhbox \voidb@x \hbox {\relax \mathversion  {bold}$y$})=\DOTSB \sum@ \slimits@ (y_i -b_{1}(\mathbf  {1},\unhbox \voidb@x \hbox {\relax \mathversion  {bold}$y$}))^2 =1$. $\mathcal  {A}$ is the combination of three quarter circles, one on each plane defined by $y_i=0$. The projection of this manifold onto the deviation space is depicted by the bowed triangular shape in the plane defined by $\DOTSB \sum@ \slimits@ y_i=0$. The circle in this plane represents the sample space for the intermediate sample $\unhbox \voidb@x \hbox {\relax \mathversion  {bold}$z$}^*$. Also depicted is the vector $\mathbf  {1}$, the design matrix for the location and scale setting.}}{16}{figure.3}}
+\newlabel{fig:sampSpace}{{3}{16}{A depiction of $\mathcal {A}$, $\Pi (\mathcal {A})$, and the unit circle for the illustrative example where $b_{1}(\mathbf {1},\by )=\min (\by )=0$ and $s(\mathbf {1},\by )=\sum (y_i -b_{1}(\mathbf {1},\by ))^2 =1$. $\mathcal {A}$ is the combination of three quarter circles, one on each plane defined by $y_i=0$. The projection of this manifold onto the deviation space is depicted by the bowed triangular shape in the plane defined by $\sum y_i=0$. The circle in this plane represents the sample space for the intermediate sample $\bz ^*$. Also depicted is the vector $\mathbf {1}$, the design matrix for the location and scale setting}{figure.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Evaluation of the proposal density}{17}{section*.2}}
+\newlabel{gradSTheoremReg}{{3.2}{17}{}{theorem.3.2}{}}
+\newlabel{cosine}{{12}{17}{Evaluation of the proposal density}{equation.3.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Visualization of the scaling from $z^{*}$ to $z$. Left: the first substep scales $z^{*}$ on the unit circle to the circle of radius $r = ||z||$, resulting in a change-of-variables transformation for the unit circle to a circle of radius $r$. The contribution to the Jacobian of this transformation is $r^{-(n-p-1)}$. Right: The second substep accounts for the the change-of-variables transformation from the circle of radius $r$ to $\Pi (\mathcal  {A})$. The normal vectors to these two sets are used to calculate the contribution to the Jacobian of this part of the transformation are shown in the figure.}}{18}{figure.4}}
+\newlabel{fig:stretchDeform}{{4}{18}{Visualization of the scaling from $z^{*}$ to $z$. Left: the first substep scales $z^{*}$ on the unit circle to the circle of radius $r = ||z||$, resulting in a change-of-variables transformation for the unit circle to a circle of radius $r$. The contribution to the Jacobian of this transformation is $r^{-(n-p-1)}$. Right: The second substep accounts for the the change-of-variables transformation from the circle of radius $r$ to $\Pi (\mathcal {A})$. The normal vectors to these two sets are used to calculate the contribution to the Jacobian of this part of the transformation are shown in the figure}{figure.4}{}}
+\newlabel{lem:basis}{{3.3}{18}{}{theorem.3.3}{}}
 \citation{miao1992}
-\newlabel{lem:fullrank}{{3.4}{17}{}{theorem.3.4}{}}
-\newlabel{eq:volume}{{12}{17}{Evaluation of the proposal density}{equation.3.12}{}}
-\@writefile{brf}{\backcite{miao1992}{{17}{3.2}{equation.3.12}}}
-\newlabel{Jacobian}{{3.5}{17}{}{theorem.3.5}{}}
-\newlabel{dens:ystst}{{13}{17}{}{equation.3.13}{}}
+\newlabel{lem:fullrank}{{3.4}{19}{}{theorem.3.4}{}}
+\newlabel{eq:volume}{{13}{19}{Evaluation of the proposal density}{equation.3.13}{}}
+\@writefile{brf}{\backcite{miao1992}{{19}{3.2}{equation.3.13}}}
+\newlabel{Jacobian}{{3.5}{19}{}{theorem.3.5}{}}
+\newlabel{dens:ystst}{{14}{19}{}{equation.3.14}{}}
 \citation{miao1992}
-\@writefile{brf}{\backcite{miao1992}{{18}{3.2}{equation.3.13}}}
-\newlabel{theorem:sings}{{3.7}{18}{}{theorem.3.7}{}}
-\newlabel{Mest}{{14}{18}{Evaluation of the proposal density}{equation.3.14}{}}
+\@writefile{brf}{\backcite{miao1992}{{20}{3.2}{equation.3.14}}}
+\newlabel{theorem:sings}{{3.7}{20}{}{theorem.3.7}{}}
+\newlabel{Mest}{{15}{21}{Evaluation of the proposal density}{equation.3.15}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {4}Simulated Data}{21}{section.4}}
+\newlabel{simData}{{4}{21}{Simulated Data}{section.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Simulation 1}{21}{subsection.4.1}}
+\newlabel{gensim2}{{16}{21}{Simulation 1}{equation.4.16}{}}
 \citation{huber2009}
-\@writefile{toc}{\contentsline {section}{\numberline {4}Simulated Data}{19}{section.4}}
-\newlabel{simData}{{4}{19}{Simulated Data}{section.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.1}Simulation 1}{19}{subsection.4.1}}
-\newlabel{gensim2}{{15}{19}{Simulation 1}{equation.4.15}{}}
-\newlabel{fullsim2}{{16}{19}{Simulation 1}{equation.4.16}{}}
-\@writefile{brf}{\backcite{huber2009}{{20}{4.1}{equation.4.16}}}
-\newlabel{sim1loss}{{17}{20}{Simulation 1}{equation.4.17}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {4}{\ignorespaces Average Loss plus/minus one standard error for each value of $a_{s}$ and $c$. Smaller values represent better fits. The panels correspond to $c = 0.5$ (left), $c=1$ (middle), and $c=2$ (right), with the values of $a_{s}$ on the horizontal axis. The average loss for the normal theory model ranges from $1.19$ to $1.42$ and is left out of the figure.}}{22}{figure.4}}
-\newlabel{kl_sim}{{4}{22}{Average Loss plus/minus one standard error for each value of $a_{s}$ and $c$. Smaller values represent better fits. The panels correspond to $c = 0.5$ (left), $c=1$ (middle), and $c=2$ (right), with the values of $a_{s}$ on the horizontal axis. The average loss for the normal theory model ranges from $1.19$ to $1.42$ and is left out of the figure}{figure.4}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}{\color  {blue}Simulation 2}}{22}{subsection.4.2}}
-\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Average loss plus/minus one standard error grouped by the factors $m$ (left), $n$ (middle), and $p$ (right). These results are for the single prior with $a_s = 5$ and $c = 1$.}}{23}{figure.5}}
-\newlabel{kl_mnp}{{5}{23}{Average loss plus/minus one standard error grouped by the factors $m$ (left), $n$ (middle), and $p$ (right). These results are for the single prior with $a_s = 5$ and $c = 1$}{figure.5}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces ADD}}{24}{figure.6}}
-\newlabel{mseSimMany}{{6}{24}{ADD}{figure.6}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {5}Real Data}{24}{section.5}}
-\newlabel{RealData}{{5}{24}{Real Data}{section.5}{}}
+\newlabel{fullsim2}{{17}{22}{Simulation 1}{equation.4.17}{}}
+\@writefile{brf}{\backcite{huber2009}{{22}{4.1}{equation.4.17}}}
+\newlabel{sim1loss}{{18}{23}{Simulation 1}{equation.4.18}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {5}{\ignorespaces Average Loss plus/minus one standard error for each value of $a_{s}$ and $c$. Smaller values represent better fits. The panels correspond to $c = 0.5$ (left), $c=1$ (middle), and $c=2$ (right), with the values of $a_{s}$ on the horizontal axis. The average loss for the normal theory model ranges from $1.19$ to $1.42$ and is left out of the figure.}}{24}{figure.5}}
+\newlabel{kl_sim}{{5}{24}{Average Loss plus/minus one standard error for each value of $a_{s}$ and $c$. Smaller values represent better fits. The panels correspond to $c = 0.5$ (left), $c=1$ (middle), and $c=2$ (right), with the values of $a_{s}$ on the horizontal axis. The average loss for the normal theory model ranges from $1.19$ to $1.42$ and is left out of the figure}{figure.5}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {6}{\ignorespaces Average loss plus/minus one standard error grouped by the factors $m$ (left), $n$ (middle), and $p$ (right). These results are for the single prior with $a_s = 5$ and $c = 1$.}}{25}{figure.6}}
+\newlabel{kl_mnp}{{6}{25}{Average loss plus/minus one standard error grouped by the factors $m$ (left), $n$ (middle), and $p$ (right). These results are for the single prior with $a_s = 5$ and $c = 1$}{figure.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {4.2}{\color  {blue}Simulation 2}}{25}{subsection.4.2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces ADD}}{26}{figure.7}}
+\newlabel{mseSimMany}{{7}{26}{ADD}{figure.7}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {5}Real Data}{27}{section.5}}
+\newlabel{RealData}{{5}{27}{Real Data}{section.5}{}}
 \citation{zellner1986,liang2008}
 \citation{kass1995reference}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}State Level Regression model}{25}{subsection.5.1}}
-\newlabel{regModelNW}{{5.1}{25}{State Level Regression model}{subsection.5.1}{}}
-\newlabel{eq:regModel}{{18}{25}{State Level Regression model}{equation.5.18}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {7}{\ignorespaces The square root of (scaled) count in 2012 versus that in 2010 for four states. The colors represent the varying contractual agreements as they stood in 2010 (`Type'). Agencies that closed during the 2010-2012 period are represented by the zero counts for 2012.}}{26}{figure.7}}
-\newlabel{fig:ctVct}{{7}{26}{The square root of (scaled) count in 2012 versus that in 2010 for four states. The colors represent the varying contractual agreements as they stood in 2010 (`Type'). Agencies that closed during the 2010-2012 period are represented by the zero counts for 2012}{figure.7}{}}
-\@writefile{brf}{\backcite{zellner1986}{{26}{5.1}{equation.5.18}}}
-\@writefile{brf}{\backcite{liang2008}{{26}{5.1}{equation.5.18}}}
-\@writefile{brf}{\backcite{kass1995reference}{{26}{5.1}{equation.5.18}}}
+\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces The square root of (scaled) count in 2012 versus that in 2010 for four states. The colors represent the varying contractual agreements as they stood in 2010 (`Type'). Agencies that closed during the 2010-2012 period are represented by the zero counts for 2012.}}{28}{figure.8}}
+\newlabel{fig:ctVct}{{8}{28}{The square root of (scaled) count in 2012 versus that in 2010 for four states. The colors represent the varying contractual agreements as they stood in 2010 (`Type'). Agencies that closed during the 2010-2012 period are represented by the zero counts for 2012}{figure.8}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.1}State Level Regression model}{28}{subsection.5.1}}
+\newlabel{regModelNW}{{5.1}{28}{State Level Regression model}{subsection.5.1}{}}
+\newlabel{eq:regModel}{{19}{28}{State Level Regression model}{equation.5.19}{}}
 \citation{ronchetti1997}
 \citation{jung2014}
-\@writefile{toc}{\contentsline {subsubsection}{Method of model comparison}{27}{section*.3}}
-\@writefile{brf}{\backcite{ronchetti1997}{{27}{5.1}{section*.3}}}
-\@writefile{brf}{\backcite{jung2014}{{27}{5.1}{section*.3}}}
-\@writefile{toc}{\contentsline {subsubsection}{Comparison of predictive performance}{28}{section*.4}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Hierarchical regression model}{29}{subsection.5.2}}
-\newlabel{hierRegNW}{{5.2}{29}{Hierarchical regression model}{subsection.5.2}{}}
-\newlabel{eq:hierModel}{{19}{29}{Hierarchical regression model}{equation.5.19}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {8}{\ignorespaces Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples. The panels are for the different states 2, 15, 27, and 36, with $n = 222, 40, 117,$ and $46$, respectively. The horizontal axis is the percent of $n$ used in each training set. The color corresponds to the fitting model. Larger values of TLM are better.}}{30}{figure.8}}
-\newlabel{fig:tlm}{{8}{30}{Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples. The panels are for the different states 2, 15, 27, and 36, with $n = 222, 40, 117,$ and $46$, respectively. The horizontal axis is the percent of $n$ used in each training set. The color corresponds to the fitting model. Larger values of TLM are better}{figure.8}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples for several values of the trimming fraction $\alpha $. The training sample size used is $0.5n$. Larger values of TLM are better.}}{31}{figure.9}}
-\newlabel{fig:tlmbyAlpha}{{9}{31}{Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples for several values of the trimming fraction $\alpha $. The training sample size used is $0.5n$. Larger values of TLM are better}{figure.9}{}}
+\@writefile{brf}{\backcite{zellner1986}{{29}{5.1}{equation.5.19}}}
+\@writefile{brf}{\backcite{liang2008}{{29}{5.1}{equation.5.19}}}
+\@writefile{brf}{\backcite{kass1995reference}{{29}{5.1}{equation.5.19}}}
+\@writefile{toc}{\contentsline {subsubsection}{Method of model comparison}{29}{section*.3}}
+\@writefile{brf}{\backcite{ronchetti1997}{{29}{5.1}{section*.3}}}
+\@writefile{brf}{\backcite{jung2014}{{29}{5.1}{section*.3}}}
+\@writefile{toc}{\contentsline {subsubsection}{Comparison of predictive performance}{30}{section*.4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {9}{\ignorespaces Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples. The panels are for the different states 2, 15, 27, and 36, with $n = 222, 40, 117,$ and $46$, respectively. The horizontal axis is the percent of $n$ used in each training set. The color corresponds to the fitting model. Larger values of TLM are better.}}{32}{figure.9}}
+\newlabel{fig:tlm}{{9}{32}{Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples. The panels are for the different states 2, 15, 27, and 36, with $n = 222, 40, 117,$ and $46$, respectively. The horizontal axis is the percent of $n$ used in each training set. The color corresponds to the fitting model. Larger values of TLM are better}{figure.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {5.2}Hierarchical regression model}{32}{subsection.5.2}}
+\newlabel{hierRegNW}{{5.2}{32}{Hierarchical regression model}{subsection.5.2}{}}
+\newlabel{eq:hierModel}{{20}{32}{Hierarchical regression model}{equation.5.20}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples for several values of the trimming fraction $\alpha $. The training sample size used is $0.5n$. Larger values of TLM are better.}}{33}{figure.10}}
+\newlabel{fig:tlmbyAlpha}{{10}{33}{Average TLM plus/minus one standard deviation over $K = 50$ splits into training and holdout samples for several values of the trimming fraction $\alpha $. The training sample size used is $0.5n$. Larger values of TLM are better}{figure.10}{}}
 \citation{gelman2006}
-\@writefile{lof}{\contentsline {figure}{\numberline {10}{\ignorespaces Hierarchical model results: $\overline  {TLM}_b(A)_{\cdot }$ plus/minus one standard deviation over $K = 50$ splits into training and holdout sets with the Student-t as the base model and several values of the trimming fraction $\alpha $. Larger values of TLM are better.}}{33}{figure.10}}
-\newlabel{fig:hierTLM}{{10}{33}{Hierarchical model results: $\overline {TLM}_b(A)_{\cdot }$ plus/minus one standard deviation over $K = 50$ splits into training and holdout sets with the Student-t as the base model and several values of the trimming fraction $\alpha $. Larger values of TLM are better}{figure.10}{}}
-\@writefile{brf}{\backcite{gelman2006}{{33}{5.2}{figure.10}}}
-\@writefile{toc}{\contentsline {section}{\numberline {6}Discussion}{34}{section.6}}
-\newlabel{Conclusions}{{6}{34}{Discussion}{section.6}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {7}Supplementary Material}{35}{section.7}}
-\newlabel{sec:appendix}{{7}{35}{Supplementary Material}{section.7}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Practical Considerations for Using the Restricted Likelihood}{35}{subsection.7.1}}
-\citation{rousseeuw1987}
-\citation{kass1995reference}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}An Additional Illustrative Example}{36}{subsection.7.2}}
-\@writefile{brf}{\backcite{rousseeuw1987}{{36}{7.2}{subsection.7.2}}}
-\@writefile{brf}{\backcite{kass1995reference}{{36}{7.2}{equation.7.21}}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Proofs}{38}{subsection.7.3}}
-\newlabel{1to1onto}{{7.1}{38}{}{theorem.7.1}{}}
-\newlabel{perpGradReg}{{7.3}{38}{Proofs}{theorem.7.1}{}}
-\newlabel{eq:lem3.2}{{27}{38}{Proofs}{equation.7.27}{}}
-\newlabel{BigMatrix}{{28}{39}{Proofs}{equation.7.28}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Hierarchical model results: $\overline  {TLM}_b(A)_{\cdot }$ plus/minus one standard deviation over $K = 50$ splits into training and holdout sets with the Student-t as the base model and several values of the trimming fraction $\alpha $. Larger values of TLM are better.}}{35}{figure.11}}
+\newlabel{fig:hierTLM}{{11}{35}{Hierarchical model results: $\overline {TLM}_b(A)_{\cdot }$ plus/minus one standard deviation over $K = 50$ splits into training and holdout sets with the Student-t as the base model and several values of the trimming fraction $\alpha $. Larger values of TLM are better}{figure.11}{}}
+\@writefile{brf}{\backcite{gelman2006}{{36}{5.2}{figure.11}}}
+\@writefile{toc}{\contentsline {section}{\numberline {6}Discussion}{36}{section.6}}
+\newlabel{Conclusions}{{6}{36}{Discussion}{section.6}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {7}Supplementary Material}{38}{section.7}}
+\newlabel{sec:appendix}{{7}{38}{Supplementary Material}{section.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.1}Practical Considerations for Using the Restricted Likelihood}{38}{subsection.7.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.2}Proofs}{39}{subsection.7.2}}
+\newlabel{1to1onto}{{7.1}{39}{}{theorem.7.1}{}}
+\newlabel{perpGradReg}{{7.2}{40}{Proofs}{theorem.7.1}{}}
+\newlabel{eq:lem3.2}{{27}{40}{Proofs}{equation.7.27}{}}
+\newlabel{BigMatrix}{{28}{40}{Proofs}{equation.7.28}{}}
 \citation{miao1992}
-\@writefile{brf}{\backcite{miao1992}{{40}{7.3}{equation.7.28}}}
-\newlabel{MBI:lemma}{{7.2}{40}{}{theorem.7.2}{}}
-\newlabel{MBI:thm}{{7.3}{40}{}{theorem.7.3}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}Setting the hierarchical prior values}{40}{subsection.7.4}}
-\@writefile{toc}{\contentsline {section}{\numberline {8}M-estimators}{41}{section.8}}
-\newlabel{sec:Mestimators}{{8}{41}{M-estimators}{section.8}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.1}M-estimators of Location}{42}{subsection.8.1}}
-\newlabel{sec:Mlocation}{{8.1}{42}{M-estimators of Location}{subsection.8.1}{}}
-\newlabel{locMod}{{29}{42}{M-estimators of Location}{equation.8.29}{}}
-\newlabel{MrhoLoc}{{30}{42}{M-estimators of Location}{equation.8.30}{}}
-\newlabel{MpsiLoc}{{31}{42}{M-estimators of Location}{equation.8.31}{}}
-\newlabel{MpsiLocWeight}{{32}{42}{M-estimators of Location}{equation.8.32}{}}
-\newlabel{weightedAve}{{33}{42}{M-estimators of Location}{equation.8.33}{}}
-\newlabel{Huber}{{34}{42}{M-estimators of Location}{equation.8.34}{}}
+\@writefile{brf}{\backcite{miao1992}{{41}{7.2}{equation.7.28}}}
+\newlabel{MBI:lemma}{{7.2}{41}{}{theorem.7.2}{}}
+\newlabel{MBI:thm}{{7.3}{41}{}{theorem.7.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.3}Setting the hierarchical prior values}{42}{subsection.7.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.4}M-estimators}{43}{subsection.7.4}}
+\newlabel{sec:Mestimators}{{7.4}{43}{M-estimators}{subsection.7.4}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.5}M-estimators of Location}{43}{subsection.7.5}}
+\newlabel{sec:Mlocation}{{7.5}{43}{M-estimators of Location}{subsection.7.5}{}}
+\newlabel{locMod}{{29}{43}{M-estimators of Location}{equation.7.29}{}}
+\newlabel{MrhoLoc}{{30}{43}{M-estimators of Location}{equation.7.30}{}}
+\newlabel{MpsiLoc}{{31}{43}{M-estimators of Location}{equation.7.31}{}}
+\newlabel{MpsiLocWeight}{{32}{43}{M-estimators of Location}{equation.7.32}{}}
+\newlabel{weightedAve}{{33}{43}{M-estimators of Location}{equation.7.33}{}}
 \citation{huber2009}
 \citation{huber2009}
 \citation{maronna2006}
 \citation{huber2009}
 \citation{maronna2006}
-\newlabel{Tukey}{{35}{43}{M-estimators of Location}{equation.8.35}{}}
-\@writefile{brf}{\backcite{huber2009}{{43}{8.1}{equation.8.35}}}
-\@writefile{brf}{\backcite{huber2009}{{43}{8.1}{equation.8.35}}}
-\@writefile{brf}{\backcite{maronna2006}{{43}{8.1}{equation.8.35}}}
-\@writefile{brf}{\backcite{huber2009}{{43}{8.1}{equation.8.35}}}
-\@writefile{brf}{\backcite{maronna2006}{{43}{8.1}{equation.8.35}}}
-\newlabel{eq:Epsi}{{36}{43}{M-estimators of Location}{equation.8.36}{}}
-\newlabel{eq:asyNormM}{{37}{43}{M-estimators of Location}{equation.8.37}{}}
+\newlabel{Huber}{{34}{44}{M-estimators of Location}{equation.7.34}{}}
+\newlabel{Tukey}{{35}{44}{M-estimators of Location}{equation.7.35}{}}
+\@writefile{brf}{\backcite{huber2009}{{44}{7.5}{equation.7.35}}}
+\@writefile{brf}{\backcite{huber2009}{{44}{7.5}{equation.7.35}}}
+\@writefile{brf}{\backcite{maronna2006}{{44}{7.5}{equation.7.35}}}
+\@writefile{brf}{\backcite{huber2009}{{44}{7.5}{equation.7.35}}}
+\@writefile{brf}{\backcite{maronna2006}{{44}{7.5}{equation.7.35}}}
+\newlabel{eq:Epsi}{{36}{44}{M-estimators of Location}{equation.7.36}{}}
 \citation{huber1964}
-\newlabel{eq:Eff}{{38}{44}{M-estimators of Location}{equation.8.38}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.2}M-estimators of Scale}{44}{subsection.8.2}}
-\newlabel{sec:Mscale}{{8.2}{44}{M-estimators of Scale}{subsection.8.2}{}}
-\newlabel{scaleMod}{{39}{44}{M-estimators of Scale}{equation.8.39}{}}
-\newlabel{eq:Msigmachi}{{40}{44}{M-estimators of Scale}{equation.8.40}{}}
-\@writefile{brf}{\backcite{huber1964}{{44}{8.2}{equation.8.40}}}
-\newlabel{HuberScale}{{41}{44}{M-estimators of Scale}{equation.8.41}{}}
-\newlabel{madchi}{{42}{45}{M-estimators of Scale}{equation.8.42}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {8.3}Simultaneous M-estimators of Location and Scale}{45}{subsection.8.3}}
-\newlabel{sec:MlocScale}{{8.3}{45}{Simultaneous M-estimators of Location and Scale}{subsection.8.3}{}}
-\newlabel{locScaleMod}{{43}{45}{Simultaneous M-estimators of Location and Scale}{equation.8.43}{}}
-\newlabel{simM}{{44}{45}{Simultaneous M-estimators of Location and Scale}{equation.8.44}{}}
-\newlabel{regM}{{45}{45}{Simultaneous M-estimators of Location and Scale}{equation.8.45}{}}
-\newlabel{simMreg}{{46}{45}{Simultaneous M-estimators of Location and Scale}{equation.8.46}{}}
+\newlabel{eq:asyNormM}{{37}{45}{M-estimators of Location}{equation.7.37}{}}
+\newlabel{eq:Eff}{{38}{45}{M-estimators of Location}{equation.7.38}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.6}M-estimators of Scale}{45}{subsection.7.6}}
+\newlabel{sec:Mscale}{{7.6}{45}{M-estimators of Scale}{subsection.7.6}{}}
+\newlabel{scaleMod}{{39}{45}{M-estimators of Scale}{equation.7.39}{}}
+\newlabel{eq:Msigmachi}{{40}{45}{M-estimators of Scale}{equation.7.40}{}}
+\@writefile{brf}{\backcite{huber1964}{{46}{7.6}{equation.7.40}}}
+\newlabel{HuberScale}{{41}{46}{M-estimators of Scale}{equation.7.41}{}}
+\newlabel{madchi}{{42}{46}{M-estimators of Scale}{equation.7.42}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {7.7}Simultaneous M-estimators of Location and Scale}{46}{subsection.7.7}}
+\newlabel{sec:MlocScale}{{7.7}{46}{Simultaneous M-estimators of Location and Scale}{subsection.7.7}{}}
+\newlabel{locScaleMod}{{43}{46}{Simultaneous M-estimators of Location and Scale}{equation.7.43}{}}
+\newlabel{simM}{{44}{46}{Simultaneous M-estimators of Location and Scale}{equation.7.44}{}}
+\newlabel{regM}{{45}{46}{Simultaneous M-estimators of Location and Scale}{equation.7.45}{}}
 \bibstyle{bib/ba}
 \bibdata{bib/refPaper1}
 \bibcite{berger2006}{{1}{2006}{{Berger}}{{}}}
@@ -262,10 +262,11 @@
 \bibcite{clyde2004}{{5}{2004}{{Clyde and George}}{{}}}
 \bibcite{clyde2013}{{6}{2013}{{Clyde and Iversen}}{{}}}
 \bibcite{doksum1990}{{7}{1990}{{Doksum and Lo}}{{}}}
+\newlabel{simMreg}{{46}{47}{Simultaneous M-estimators of Location and Scale}{equation.7.46}{}}
+\newlabel{ExpMreg}{{47}{47}{Simultaneous M-estimators of Location and Scale}{equation.7.47}{}}
+\@writefile{toc}{\contentsline {section}{References}{47}{section*.6}}
 \bibcite{fearnhead2012}{{8}{2012}{{Fearnhead and Prangle}}{{}}}
 \bibcite{garthwaite2005}{{9}{2005}{{Garthwaite et~al.}}{{Garthwaite, Kadane, and O'Hagan}}}
-\newlabel{ExpMreg}{{47}{46}{Simultaneous M-estimators of Location and Scale}{equation.8.47}{}}
-\@writefile{toc}{\contentsline {section}{References}{46}{section*.6}}
 \bibcite{gelfand1990}{{10}{1990}{{Gelfand and Smith}}{{}}}
 \bibcite{gelman2006}{{11}{2006}{{Gelman}}{{}}}
 \bibcite{hastings1970}{{12}{1970}{{Hastings}}{{}}}
@@ -301,7 +302,5 @@
 \bibcite{yuan1999minimally}{{42}{1999}{{Yuan and Clarke}}{{}}}
 \bibcite{zellner1986}{{43}{1986}{{Zellner}}{{}}}
 \bibcite{zhu2011}{{44}{2011}{{Zhu et~al.}}{{Zhu, Ibrahim, and Tang}}}
-\@writefile{lof}{\contentsline {figure}{\numberline {11}{\ignorespaces Hierarchical model results: ${TLM}_b(A)_{j}$ plus/minus one standard deviation over $K = 50$ repetitions for each state and $\alpha = 0.3$. The states are ordered along the $x$-axis according to number of agencies within the state (shown in parentheses). Results displayed are for the robust models using Tukey's M-estimators. Larger values of TLM are better.}}{51}{figure.11}}
-\newlabel{fig:hierTLMstate}{{11}{51}{Hierarchical model results: ${TLM}_b(A)_{j}$ plus/minus one standard deviation over $K = 50$ repetitions for each state and $\alpha = 0.3$. The states are ordered along the $x$-axis according to number of agencies within the state (shown in parentheses). Results displayed are for the robust models using Tukey's M-estimators. Larger values of TLM are better}{figure.11}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Pointwise posterior predictive intervals of log(calls) under the normal theory model fit to the non-outliers, the restricted likelihood model with Tukey's M-estimator for the slope and intercept with Huber's `proposal 2' for scale, and a heavy-tailed t-distribution model. The first three data points were used to specify the prior with each model using the remaining 21 for fitting. The normal theory model was also fit after removing observations 14-20 (years 1963 - 1970).}}{52}{figure.12}}
-\newlabel{fig:calls_predictive}{{12}{52}{Pointwise posterior predictive intervals of log(calls) under the normal theory model fit to the non-outliers, the restricted likelihood model with Tukey's M-estimator for the slope and intercept with Huber's `proposal 2' for scale, and a heavy-tailed t-distribution model. The first three data points were used to specify the prior with each model using the remaining 21 for fitting. The normal theory model was also fit after removing observations 14-20 (years 1963 - 1970)}{figure.12}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {12}{\ignorespaces Hierarchical model results: ${TLM}_b(A)_{j}$ plus/minus one standard deviation over $K = 50$ repetitions for each state and $\alpha = 0.3$. The states are ordered along the $x$-axis according to number of agencies within the state (shown in parentheses). Results displayed are for the robust models using Tukey's M-estimators. Larger values of TLM are better.}}{52}{figure.12}}
+\newlabel{fig:hierTLMstate}{{12}{52}{Hierarchical model results: ${TLM}_b(A)_{j}$ plus/minus one standard deviation over $K = 50$ repetitions for each state and $\alpha = 0.3$. The states are ordered along the $x$-axis according to number of agencies within the state (shown in parentheses). Results displayed are for the robust models using Tukey's M-estimators. Larger values of TLM are better}{figure.12}{}}

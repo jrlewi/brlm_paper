@@ -3,7 +3,7 @@
 \BOOKMARK [2][-]{subsection.2.1}{Examples}{section.2}% 3
 \BOOKMARK [2][-]{subsection.2.2}{Generalization}{section.2}% 4
 \BOOKMARK [2][-]{subsection.2.3}{Literature review}{section.2}% 5
-\BOOKMARK [2][-]{subsection.2.4}{An Illustrative Example}{section.2}% 6
+\BOOKMARK [2][-]{subsection.2.4}{Illustrative Examples}{section.2}% 6
 \BOOKMARK [1][-]{section.3}{Restricted Likelihood for the Linear Model}{}% 7
 \BOOKMARK [2][-]{subsection.3.1}{The Bayesian linear model}{section.3}% 8
 \BOOKMARK [2][-]{subsection.3.2}{Computational strategy}{section.3}% 9
@@ -20,11 +20,10 @@
 \BOOKMARK [1][-]{section.6}{Discussion}{}% 20
 \BOOKMARK [1][-]{section.7}{Supplementary Material}{}% 21
 \BOOKMARK [2][-]{subsection.7.1}{Practical Considerations for Using the Restricted Likelihood}{section.7}% 22
-\BOOKMARK [2][-]{subsection.7.2}{An Additional Illustrative Example}{section.7}% 23
-\BOOKMARK [2][-]{subsection.7.3}{Proofs}{section.7}% 24
-\BOOKMARK [2][-]{subsection.7.4}{Setting the hierarchical prior values}{section.7}% 25
-\BOOKMARK [1][-]{section.8}{M-estimators}{}% 26
-\BOOKMARK [2][-]{subsection.8.1}{M-estimators of Location}{section.8}% 27
-\BOOKMARK [2][-]{subsection.8.2}{M-estimators of Scale}{section.8}% 28
-\BOOKMARK [2][-]{subsection.8.3}{Simultaneous M-estimators of Location and Scale}{section.8}% 29
-\BOOKMARK [1][-]{section*.6}{References}{}% 30
+\BOOKMARK [2][-]{subsection.7.2}{Proofs}{section.7}% 23
+\BOOKMARK [2][-]{subsection.7.3}{Setting the hierarchical prior values}{section.7}% 24
+\BOOKMARK [2][-]{subsection.7.4}{M-estimators}{section.7}% 25
+\BOOKMARK [2][-]{subsection.7.5}{M-estimators of Location}{section.7}% 26
+\BOOKMARK [2][-]{subsection.7.6}{M-estimators of Scale}{section.7}% 27
+\BOOKMARK [2][-]{subsection.7.7}{Simultaneous M-estimators of Location and Scale}{section.7}% 28
+\BOOKMARK [1][-]{section*.6}{References}{}% 29

@@ -121,15 +121,15 @@ summarize_data_frames <- readRDS(file.path(here::here(), "summarize_data_frames.
 #     for(as in ass.vec){
 #       for(sc in scale_vec){
 #         rds_name <- paste0("_",data_sim, "__as_", as,"__scale_as_", sc, "__sig2_", ss, ".rds")
-#         
+# 
 #         huber <- read_rds(file.path(results_df, paste0("huber", rds_name)))
-#         
+# 
 #         accept_rates[1, data_sim, which(ss == sig2),which(as == ass.vec), which(sc == scale_vec)] <- mean(huber$yAccept)
-#         
-#         
-#         
+# 
+# 
+# 
 #         tukey <- read_rds(file.path(results_df, paste0("tukey", rds_name)))
-#         
+# 
 #         accept_rates[2,data_sim, which(ss == sig2),which(as == ass.vec), which(sc == scale_vec)] <- mean(tukey$yAccept)
 #       }
 #     }

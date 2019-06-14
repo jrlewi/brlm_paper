@@ -4,18 +4,20 @@
 library(tidyverse)
 library(brlm)
 library(MCMCpack)
-
+set.seed(123)
 #Simulation Parameters ----- 
 n_sims <- 30
 n <- 500 #sample size
 p <- 3 #active covariates
 p_extra <- 30 - p #inactive covariates
+num_corr <- 6 # number of extra covariates to correlate with the active ones
 a_0 <- 5
-b_0 <- 5 
-prob_outlier <- .1
+b_0 <- 1 
+sd_slopes <- .3 # sd for slopes between true x's and extra x's
+prob_outlier <- .2
 outlier_contam <- 25
 mu_0 <-  rep(0, p + p_extra)
-prior_sd <- seq(.2, 1, by = .2) 
+prior_sd <- seq(.2, 1, by = .2) #c(.4, 1) # 
 # Sigma_0 = diag(p+p_extra),
 nkeep <- 1000
 nburn <- 1500
@@ -28,8 +30,34 @@ data_generation <- function(n, p, p_extra,
                                a_0,
                                b_0,
                                prob_outlier,
-                               outlier_contam){
+                               outlier_contam, 
+                               sd_slopes,
+                               num_corr){
+  #num_corr is the number of X_extras to correlate with one of the active covariates
   X <- matrix(runif(n*p), n, p)
+  # consider some correlation structure for the extra covariates
+  #n_groups <- floor(p_extra/p)
+  #extra <- lapply(1:n_groups, function(a){
+  
+  if(num_corr > p_extra) {num_corr <- p_extra}
+  X_extra <- matrix(NA, n, num_corr)
+  which_active <- rep(1:p, length.out = num_corr)
+  for(jj in 1:num_corr){
+  ind <- which_active[jj]
+  slope  <- rnorm(1, 0, sd = sd_slopes)
+  X_extra[,jj] <- X[,ind] * slope + rnorm(n, sd =  sd_slopes/3)
+  }
+  p_remain <-  p_extra - num_corr
+  if(p_remain > 0){
+  X_extra <- cbind(X_extra, matrix(runif(n*p_remain), n,  p_remain))
+  }
+  # cor(X_extra[,5], X[, 2])
+  # X_extra <- matrix(runif(n*p_extra), n, p_extra)
+  # X <- matrix(rnorm(n*p), n, p)
+  # X_extra <- matrix(rnorm(n*p_extra), n, p_extra)
+  # X_all <- cbind(X, X_extra)
+  # X_all_corr <- 
+  
   beta <- rnorm(p, 0, 1)
   sigma2 <- rinvgamma(1, a_0, b_0)
   expected <- X %*% beta
@@ -43,7 +71,7 @@ data_generation <- function(n, p, p_extra,
     }
     list(mn + err, outlier)
   })
-  X_extra <- matrix(runif(n*p_extra), n, p_extra)
+  # X_extra <- matrix(runif(n*p_extra), n, p_extra)
   data <- cbind(unlist(y[1,]), X)
   params <- c(beta, sigma2)
   outlier <- unlist(y[2,])
@@ -225,12 +253,14 @@ estimates_sigma2 <- array(NA, c(n_sims, length(prior_sd), 4))
 
 strt <- Sys.time()
 data_save <- outlier_save <- X_extra_save <- vector('list', n_sims)
-for(i in 1:n_sims){
+for(i in 1:n_sims) {
   data <- data_generation(n, p,p_extra,
                           a_0,
                           b_0,
                           prob_outlier,
-                          outlier_contam)
+                          outlier_contam, 
+                          sd_slopes,
+                          num_corr)
   
   data_save[[i]] <- data$data
   X_extra_save[[i]] <- data$X_extra
@@ -339,7 +369,7 @@ out <- list(estimates = estimates, marginals = marginals,
 
 write_rds(out,
           file.path(here::here(),
-                    '1_simulation_out_2.rds'))
+                    '1_simulation_out_3.rds'))
 
 
 
@@ -352,8 +382,17 @@ mse  <- out$estimates %>% filter(variable != 'sigma2') %>%
       ungroup() %>%
       mutate(prior_sd = as_factor(as.character(prior_sd)))
 
+mse  <- out$estimates %>% filter(variable != 'sigma2') %>% 
+  mutate(sq_error = (true_value - estimates)^2) %>% 
+  group_by(simulation, prior_sd, method) %>% 
+  summarize(mse_sim = mean(sq_error)) %>% 
+  ungroup() %>% group_by(prior_sd, method) %>% 
+  summarize(mse = mean(mse_sim), se = sd(mse_sim)/sqrt(n())) %>% ungroup() %>% 
+  mutate(prior_sd = as_factor(as.character(prior_sd)))
+
 ggplot(mse, aes(prior_sd, mse, group = method, col = method)) +
   geom_line()
+
 
 
 mse_sub <- out$estimates %>% filter(variable %in% c('1', '2', '3')) %>% 
@@ -366,10 +405,8 @@ ggplot(mse_sub, aes(prior_sd, mse, group = method, col = method)) +
   geom_line()
 
 
-# 
-# 
-# 
-ave_margs <- out$marginals %>%
+
+ave_margs <- out$marginals %>% 
   group_by(prior_sd, method) %>%
   summarise(mean = mean(mean_log_predictive_point),
             se = sd(mean_log_predictive)/sqrt(n()))
