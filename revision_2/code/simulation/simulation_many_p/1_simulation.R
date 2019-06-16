@@ -34,7 +34,7 @@ data_generation <- function(n, p, p_extra,
                                sd_slopes,
                                num_corr){
   #num_corr is the number of X_extras to correlate with one of the active covariates
-  X <- matrix(runif(n*p), n, p)
+  X <- matrix(rnorm(n*p), n, p)
   # consider some correlation structure for the extra covariates
   #n_groups <- floor(p_extra/p)
   #extra <- lapply(1:n_groups, function(a){
@@ -49,7 +49,7 @@ data_generation <- function(n, p, p_extra,
   }
   p_remain <-  p_extra - num_corr
   if(p_remain > 0){
-  X_extra <- cbind(X_extra, matrix(runif(n*p_remain), n,  p_remain))
+  X_extra <- cbind(X_extra, matrix(rnorm(n*p_remain), n,  p_remain))
   }
   # cor(X_extra[,5], X[, 2])
   # X_extra <- matrix(runif(n*p_extra), n, p_extra)
@@ -58,6 +58,10 @@ data_generation <- function(n, p, p_extra,
   # X_all <- cbind(X, X_extra)
   # X_all_corr <- 
   
+  X <- scale(X)
+  X_extra <- scale(X_extra) #mean zero, variance 1
+  
+  cor(X_extra[,5], X[, 2])
   beta <- rnorm(p, 0, 1)
   sigma2 <- rinvgamma(1, a_0, b_0)
   expected <- X %*% beta
