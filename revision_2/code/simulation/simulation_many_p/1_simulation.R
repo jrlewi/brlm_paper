@@ -9,15 +9,17 @@ set.seed(123)
 n_sims <- 30
 n <- 500 #sample size
 p <- 3 #active covariates
+beta <- rep(2, p)
+sigma2 <- 1
 p_extra <- 30 - p #inactive covariates
 num_corr <- 6 # number of extra covariates to correlate with the active ones
-a_0 <- 5
-b_0 <- 1 
+a_0 <- 10
+b_0 <- 9 
 sd_slopes <- .3 # sd for slopes between true x's and extra x's
 prob_outlier <- .2
 outlier_contam <- 25
 mu_0 <-  rep(0, p + p_extra)
-prior_sd <- seq(.2, 1, by = .2) #c(.4, 1) # 
+prior_sd <- seq(.2, 1.4, by = .2) # c(.4, 1) # 
 # Sigma_0 = diag(p+p_extra),
 nkeep <- 1000
 nburn <- 1500
@@ -27,6 +29,8 @@ nu <- 5 #df for t_fit
 
 # helper functions -----
 data_generation <- function(n, p, p_extra,
+                               beta = NULL,
+                               sigma2 = NULL,
                                a_0,
                                b_0,
                                prob_outlier,
@@ -34,21 +38,35 @@ data_generation <- function(n, p, p_extra,
                                sd_slopes,
                                num_corr){
   #num_corr is the number of X_extras to correlate with one of the active covariates
+  
+  if(is.null(beta)){
+  beta <- rnorm(p, 0, 1)
+  } else {
+    p <- length(beta)
+  }
+  if(is.null(sigma2)){
+  sigma2 <- rinvgamma(1, a_0, b_0)
+  }
+  
+  
+  
   X <- matrix(rnorm(n*p), n, p)
   # consider some correlation structure for the extra covariates
   #n_groups <- floor(p_extra/p)
   #extra <- lapply(1:n_groups, function(a){
   
-  if(num_corr > p_extra) {num_corr <- p_extra}
+  if (num_corr > p_extra) { 
+    num_corr <- p_extra 
+    }
   X_extra <- matrix(NA, n, num_corr)
   which_active <- rep(1:p, length.out = num_corr)
-  for(jj in 1:num_corr){
+  for (jj in 1:num_corr) {
   ind <- which_active[jj]
   slope  <- rnorm(1, 0, sd = sd_slopes)
   X_extra[,jj] <- X[,ind] * slope + rnorm(n, sd =  sd_slopes/3)
   }
   p_remain <-  p_extra - num_corr
-  if(p_remain > 0){
+  if (p_remain > 0) {
   X_extra <- cbind(X_extra, matrix(rnorm(n*p_remain), n,  p_remain))
   }
   # cor(X_extra[,5], X[, 2])
@@ -61,11 +79,11 @@ data_generation <- function(n, p, p_extra,
   X <- scale(X)
   X_extra <- scale(X_extra) #mean zero, variance 1
   
-  cor(X_extra[,5], X[, 2])
-  beta <- rnorm(p, 0, 1)
-  sigma2 <- rinvgamma(1, a_0, b_0)
+  #cor(X_extra[,5], X[, 2])
+  
   expected <- X %*% beta
   vr_out <- (outlier_contam)*sigma2
+  
   y <- sapply(expected, function(mn){
     outlier <- rbinom(1,1, prob_outlier)
     err <- if (outlier) {
@@ -73,15 +91,29 @@ data_generation <- function(n, p, p_extra,
     } else {
       rnorm(1, 0, sd = sqrt(sigma2))
     }
-    list(mn + err, outlier)
+    c(mn + err, outlier)
   })
   # X_extra <- matrix(runif(n*p_extra), n, p_extra)
-  data <- cbind(unlist(y[1,]), X)
+  data <- cbind(y[1,], X)
   params <- c(beta, sigma2)
-  outlier <- unlist(y[2,])
+  outlier <- y[2,]
+  #pairs(data, col = outlier + 1)
   list(data = data, params = params, outlier = outlier, 
        X_extra = X_extra)
 }
+
+
+# tmp <- data_generation(n, p, p_extra,
+#                             beta = beta,
+#                             sigma2 = sigma2,
+#                             a_0,
+#                             b_0,
+#                             prob_outlier,
+#                             outlier_contam,
+#                             sd_slopes,
+#                             num_corr)
+# # 
+# pairs(tmp$data, col = tmp$outlier + 1)
 
 #marginal computations ----
 get_marginal_rest <- function(y_gen, X_gen, mcmc, point_est = FALSE){
@@ -259,6 +291,8 @@ strt <- Sys.time()
 data_save <- outlier_save <- X_extra_save <- vector('list', n_sims)
 for(i in 1:n_sims) {
   data <- data_generation(n, p,p_extra,
+                          beta, 
+                          sigma2,
                           a_0,
                           b_0,
                           prob_outlier,
@@ -373,7 +407,7 @@ out <- list(estimates = estimates, marginals = marginals,
 
 write_rds(out,
           file.path(here::here(),
-                    '1_simulation_out_3.rds'))
+                    '1_simulation_out_4.rds'))
 
 
 
