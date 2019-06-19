@@ -9,17 +9,19 @@ set.seed(123)
 n_sims <- 30
 n <- 500 #sample size
 p <- 3 #active covariates
-beta <- rep(2, p)
-sigma2 <- 1
+beta <- rep(1, p)
+sigma2 <- 2
 p_extra <- 30 - p #inactive covariates
 num_corr <- 6 # number of extra covariates to correlate with the active ones
-a_0 <- 10
-b_0 <- 9 
-sd_slopes <- .3 # sd for slopes between true x's and extra x's
+a_0 <- 5
+b_0 <- 8 
+sd_cor_1 <- 2 # sd for cor between the x's
+sd_cor_2 <- 1 # sd for cor between true x's and extra x's
+
 prob_outlier <- .2
 outlier_contam <- 25
 mu_0 <-  rep(0, p + p_extra)
-prior_sd <- seq(.2, 1.4, by = .2) # c(.4, 1) # 
+prior_sd <- seq(.4, 1.4, by = .2) # c(.4, 1) # 
 # Sigma_0 = diag(p+p_extra),
 nkeep <- 1000
 nburn <- 1500
@@ -35,7 +37,8 @@ data_generation <- function(n, p, p_extra,
                                b_0,
                                prob_outlier,
                                outlier_contam, 
-                               sd_slopes,
+                               sd_cor_1,
+                               sd_cor_2,
                                num_corr){
   #num_corr is the number of X_extras to correlate with one of the active covariates
   
@@ -50,7 +53,12 @@ data_generation <- function(n, p, p_extra,
   
   
   
-  X <- matrix(rnorm(n*p), n, p)
+  X <- matrix(NA, n, p)
+  x1 <- rnorm(n)
+  X[,1] <- x1
+  for(ii in 2:p){
+    X[,ii] <- x1 + rnorm(n, sd = sd_cor_1) 
+  }
   # consider some correlation structure for the extra covariates
   #n_groups <- floor(p_extra/p)
   #extra <- lapply(1:n_groups, function(a){
@@ -59,11 +67,11 @@ data_generation <- function(n, p, p_extra,
     num_corr <- p_extra 
     }
   X_extra <- matrix(NA, n, num_corr)
-  which_active <- rep(1:p, length.out = num_corr)
+which_active <- rep(1:p, length.out = num_corr)
   for (jj in 1:num_corr) {
   ind <- which_active[jj]
-  slope  <- rnorm(1, 0, sd = sd_slopes)
-  X_extra[,jj] <- X[,ind] * slope + rnorm(n, sd =  sd_slopes/3)
+  slope  <- 1 #rnorm(1, 0, sd = sd_slopes)
+  X_extra[,jj] <- X[,ind] * slope + rnorm(n, sd =  sd_cor_2)
   }
   p_remain <-  p_extra - num_corr
   if (p_remain > 0) {
@@ -110,10 +118,13 @@ data_generation <- function(n, p, p_extra,
 #                             b_0,
 #                             prob_outlier,
 #                             outlier_contam,
-#                             sd_slopes,
+#                             sd_cor_1,
+#                             sd_cor_2,
 #                             num_corr)
-# # 
-# pairs(tmp$data, col = tmp$outlier + 1)
+# # # 
+# # pairs(tmp$data, col = tmp$outlier + 1)
+
+
 
 #marginal computations ----
 get_marginal_rest <- function(y_gen, X_gen, mcmc, point_est = FALSE){
@@ -186,7 +197,7 @@ one_sim <- function(
   
   #rlm_tukey ---
   rlm_tukey <- rlm(X_all, y, 
-                  psi = psi.bisquare, maxit = maxit)
+                  psi = psi.bisquare, scale.est = 'Huber', maxit = maxit)
   rlm_estimates <- coef(rlm_tukey) 
   rlm_sig2_hat <- rlm_tukey$s^2
   sigma2Int <- rlm_sig2_hat
@@ -297,7 +308,8 @@ for(i in 1:n_sims) {
                           b_0,
                           prob_outlier,
                           outlier_contam, 
-                          sd_slopes,
+                          sd_cor_1,
+                          sd_cor_2,
                           num_corr)
   
   data_save[[i]] <- data$data
@@ -407,7 +419,7 @@ out <- list(estimates = estimates, marginals = marginals,
 
 write_rds(out,
           file.path(here::here(),
-                    '1_simulation_out_4.rds'))
+                    '1_simulation_out_5.rds'))
 
 
 
