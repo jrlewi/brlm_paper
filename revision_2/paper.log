@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  21 JUN 2019 07:35
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  21 JUN 2019 09:34
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -462,14 +462,14 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [3]
 [4] [5] [6] [7]
-<figs/speed_of_light_beta.png, id=295, 2127.95pt x 1032.85875pt>
+<figs/speed_of_light_beta.png, id=283, 2127.95pt x 1032.85875pt>
 File: figs/speed_of_light_beta.png Graphic file (type png)
 
 <use figs/speed_of_light_beta.png>
 Package pdftex.def Info: figs/speed_of_light_beta.png used on input line 399.
 (pdftex.def)             Requested size: 289.07999pt x 140.31248pt.
 
-<figs/speed_of_light_predictive.png, id=297, 2546.51375pt x 1504.62125pt>
+<figs/speed_of_light_predictive.png, id=285, 2546.51375pt x 1504.62125pt>
 File: figs/speed_of_light_predictive.png Graphic file (type png)
 
 <use figs/speed_of_light_predictive.png>
@@ -489,7 +489,7 @@ Underfull \vbox (badness 7814) has occurred while \output is active []
                                                   \fi \fi 
 l.415 
        <./figs/speed_of_light_beta.png> <./figs/speed_of_light_predictive.png>]
-<figs/calls_predictive.png, id=319, 2107.875pt x 1505.625pt>
+<figs/calls_predictive.png, id=307, 2107.875pt x 1505.625pt>
 File: figs/calls_predictive.png Graphic file (type png)
 
 <use figs/calls_predictive.png>
@@ -520,7 +520,7 @@ cmm/m/it/10 ; s\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 X; \OMS/cmsy/m/n/10 ^^A\OT1/cm
 r/m/n/10 ))$
  []
 
-[14] [15] <figures/minSS3dSampleSpace.jpg, id=412, 387.69844pt x 411.78844pt>
+[14] [15] <figures/minSS3dSampleSpace.jpg, id=400, 387.69844pt x 411.78844pt>
 File: figures/minSS3dSampleSpace.jpg Graphic file (type jpg)
 
 <use figures/minSS3dSampleSpace.jpg>
@@ -540,7 +540,7 @@ l.629 \noindent
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./figures/minSSZSpace3.pdf):
  PDF inclusion: found PDF version <1.6>, but at most version <1.4> allowed
-<figures/minSSZSpace3.pdf, id=424, 505.89pt x 505.89pt>
+<figures/minSSZSpace3.pdf, id=412, 505.89pt x 505.89pt>
 File: figures/minSSZSpace3.pdf Graphic file (type pdf)
 
 <use figures/minSSZSpace3.pdf>
@@ -550,7 +550,7 @@ Package pdftex.def Info: figures/minSSZSpace3.pdf used on input line 661.
 
 pdfTeX warning: /Library/TeX/texbin/pdflatex (file ./figures/minSSZSpace5.pdf):
  PDF inclusion: found PDF version <1.6>, but at most version <1.4> allowed
-<figures/minSSZSpace5.pdf, id=425, 505.89pt x 505.89pt>
+<figures/minSSZSpace5.pdf, id=413, 505.89pt x 505.89pt>
 File: figures/minSSZSpace5.pdf Graphic file (type pdf)
 
 <use figures/minSSZSpace5.pdf>
@@ -569,56 +569,50 @@ l.702
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [20]
-[21] [22] <figs/mse_sim2_facet_scale.png, id=524, 2642.87375pt x 2011.515pt>
+[21] [22] <figs/mse_sim2_facet_scale.png, id=512, 1806.75pt x 1204.5pt>
 File: figs/mse_sim2_facet_scale.png Graphic file (type png)
 
 <use figs/mse_sim2_facet_scale.png>
-Package pdftex.def Info: figs/mse_sim2_facet_scale.png used on input line 825.
-(pdftex.def)             Requested size: 361.34999pt x 275.01114pt.
+Package pdftex.def Info: figs/mse_sim2_facet_scale.png used on input line 821.
+(pdftex.def)             Requested size: 361.34999pt x 240.89574pt.
 
-<figs/MSE_sim2_mnp.png, id=526, 1806.75pt x 1204.5pt>
+<figs/MSE_sim2_mnp.png, id=514, 1806.75pt x 1204.5pt>
 File: figs/MSE_sim2_mnp.png Graphic file (type png)
 
 <use figs/MSE_sim2_mnp.png>
-Package pdftex.def Info: figs/MSE_sim2_mnp.png used on input line 834.
+Package pdftex.def Info: figs/MSE_sim2_mnp.png used on input line 830.
 (pdftex.def)             Requested size: 361.34999pt x 240.89574pt.
  [23]
 
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
-(hyperref)                removing `\@ifnextchar' on input line 842.
+(hyperref)                removing `\@ifnextchar' on input line 838.
 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [24pdfTeX warning (ext4): destination with the same identifier (name{figure.5}
-) has been already used, duplicate ignored
+[24pdfTeX warning (ext4): destination with the same identifier (name{figure.5})
+ has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.846 
-       <./figs/mse_sim2_facet_scale.png>]
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [25pdfTeX warning (ext4): destination with the same identifier (name{figure.6}
-) has been already used, duplicate ignored
+l.842 
+       <./figs/mse_sim2_facet_scale.png>] [25pdfTeX warning (ext4): destination
+ with the same identifier (name{figure.6}) has been already used, duplicate ign
+ored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.847 F
-       or the simulation, $K = 30$ data sets (including the additional covar...
- <./figs/MSE_sim2_mnp.png>]
-<figs/mse_sim_many_p.png, id=547, 1806.75pt x 1204.5pt>
+l.844 
+       <./figs/MSE_sim2_mnp.png>]
+<figs/mse_sim_many_p.png, id=535, 1806.75pt x 1204.5pt>
 File: figs/mse_sim_many_p.png Graphic file (type png)
 
 <use figs/mse_sim_many_p.png>
-Package pdftex.def Info: figs/mse_sim_many_p.png used on input line 851.
+Package pdftex.def Info: figs/mse_sim_many_p.png used on input line 847.
 (pdftex.def)             Requested size: 361.34999pt x 240.89574pt.
 
-<figs/negll_sim_many_p.png, id=548, 1806.75pt x 1204.5pt>
+<figs/negll_sim_many_p.png, id=536, 1806.75pt x 1204.5pt>
 File: figs/negll_sim_many_p.png Graphic file (type png)
 
 <use figs/negll_sim_many_p.png>
-Package pdftex.def Info: figs/negll_sim_many_p.png used on input line 858.
+Package pdftex.def Info: figs/negll_sim_many_p.png used on input line 854.
 (pdftex.def)             Requested size: 361.34999pt x 240.89574pt.
 
 Underfull \vbox (badness 10000) has occurred while \output is active []
@@ -629,27 +623,27 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.883 A
+l.879 A
        s an exploratory view, a plot of the square root of (scaled) househol...
  <./figs/mse_sim_many_p.png>] [28pdfTeX warning (ext4): destination with the sa
 me identifier (name{figure.8}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.885 
+l.881 
        <./figs/negll_sim_many_p.png>]
-<figs/scatter_by_state.png, id=567, 1806.75pt x 1204.5pt>
+<figs/scatter_by_state.png, id=555, 1806.75pt x 1204.5pt>
 File: figs/scatter_by_state.png Graphic file (type png)
 
 <use figs/scatter_by_state.png>
-Package pdftex.def Info: figs/scatter_by_state.png used on input line 888.
+Package pdftex.def Info: figs/scatter_by_state.png used on input line 884.
 (pdftex.def)             Requested size: 361.34999pt x 240.89574pt.
  [29pdfTeX warning (ext4): destination with the same identifier (name{figure.9}
 ) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.908 
+l.904 
        <./figs/scatter_by_state.png>]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
@@ -658,52 +652,52 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [32]
-<figs/tlm_base_Student-t.png, id=608, 1806.75pt x 1204.5pt>
+<figs/tlm_base_Student-t.png, id=596, 1806.75pt x 1204.5pt>
 File: figs/tlm_base_Student-t.png Graphic file (type png)
 
 <use figs/tlm_base_Student-t.png>
-Package pdftex.def Info: figs/tlm_base_Student-t.png used on input line 966.
+Package pdftex.def Info: figs/tlm_base_Student-t.png used on input line 962.
 (pdftex.def)             Requested size: 433.62pt x 289.06752pt.
 
-<figs/tlm_base_Student-tbyTrimming.png, id=609, 1806.75pt x 1204.5pt>
+<figs/tlm_base_Student-tbyTrimming.png, id=597, 1806.75pt x 1204.5pt>
 File: figs/tlm_base_Student-tbyTrimming.png Graphic file (type png)
 
 <use figs/tlm_base_Student-tbyTrimming.png>
 Package pdftex.def Info: figs/tlm_base_Student-tbyTrimming.png used on input li
-ne 973.
+ne 969.
 (pdftex.def)             Requested size: 433.62pt x 289.06752pt.
  [33pdfTeX warning (ext4): destination with the same identifier (name{figure.10
 }) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1029 \end{align}
+l.1025 \end{align}
                    <./figs/tlm_base_Student-t.png>] [34pdfTeX warning (ext4): d
 estination with the same identifier (name{figure.11}) has been already used, du
 plicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1048 
+l.1044 
         <./figs/tlm_base_Student-tbyTrimming.png>]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [35]
-<figs/hier_average_tlm.png, id=631, 1806.75pt x 1204.5pt>
+<figs/hier_average_tlm.png, id=619, 1806.75pt x 1204.5pt>
 File: figs/hier_average_tlm.png Graphic file (type png)
 
 <use figs/hier_average_tlm.png>
-Package pdftex.def Info: figs/hier_average_tlm.png used on input line 1059.
+Package pdftex.def Info: figs/hier_average_tlm.png used on input line 1055.
 (pdftex.def)             Requested size: 433.62pt x 289.06752pt.
 
-<figs/hier_ave_tlm_state.png, id=635, 2258.4375pt x 1505.625pt>
+<figs/hier_ave_tlm_state.png, id=623, 2258.4375pt x 1505.625pt>
 File: figs/hier_ave_tlm_state.png Graphic file (type png)
 
 <use figs/hier_ave_tlm_state.png>
-Package pdftex.def Info: figs/hier_ave_tlm_state.png used on input line 1076.
+Package pdftex.def Info: figs/hier_ave_tlm_state.png used on input line 1072.
 (pdftex.def)             Requested size: 491.43622pt x 327.60864pt.
 
-Overfull \hbox (57.81622pt too wide) in paragraph at lines 1076--1077
+Overfull \hbox (57.81622pt too wide) in paragraph at lines 1072--1073
  [][] 
  []
 
@@ -718,60 +712,60 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1162 
+l.1158 
         <./figs/hier_average_tlm.png>]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [38]
 LaTeX Font Info:    Font shape `OMS/cmr/m/n' in size <10> not available
-(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 1182.
+(Font)              Font shape `OMS/cmsy/m/n' tried instead on input line 1178.
 
 
 [39] [40] [41] [42]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [43]
-[44] [45] [46] [47] (./paper.bbl (./paper.brf)
+(./paper.bbl (./paper.brf)
 \tf@brf=\write5
 \openout5 = `paper.brf'.
 
- [48]
+ [44]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [49]
+ [45]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [50]
+ [46]
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
- [51])
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1572.
+ [47])
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1397.
 
-[52] [53pdfTeX warning (ext4): destination with the same identifier (name{figur
+[48] [49pdfTeX warning (ext4): destination with the same identifier (name{figur
 e.13}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.1572 \end{document}
+l.1397 \end{document}
                       <./figs/hier_ave_tlm_state.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1572.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 1397.
  (./paper.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1572.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1572.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1397.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1397.
 
 Package rerunfilecheck Info: File `paper.out' has not changed.
-(rerunfilecheck)             Checksum: C0F9E83719F7EA78872F4F6421AE930F;1997.
+(rerunfilecheck)             Checksum: C6D54B13B5E01F1109673CF84B597F9C;1755.
 Package rerunfilecheck Info: File `paper.brf' has not changed.
-(rerunfilecheck)             Checksum: 8F20D0E716B83B09BB0BC9D56F9E5730;2839.
+(rerunfilecheck)             Checksum: 49FB08DEC8224054D79E30E45113F29E;2741.
  ) 
 Here is how much of TeX's memory you used:
- 8998 strings out of 493089
- 130482 string characters out of 6134842
- 228289 words of memory out of 5000000
- 12122 multiletter control sequences out of 15000+600000
+ 8953 strings out of 493089
+ 129955 string characters out of 6134842
+ 227117 words of memory out of 5000000
+ 12100 multiletter control sequences out of 15000+600000
  21637 words of font info for 81 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 32i,17n,34p,3351b,532s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 32i,17n,34p,3351b,522s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb><
 /usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbxsl10.pfb>
@@ -800,9 +794,9 @@ ist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2015/texmf-di
 st/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2015/texmf-dis
 t/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2015/texmf-dist/
 fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on paper.pdf (53 pages, 2335835 bytes).
+Output written on paper.pdf (49 pages, 2265728 bytes).
 PDF statistics:
- 973 PDF objects out of 1000 (max. 8388607)
- 201 named destinations out of 1000 (max. 500000)
- 308 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 912 PDF objects out of 1000 (max. 8388607)
+ 178 named destinations out of 1000 (max. 500000)
+ 284 words of extra memory for PDF output out of 10000 (max. 10000000)
 

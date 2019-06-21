@@ -756,10 +756,10 @@ Let $U$ be a matrix whose columns form an orthonormal basis for $\mc C (X)$ and 
 Second, the gradients of $\nabla s(X,\by), \nabla b_1(X,\by),\dots, \nabla b_p(X,\by)$ are easily computed in many cases. For example, below we consider M-estimators defined by the estimating equations:
 \begin{eqnarray}
 \label{Mest}
- \sum_{i=1}^n \psi\left(\frac{y_i - x_{i}^{\top}\bb(\by,X)}{s(\by,X)}\right)=0, \
+ \sum_{i=1}^n \psi\left(\frac{y_i - x_{i}^{\top}\bb(\by,X)}{s(\by,X)}\right) x_{ij}=0, \
  \sum_{i=1}^n \chi\left(\frac{y_i - x_{i}^{\top}\bb(\by,X)}{s(\by,X)}\right)=0, 
  \end{eqnarray} 
-where $\psi$ and $\chi$ are almost surely differentiable. The gradients can be found by differentiating this system of equations with respect to each $y_{i}$. In theory, finite differences could also be used as an approximation if needed. 
+for $j = 1, 2, \dots, p$, $x_{ij}$ are the components of $x_{j}$ and  $\psi$ and $\chi$ are almost surely differentiable. The gradients can be found by differentiating this system of equations with respect to each $y_{i}$. In theory, finite differences could also be used as an approximation if needed. 
 %{\bf John - for the finite differences, is this to approximate the gradient? }
 
 \response{Finally, it is clear the estimators themselves must be computed for every iteration of the Markov Chain. We have found this burden to be marginal in relation with respect to computing the needed Jacobian. In the simulations and real data analyses presented below, we will see that the additional burden is often of added value over traditional robust regression when substantial prior information is available that is not swamped by current data.}
@@ -800,39 +800,35 @@ To complete the specification of model \eqref{fullsim2}, the hyperparameters $\m
 
 $K = 30$ data sets are generated from \eqref{gensim2}. For each data set and each pair $(a_{s}, c)$, the Bayesian models are fit using MCMC. The MCMC for the restricted likelihood version requires no computational details other than those described for the traditional Bayesian model in Section \ref{BayesLinMod}. This is because there are conditioning statistics for each group and the model's conditional independence between the groups allows the data augmentation described earlier to be performed independently within each group. That is, there is a separate Gibbs step for each group to generate the group level data matching the statistics for that group. \response{The acceptance rates for newly generated data across all groups and simulations ranged from $0.57$ to $0.68$}
 
-\response{To asses the predictive capability, we seek a metric that takes into account both the estimation of $\theta_{i}$ and $\sigma^{2}$. In this model, estimation of $\theta_{i}$ and prediction are analogous. To this end we consider
+\response{To asses the predictive capability, we seek a metric that takes into account both the estimation of $\theta_{i}$ and $\sigma^{2}$. In this model, estimation of $\theta_{i}$ and prediction are analogous. To this end we consider the loss:
 \begin{equation}
 \label{sim1loss}
-E[\log f(y|\theta_{i}, \sigma^{2}) - \log f(y|\hat{\theta_{i}}, \hat{\sigma}^{2})] =
-\log(\hat\sigma^{2}) - \log(\sigma^{2}) + \frac{1}{2\hat\sigma^{2}}(\sigma^{2} + (\theta - \hat{\theta_{i}})^{2})
+L((\hat\theta_{i}, \hat\sigma), (\theta_{i},\sigma)) =
+\log(\hat\sigma^{2}) - \log(\sigma^{2}) + \frac{1}{\hat\sigma^{2}}(\sigma^{2} + (\theta - \hat{\theta_{i}})^{2})
 \end{equation}
-The expectation is taken with respect to the true data distribution of the good data assuming fixed estimates. These estimates are the posterior means for the Bayesian methods and the standard point estimates for the classical methods.
+Note, this loss is proportional to the Kullback-Leibler divergence between two normals with the base normal being the true distribution of the good portion of the data and the the other normal representing the estimate under the fitting method. We are using fixed point estimates $\hat\theta_{i}$ and $\hat\sigma$ which are posterior means under the Bayesian models and the standard point estimates for the classical methods.
 }
-
 %To assess predictive capability, the models are compared using Kullback-Leibler (KL) divergence from the distribution of good data to the posterior predictive distribution. Specifically, for the $i^{th}$ group of the $k^{th}$ simulated data set $\by_{k}$ compute:
 %\begin{equation}
 %\label{kl}
 %KL^{(M)}_{ik} = \int \log \frac{f(\tilde y | \theta_{i}, \sigma^{2})}{f_{i}(\tilde y | M, \by_{k})}  f(\tilde y | \theta_{i}, \sigma^{2}) \ dy
 %\end{equation}
 %where $M$ indexes the fitting model and $f(\tilde y | \theta_{i}, \sigma^{2}) = N(\tilde y | \theta_{i}, \sigma^{2})$, the normal density function with (known) mean $\theta_{i}$ and variance $\sigma^{2}$, evaluated at $\tilde y$. For the Bayesian models, ${f_{i}(\tilde y | M, \by_{k})} = \int f(\tilde y |\theta_{i}, \sigma_{i}^{2}) \pi(\theta_{i}, \sigma^{2}_{i} | M, \by_{k})d\theta_{i}d\sigma^{2}_{i}$ where $\pi(\theta_{i}, \sigma^{2}_{i} | M, \by_{k})$ is the posterior for the $i^{th}$ group model parameters under model $M$ for the $k^{th}$ data set. $M$ denotes either the full normal theory model \eqref{fullsim2} or one of the two restricted likelihood versions, along with specified $a_{s}$ and $c$. For the classical robust fits, we set $f_{i}(\tilde y | M, \by_{k}) = N(\tilde y|\hat\theta_{i}, \hat\sigma^{2}_{i})$ as a groupwise plug-in estimator for the predictive distribution. The classical fits are computed separately for each group with no consideration of the hierarchical structure between the groups. The overall mean $\overline{KL}^{(M)}_{{\cdot}{\cdot}} = \frac{1}{90K} \sum_{k = 1}^{K} \sum_{i=1}^{90} KL^{(M)}_{ik}$ is used to compare the models, where smaller means correspond to better fits. Sampling variation is summarized with the standard error between the $K=30$ replicates in the simulation:  $SE(\overline{KL}^{(M)}_{{\cdot} k}) = \sqrt{\frac{1}{K(K-1)}\sum_{k = 1}^{K} (\overline{KL}^{(M)}_{{\cdot} k} - \overline{KL}^{(M)}_{{\cdot}{\cdot}})^{2}}$ where $\overline{KL}^{(M)}_{{\cdot} k} = \frac{1}{90}\sum_{i = 1}^{90} KL^{(M)}_{ik}$.
- 
-Figure \ref{kl_sim} displays the average of loss \ref{sim1loss} grouped by pairs of $a_{s}$ and $c$ with error bars plus/minus on standard error within the group.  The values of $a_{s}$ and $c$, do not affect the classical robust linear models. The average loss for the normal theory models ranges from $1.19$ to $1.42$ and are left out of the figure. For $c = 0.5$ and $c = 1$ and the two larger values of $a_{s}$ the results favor the restricted likelihood methods. 
-
-The choice of $c = 2$ corresponds to a particularly poor prior distribution.  The prior has substantial mass above $\sigma^{2} = 4$, with prior means for $\sigma^2$ from $8.9$ to $32$ as $a_s$ varies.  Additionally, the tuning parameters chosen for the location and scale estimators result in an upward bias in the estimate of $\sigma^{2}$. This bias depends on $m$ and $p$. For example, for $m = 9$ and $p = .1$, Huber's version converges to roughly $4.8$ as $n$ grows.  The bias is greater for more severe levels of contamination.  The alignment of biases in prior distribution and in likelihood from the summary statistic (when applied to the contaminated data) inflates the estimate of scale.  Not surprisingly, a poor prior distribution whose weakness matches the weakness in the likelihood results in poorer inference.  In this case, poorer than the classical estimators. 
+Figure \ref{kl_sim} displays the average of loss \ref{sim1loss} grouped by pairs of $a_{s}$ and $c$ with error bars plus/minus on standard error within the group.  The values of $a_{s}$ and $c$, do not affect the classical robust linear models. The average loss for the normal theory models ranges from $1.44$ to $1.66$ and are left out of the figure. For $c = 0.5$ and $c = 1$ the results favor the restricted likelihood methods as seen by the lower values of loss. The choice of $c = 2$ corresponds to a particularly poor prior distribution.  The prior has substantial mass above $\sigma^{2} = 4$, with prior means for $\sigma^2$ from $8.9$ to $32$ as $a_s$ varies.  Additionally, the tuning parameters chosen for the location and scale estimators result in an upward bias in the estimate of $\sigma^{2}$. This bias depends on $m$ and $p$. For example, for $m = 9$ and $p = .1$, Huber's version converges to roughly $4.8$ as $n$ grows.  The bias is greater for more severe levels of contamination.  The alignment of biases in prior distribution and in likelihood from the summary statistic (when applied to the contaminated data) inflates the estimate of scale.  Not surprisingly, a poor prior distribution whose weakness matches the weakness in the likelihood results in poorer inference.  In this case, poorer than the classical estimators. 
  
 \begin{figure}[t]
 \centering
 \includegraphics[width = 5in]{mse_sim2_facet_scale.png}
-\caption{Average Loss plus/minus one standard error for each value of $a_{s}$ and $c$. Smaller values represent better fits. The panels correspond to $c = 0.5$ (left), $c=1$ (middle), and $c=2$ (right), with the values of $a_{s}$ on the horizontal axis. The average loss for the normal theory model ranges from $1.19$ to $1.42$ and is left out of the figure.}
+\caption{Average Loss plus/minus one standard error for each value of $a_{s}$ and $c$. Smaller values represent better fits. The panels correspond to $c = 0.5$ (left), $c=1$ (middle), and $c=2$ (right), with the values of $a_{s}$ on the horizontal axis. The average loss for the normal theory model ranges from $1.44$ to $1.66$ and is left out of the figure.}
 \label{kl_sim}
 \end{figure}
 
-It is also interesting to consider the effects of factors $n$, $p$, and $m$.  We present the results for a single prior ($a_s = 5$ and $c = 1$).  For each simulation $k$, the main effect average loss is found for each factor $n$, $p$, and $m$. Figure \ref{kl_mnp} displays the average of these main effects over the $K = 30$ simulations along  with error bars plus/minus one standard error. For each group $n$, $p$, and $m$, the Bayesian restricted likelihood versions have better (lower) average loss than do the classical methods. As expected, the average loss gets larger (worse) as the contamination gets more severe (larger $m$ or larger $p$) and tends to get smaller (better) as the sample size $n$ grows.  The advantage of the Bayesian method is greater for smaller sample sizes.  
+It is also interesting to consider the effects of factors $n$, $p$, and $m$.  We present the results for a single prior ($a_s = 5$ and $c = 1$).  For each simulation $k$, the main effect average loss is found for each factor $n$, $p$, and $m$. Figure \ref{kl_mnp} displays the average of these main effects over the $K = 30$ simulations along  with error bars plus/minus one standard error. For each group $n$, $p$, and $m$, the Bayesian restricted likelihood versions have better average loss than do the classical methods. As expected, the average loss gets larger as the contamination gets more severe (larger $m$ or larger $p$) and tends to get smaller as the sample size $n$ grows.  The advantage of the Bayesian method is greater for smaller sample sizes.  
 
 \begin{figure}[t]
 \centering
 \includegraphics[width = 5in]{MSE_sim2_mnp.png}
-\caption{Average loss plus/minus one standard error grouped by the factors $m$ (left), $n$ (middle), and $p$ (right). These results are for the single prior  with $a_s = 5$ and $c = 1$.}
+\caption{Average loss plus/minus one standard error grouped by the factors $m$ (left), $n$ (middle), and $p$ (right). These results are for the single prior with $a_s = 5$ and $c = 1$.}
 \label{kl_mnp}
 \end{figure}
 
@@ -1352,46 +1348,7 @@ $\psi_\rho=a_\rho+b_\rho$ given a gamma prior. There is little evidence of any s
 \subsection{M-estimators}
 \label{sec:Mestimators}
 %%%%%%%%%%%%%%%%%%%%%%%%
-M-estimators offer a natural choice for conditioning in restricted likelihood settings and they can be readily applied when conditioning on these estimators using the method described in this paper. This section gives a brief review
-%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{M-estimators of Location}
-\label{sec:Mlocation}
-%%%%%%%%%%%%%%%%%%%%%%%%
-To begin the review it is easiest to start with the location model 
-\begin{equation}
-\label{locMod}
-y_i= \mu+\epsilon_i, \ \ i=1,\dots, n,
-\end{equation}
-where we assume that $\epsilon_i$ are independent identically
-distributed random variables from the distribution $F_0$ having
-mean zero, constant (known) variance, and density $f_0$ with
-respect to Lebesgue measure. It follows that $y_i\iid
-F(y)=F_0(y-\mu)$ . The M-estimate for $\mu$ is defined by the criterion
-\begin{equation}
-\label{MrhoLoc}
-\hat\mu= \arg \min_\mu \sum_{i=1}^n \rho(y_i -\mu),
-\end{equation}
-where $\rho$ is a loss function. It is assumed that $\rho(x)$ is nondecreasing in $|x|$ and $\rho(0)=0$.  If $F_0$ is standard normal, taking $\rho$ to be squared error loss ($\rho(x)=x^2$) results in the maximum likelihood estimator (MLE). In general, $\rho(x)=-\log f_{0}(x)$ corresponds to the MLE. In this sense, M-estimators are a generalization of MLEs.
-
-Assuming it exists, the derivative of $\rho$ is denoted by $\psi$ and $\hat\mu$  in  \eqref{MrhoLoc} satisfies the estimating equation
-\begin{equation}
-\label{MpsiLoc}
-\sum_{i=1}^n \psi(y_i-\hat\mu)=0.
-\end{equation}
-Putting $w_i=\frac{\psi(y_i-\hat \mu)}{y_i- \hat\mu}$, equation
-\eqref{MpsiLoc} can be rewritten as
-\begin{equation}
-\label{MpsiLocWeight}
-\sum_{i=1}^n w_i (y_i- \hat\mu)=0
-\end{equation}
-and an analytical expression for $\hat\mu$ is then the weighted average
-\begin{equation}
-\label{weightedAve}
-\hat\mu=\frac{\sum_{i} w_iy_i}{\sum_{i} w_i}.
-\end{equation}
-This weighted average cannot be used directly since the $w_i$
-depend on $\hat\mu$, but it provides a useful insight in how to choose a $\psi$ that downweights outlying observations. Two
-examples of commonly used $\rho$ functions whose derivatives $\psi$ achieve downweighting are
+M-estimators offer a natural choice for conditioning in restricted likelihood settings and they can be readily applied when conditioning on these estimators using the method described in this paper. This section gives a brief review. General estimating equations for the simultaneous M-estimators used in this paper appear in equation \ref{Mest} of the main text. Taking $\psi = \rho'$, the two $\rho$ functions used in this paper are: 
 \begin{equation}
 \label{Huber}
 \rho(x)=
@@ -1409,78 +1366,9 @@ and
 1, &\ |x|\geq k .
 \end{cases}
 \end{equation}
-The first of these is known as Huber's loss. It offers a compromise to squared error loss, with the loss becoming linear for absolute residuals larger than $k$. \cite{huber2009} provide a theoretical justification of this choice based the \textit{least informative distribution} in a particular class of contaminated normal distributions. The $\rho$ in \eqref{Tukey} is known as Tukey's bisquare. 
+The first of these is known as Huber's $\rho$. It offers a compromise to squared error loss, with the loss becoming linear for absolute residuals larger than $k$. \cite{huber2009} provide a theoretical justification of this choice based the \textit{least informative distribution} in a particular class of contaminated normal distributions. The $\rho$ in \eqref{Tukey} is known as Tukey's bisquare. Tukey's $\psi = \rho'$ is \textit{re-descending} as it returns to zero outside of $(-k,k)$. As a result, Tukey's estimator downweights large residuals more than does Huber's estimator. Huber's estimator is akin to Winsorising whereas Tukey's is akin to complete trimming. Note that $k$ is a tuning constant which must be chosen. We only consider `default' tuning parameters in this paper which have 95\% asymptotic efficiency under a normal distribution. More detailed results can be found in both \cite{huber2009} and \cite{maronna2006}. These values are $k=1.345$ for Huber's $\rho$ and $k=4.685$ for Tukey's. 
 
-A notable property of both of the $\psi$ functions here is that they are bounded. This implies a bounded \textit{influence function} (IF). The influence function is a measure of how much an estimator is
-affected by a small fraction of identical outliers in the
-sample. Boundedness is desirable because it
-implies that the effect of a small contamination on a
-statistical procedure cannot become arbitrarily large. More details on influence functions can be found in \cite{huber2009} and \cite{maronna2006}. Tukey's $\psi$ is \textit{re-descending} as it returns to zero outside of $(-k,k)$. As a result, Tukey's estimator downweights large residuals more than does Huber's estimator. Huber's estimator is akin to Winsorising whereas Tukey's is akin to complete trimming.
-
-Note that $k$ is a tuning constant which must be chosen. Under usually satisfied conditions, M-estimators are asymptotically normal and this property can be employed to choose $k$. The results for the location setting, which extend up to linear regression, are presented here. Again, more detailed results can be found in both \cite{huber2009} and \cite{maronna2006}.
-
-For a given distribution $F$, let $\mu_0$ be the value such that
-\begin{equation}
-\label{eq:Epsi}
-E_F\psi(x-\mu_0)=\int\psi(x-\mu_0)\ dF=0.
-\end{equation}
-Taking $\hat\mu$ to be the solution to \eqref{MpsiLoc} we have
-$\hat\mu\overset{p}\rightarrow \mu_0$ and
-\begin{equation}
-\label{eq:asyNormM}
-\sqrt{n}(\hat\mu-\mu_0)\overset{\mc D}\rightarrow N(0, v)\
-\text{with}\
-v=\frac{E_F(\psi(y-\mu_0)^2)}{(E_F\psi'(y-\mu_0))^2}
-\end{equation}
-as $n\rightarrow\infty$. The conditions for the above convergence properties to hold depend on $\psi$ and
-$F$. In particular, the numerator of $v$ must be finite and the
-denominator must exist and be nonzero. Re-descending $\psi$
-functions, such as Tukey's, require slightly stronger conditions than those for monotone $\psi$.
-
-Under the assumed model, the MLE is optimal in the sense of achieving the minimum asymptotic variance of $v_0=I(\mu)^{-1}$  where $I(\mu)$ is the Fisher information for $\mu$.  Hence, $v\geq v_0$ and $k$ is typically chosen by considering the asymptotic relative efficiency of $\hat\mu$
-\begin{equation}
-\label{eq:Eff}
-\text{Eff}(\hat\mu)=\frac{v_0}{v}.
-\end{equation}
-The idea is for robust estimators to not perform badly compared
-to the optimal estimator, under the assumed model. To this end,
-$k$ is set so that $\text{Eff}(\hat\mu)$ is reasonably close to
-one. The standard default is to assume a normal model and set
-$\text{Eff}(\hat\mu)=0.95$. This leads to $k=1.345$ for Huber's $\rho$ and $k=4.685$ for Tukey's. Unless otherwise stated, these values are used for the applications in this dissertation. 
-
-%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{M-estimators of Scale}
-\label{sec:Mscale}
-%%%%%%%%%%%%%%%%%%%%%%%%
-$M$-estimation naturally extends the scale model
-\begin{equation}
-\label{scaleMod}
-y_i= \sigma\epsilon_i, \ \ i=1,\dots, n,
-\end{equation}
-where $\epsilon_i$ are independent identically distributed with
-density $f_0$ and $\sigma>0$ is the unknown parameter. Then
-$y_i$ come from a scale family with density $f_\sigma(y)=
-\frac{1}{\sigma}f_0(\frac{y}{\sigma})$. %The MLE of $\sigma$ is
-%\begin{equation}
-%\label{mleSigma}
-%\hat\sigma= \arg \min_\sigma \prod_{i=1}^n
-%\frac{1}{\sigma}f_0\left(\frac{y_i}{\sigma}\right)
-%\end{equation}
-The M-estimator for $\sigma$ is defined through the estimating equation
-\begin{equation}
-\label{eq:Msigmachi}
- \sum_{i=1}^n\chi \left(\frac{y_i}{\sigma}\right)=0,
-\end{equation}
-for some function $\chi$. Taking $\chi(x)=-x\frac{f'_0(x)}{f_0(x)}-\delta$ for $\delta=1$ corresponds to the MLE. This reduces to $\chi(x)=x^2-1$ for the standard normal yielding the estimate
-$\hat\sigma= \sqrt{\frac{1}{n}\sum{y_i^2}}$. Using the same idea as in
-the location case, a different $\chi$ can be chosen in an effort to achieve a robust estimate of
- $\sigma$.
- %for a given distribution
-%$F$, the estimate $\hat\sigma$ from \eqref{eq:Msigmachi}
-%converges in probability to the value $\sigma_0$ that satisfies
-%$E_{F}[\chi(\frac{x}{\sigma_0})]=\int\chi(\frac{x}{\sigma_0})\
-%dF=0$.
-\cite{huber1964} proposed the choice 
+For the $\chi$ function, \cite{huber1964} proposed the choice 
 \begin{equation}
 \label{HuberScale}
 \chi(x)=
@@ -1489,79 +1377,16 @@ x^2-\delta, &\ |x|\leq k\\
 k^2-\delta, &\ |x|> k .
 \end{cases}
 \end{equation}
- For consistency when $F$ is
-$N(0,\sigma^2)$ we need $E_{\Phi}[\chi({x})]=\int\chi({x})\
-d\Phi=0$ where $\Phi$ is the standard normal distribution. This
-yields $\delta\approx 0.71016$ for the $\chi$ in \eqref{HuberScale}. For convenience,
-$k$ is often set to $1.345$, the value giving $95\%$ efficiency at the normal for
-Huber's location estimator. This is often
-referred to as Huber's `Proposal 2'.
+For consistency under the normal distribution the tuning parameter is set to $\delta\approx 0.71016$, taking $k = 1.345$ as above for Huber's $\psi$ is
+referred to as Huber's `Proposal 2'. This is estimator used throughout this this paper. 
 
-Another popular choice is the step function
-\begin{equation}
-\label{madchi}
-\chi(x)=I(|x|>c)-\delta.
-\end{equation}
-Fixing $\delta=0.5$ yields the aforementioned \textit{rescaled
-median absolute deviation}, written here as $\hat\sigma=K(\text{Med}(|x|))$ with $K=1/c$. %This is the  Recall, putting $K=1/\Phi^{-1}(3/4)\approx1.4826$ results in a constant estimator for $\sigma$ under normality. %Again $$ is typically chosen forconsistency at an assumed model which yields $c=0.6745$ for thenormal. %Still another option for robustness is Tukey's bisquare \eqref{Tukey} with $k=1$
-
-%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{Simultaneous M-estimators of Location and Scale}
-\label{sec:MlocScale}
-%%%%%%%%%%%%%%%%%%%%%%%%
-There are many ways to define $M$-estimates for multiple
-parameters but for convenience we concentrate on
-\textit{simultaneous estimators}. We first consider the location
-and scale setting
-\begin{equation}
-\label{locScaleMod}
-y_i= \mu+\sigma\epsilon_i, \ \ i=1,\dots, n,
-\end{equation}
-where $\epsilon_i$ are independent identically distributed with
-density $f_0$, $\mu$ and $\sigma>0$ unknown and $y_i$ has density $f(y)=\frac{1}{\sigma}f_0(\frac{y-\mu}{\sigma})$. Combining the equations in \eqref{MpsiLoc}
-and \eqref{eq:Msigmachi}, the simultaneous M-estimators of
-location and scale are the solutions to
-\begin{equation}
-\label{simM}
-\begin{aligned}
-&\sum \psi \left(\frac{y_i-\hat\mu}{\hat\sigma}\right)=0\\
-&\sum \chi \left(\frac{y_i-\hat\mu}{\hat\sigma}\right)=0.
-\end{aligned}
-\end{equation}
-
-The extension of $M$-estimators to linear regression is
-straightforward. Consider the standard regression model
-\begin{equation}
-\label{regM}
-y_i=\bx_i'\bbeta+\epsilon_i,
-\end{equation}
-where $\epsilon_i$ are independent random variables with mean zero and variance
-$\sigma^2$, $\bx_{i}\in\mathbb{R}^{p}$ is a vector of predictors, and  $\bbeta\in\mathbb{R}^{p}$ is a vector of regression parameters. The simultaneous M-estimators of $\bbeta$ and
-$\sigma$ are defined by
-\begin{equation}
-\label{simMreg}
-\begin{aligned}
-&\sum \psi
-\left(\frac{y_i-\bx_i'\widehat\bbeta}{\hat\sigma}\right)\bx_i=\mathbf{0}\\
-&\sum \chi \left(\frac{y_i-\bx_i'\widehat\bbeta}{\hat\sigma}\right)=0.
-\end{aligned}
-\end{equation}
-Common $\psi$ functions include Huber's and Tukey's mentioned earlier and common
-$\chi$ functions appear in \eqref{HuberScale} and \eqref{madchi}.
-Assuming the distribution of the errors is $F$, under standard conditions for $\psi$, $\chi$, the general result is again
-$\widehat\bbeta\overset{p}\rightarrow\bbeta_{0}$ and
-$\hat\sigma\overset{p}\rightarrow\sigma_{0}$ where $\bbeta_{0}$ and
-$\sigma_{0}$ satisfy
-\begin{equation}
-\label{ExpMreg}
-\begin{aligned}
-& E_F \psi
-\left(\frac{y_i-\bx_i'\bbeta_{0}}{\sigma_{0}}\right)\bx_i=\mathbf{0}\\
-& E_F \chi \left(\frac{y_i-\bx_i'\bbeta_{0}}{\sigma_{0}}\right)=0.
-\end{aligned}
-\end{equation}
-Further, the estimates are jointly asymptotically normal with a
-covariance matrix depending on the $\psi$ and $\chi$ functions.
+%Another popular choice is the step function
+%\begin{equation}
+%\label{madchi}
+%\chi(x)=I(|x|>c)-\delta.
+%\end{equation}
+%Fixing $\delta=0.5$ yields the \textit{rescaled
+%median absolute deviation}.
 
 
 

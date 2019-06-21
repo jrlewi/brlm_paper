@@ -178,7 +178,7 @@ Instead of just reporting numerical performance, the authors should provide some
 \begin{enumerate}
 \item Point out that M-Estimators have been our default choice in the very first illustrative example:
  \response{Details of these estimators can be found in many places, including \citep{huber2009}. We return to the two M-estimators throughout this paper as we have found them to offer good default choices for practitioners dealing with outliers. A short review of these estimators is provided in the Supplementary Material.}
- \item Included a review of M-Estimators in the Supplement
+ \item Included a short review of M-Estimators in the Supplement
  \item Included a `Practical Considerations for Using the Restricted Likelihood' to the Supplement. 
 \end{enumerate}
 }
@@ -202,10 +202,10 @@ Additionally we have included a paragraph in the introduction discussing advanta
 \item The authors compare KL diver-gence, but 1) few real applications care about KL divergence not mentioning the predictive density f(y|M,yobs) is not available in closed-form; 2) since f(y|M,yobs) is not available close-form, the KL divergence is approximated and it’s not clear to me how accurate the approximation is.
 The authors should compare prediction and estimation accuracy, common met- rics used for regression models.
 
-\response{We have changed to the metric to address the estimation concern you bring up. The metric is $ 
-\log(\hat\sigma^{2}) - \log(\sigma^{2}) + \frac{1}{2\hat\sigma^{2}}(\sigma^{2} + (\theta - \hat{\theta_{i}})^{2}
+\response{We have changed to a closed form version of KL between two normals to address estimation concern you bring up: $ 
+\log(\hat\sigma^{2}) - \log(\sigma^{2}) + \frac{1}{\hat\sigma^{2}}(\sigma^{2} + (\theta - \hat{\theta_{i}})^{2}
 $
-which combines estimation error for both the $\theta_{i}$ and $\sigma$. While we couldn't compute this metric in a real analysis since we wouldn't know the $\theta_{i}$ and $\sigma$, we feel it is best to make this direct comparison since we know them in the simulation.}
+While we wouldn't be able to compute this in a real application it does combines estimation error for both the $\theta_{i}$ and $\sigma$ and is a decent metric to compare the methods under the simulation setup. }
 
 \item The simulation setup is too simple. Suggest to add some linear regression models with large p and/or large n.
 
@@ -241,7 +241,7 @@ which combines estimation error for both the $\theta_{i}$ and $\sigma$. While we
 
 
 \item  Eq (18): change dy to d$\tilde{y}$?
-\response{Thanks for noticing this typo - based on your other comment we are using a different metric then KL divergence and so this equation is no longer in the paper.}
+\response{Thanks for noticing this typo - based on your other comment on KL divergence, this formula was taken out and now is a closed form version. }
 
 \end{enumerate}
 
