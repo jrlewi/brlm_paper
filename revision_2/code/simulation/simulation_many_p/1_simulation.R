@@ -419,7 +419,7 @@ out <- list(estimates = estimates, marginals = marginals,
 
 write_rds(out,
           file.path(here::here(),
-                    '1_simulation_out_5.rds'))
+                    '1_simulation_out.rds'))
 
 
 
