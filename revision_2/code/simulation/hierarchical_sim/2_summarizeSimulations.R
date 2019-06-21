@@ -150,14 +150,18 @@ xx <- seq(.1,10, length.out = 100)
 wts <- sapply(xx, wt, y = 4)
 plot(xx,wts)
 
+kl_two_normals <- function(sigma2_hat, sigma2, theta_hat, theta){
+  log(sigma2_hat) - log(sigma2) + 
+         (1/sigma2_hat)*(sigma2 + (theta - theta_hat)^2)
+}
+
 # rowwise() %>% 
 # mutate(weight = wt(sigma2_hat, sigma2)) %>%
 # ungroup %>% 
 df_mse <- df_estimates %>% #dplyr::select(-p,n,-m) %>%  
   group_by(simulation, statistic, method, a_s, scale_as, sigma2) %>% 
   summarise(MSE_1 = mean((theta_hat - theta)^2 + .5*wt(sigma2_hat, sigma2)),
-            MSE = mean(log(sigma2_hat) - log(sigma2) + 
-                    (.5/sigma2_hat)*(sigma2 + (theta - theta_hat)^2))) %>% 
+            MSE = mean(kl_two_normals(sigma2_hat, sigma2, theta_hat, theta))) %>% 
   ungroup() %>% 
   group_by(statistic, method, a_s, scale_as, sigma2) %>% 
   summarise(mean_MSE = mean(MSE), sd_MSE = sd(MSE)) %>% ungroup() %>% 
@@ -185,7 +189,7 @@ ggplot(df_mse %>%  filter(method != 'Normal' & statistic != 'Normal'), aes(x = a
   
 #  theme(text = element_text(family = 'Times')) + guides(col = guide_legend(title="Method/Statistic")) +
 #+  guides(fill=guide_legend(title="Method/Statistic"))
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'mse_sim2_facet_scale.png'),width = 6, height = 4))
+ggsave(file.path(getwd(), "..", "..", "..", "figs", 'mse_sim2_facet_scale.png'),width = 6, height = 4)
 
 df_mse %>% filter(method == 'Normal') %>% 
   summarize(min(mean_MSE), max(mean_MSE))
@@ -195,8 +199,7 @@ ggplot(df_mse, aes(x = as.factor(scale_as), y = mean_MSE, col = interaction(meth
   facet_wrap(~a_s,   labeller = label_bquote(a[s] == .(a_s))) +
   labs(x = expression(c),  y = 'Average MSE') + labels_vals + theme(text = element_text(family = 'Times')) 
 
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'mse_sim2_facet_as.png')),
-       width = 6, height = 4)
+ggsave(file.path(getwd(), "..", "..", "..", "figs", 'mse_sim2_facet_as.png'),width = 6, height = 4)
 
 
 # by m, n, and p
@@ -205,8 +208,7 @@ ggsave(file.path(getwd(), "..", "..", "..", "figs", 'mse_sim2_facet_as.png')),
 
 df_mse_mean_n <- df_estimates %>% 
   group_by(simulation, n, statistic, method, sigma2,  a_s, scale_as) %>% 
-  summarise(MSE = mean(log(sigma2_hat) - log(sigma2) + 
-                         (.5/sigma2_hat)*(sigma2 + (theta - theta_hat)^2))) %>% 
+  summarise(MSE = mean(kl_two_normals(sigma2_hat, sigma2, theta_hat, theta))) %>% 
   ungroup() %>% 
   group_by(n, statistic, method, sigma2,  a_s, scale_as) %>% 
   summarise(mean_MSE = mean(MSE), sd_MSE = sd(MSE), num = n())
@@ -215,8 +217,7 @@ df_mse_mean_n <- df_estimates %>%
 #m ----
 df_mse_mean_m <- df_estimates %>% 
   group_by(simulation, m, statistic, method, sigma2,  a_s, scale_as) %>% 
-  summarise(MSE = mean(log(sigma2_hat) - log(sigma2) + 
-                        (.5/sigma2_hat)*(sigma2 + (theta - theta_hat)^2)))%>% 
+  summarise(MSE = mean(kl_two_normals(sigma2_hat, sigma2, theta_hat, theta))) %>% 
   ungroup() %>% 
   group_by(m, statistic, method, sigma2,  a_s, scale_as) %>% 
   summarise(mean_MSE = mean(MSE), sd_MSE = sd(MSE), num = n())
@@ -226,8 +227,7 @@ df_mse_mean_m <- df_estimates %>%
 #p ----
 df_mse_mean_p <- df_estimates %>% 
   group_by(simulation, p, statistic, method, sigma2,  a_s, scale_as) %>% 
-  summarise(MSE = mean(log(sigma2_hat) - log(sigma2) + 
-                         (.5/sigma2_hat)*(sigma2 + (theta - theta_hat)^2)))%>% 
+  summarise(MSE = mean(kl_two_normals(sigma2_hat, sigma2, theta_hat, theta))) %>% 
   ungroup() %>% 
   group_by(p, statistic, method, sigma2,  a_s, scale_as) %>% 
   summarise(mean_MSE = mean(MSE), sd_MSE = sd(MSE), num = n())
@@ -249,340 +249,340 @@ ggsave(file.path(getwd(), "..", "..", "..", "figs", 'MSE_sim2_mnp.png'), width =
 
 
 
-
-# K - L divergence evaluation metric -----
-# K-L Divergence E[log f(y_good_i|theta_i, sig2True)/ f(y_good_i) ], expected value taken with respect to  f(y_good_i|theta_i, sig2True)
-
-
-# function to compute the predictive distribution on a grid for one group
-
-
-if(New_results){
-compute_pred_dist<-function(ygrid, thetaSamples, sigma2Samples){
-  #ygrid: grid of y values to evaluate the pred distribution
-  #thetaSamples, sigma2Samples MCMC samples from the given group
-  #OR for the robust regressions, these are just the estimates of theta and sigma2 from the robust regressions
-  if(length(ygrid)>1000){
-    sapply(ygrid, FUN=function(x) {
-      mean(dnorm(x, thetaSamples, sqrt(sigma2Samples)))
-    } 
-    ) } else {
-      ygridN <- matrix(ygrid, nrow = length(thetaSamples), ncol = length(ygrid), byrow = TRUE)
-      colMeans(dnorm(ygridN, thetaSamples, sqrt(sigma2Samples)))
-    }
-}
-
-
-
-# function to compute the K-L metric, for one group
-
-compute_KL<-function(thetaTrue,thetaSamples, sigma2Samples, sig2True, ngridpts){
-  #thetaTrue: scalar of the true value of theta for the given group
-  #thetaSamples: MCMC sample of the theta_i from the given group
-  #OR for robust regression it is just the estimate of theta for the given group
-  #sigma2Sample: MCMC sample of the sigma2_i from the given group
-  #OR for robust regression it is just the estimate of sigma2 for the given group
-  #sig2True: scalar of the true value of sigma2
-  #ygrid: grid of y values for the quadrature approximation of the expectation: not used anymore
-  #ngridpts: number of grid points
-  
-  ygrid<-seq(thetaTrue-5*sqrt(sig2True),thetaTrue+5*sqrt(sig2True), length.out=ngridpts)
-  predDist<-compute_pred_dist(ygrid,  thetaSamples, sigma2Samples)
-  trueDist<-dnorm(ygrid, thetaTrue, sqrt(sig2True))
-  dif <- diff(ygrid)
-  kl <- ((log(trueDist)-log(predDist))*trueDist)[-1]
-  KL <- sum((kl*dif)) #[kl!=Inf])
-  KL
-}
-
-
-#exact: for use with the robust regression methods
-KL_twoNormals<-function(mu1,sigma2_1, mu2, sigma2_2){
-  #KL(p,q) where p~N(mu_1,sigma2_1),q~N(mu_2, sigma2_2)
-  sig_1<-sqrt(sigma2_1)
-  sig_2<-sqrt(sigma2_2)
-  log(sig_2/sig_1)+(sigma2_1+(mu1-mu2)^2)/(2*sigma2_2)-1/2  
-}
-
-
-
-# Function to compute the KL for each group
-
-compute_KL_each_group<-function(ngridpts, thetaTrueVect, sig2True,thetaSamplesMat, sigma2SamplesMat){
-  # thetaTrueVect: the vector of true theta values for each group
-  # thetaSampleMat: nTot by nGroups matrix of MCMC samples of the theta_i's
-  #OR for robust regression a vector of estimates of the theta_is
-  # sigma2SamplesMat: nTot by nGroups matrix of MCMC samples of the sigma2_i's
-  #OR for robust regression a vector of estimates of the sigma2_is
-  if(class(thetaSamplesMat)=='matrix'){
-    if(class(sigma2SamplesMat)!='matrix'){ stop('error: thetaSamplesMat and sigma2SamplesMat must both be matrices of MCMC sampples or both be vectors of robust regression estimates')}  
-    #create a list out of the columns of thetaSamplesMat and sigma2SamplesMat
-    #this will be fed into mapply
-    thetaSamplesMat<-split(thetaSamplesMat, col(thetaSamplesMat))
-    sigma2SamplesMat<-split(sigma2SamplesMat, col(sigma2SamplesMat))
-  } else {
-    if(class(thetaSamplesMat)!='numeric' || class(sigma2SamplesMat)!='numeric'){
-      stop('error: thetaSamplesMat and sigma2SamplesMat must both be matrices of MCMC sampples or both be vectors of robust regression estimates')
-    }
-  } 
-  mapply(compute_KL,thetaTrue=thetaTrueVect,thetaSamples=thetaSamplesMat, sigma2Samples=sigma2SamplesMat, MoreArgs=list(sig2True=sig2True, ngridpts=ngridpts))
-}
-
-# Note: some numerical issues occur for the plug in predictive distribution for the robust regression estimates. The pred dist at the tail ygrid values is numerically zero. Could compute log pred for the robsust estimates. For unified code function fn.compute.pred to handle both MCMC samples and plug in, I handled this in compute.KL by adding KL<-sum((kl*dif)[kl!=Inf]). Both ways work here, but it is a note of caution. 
-
-sig2 <- 4
-ngridpts <- 100
+# 
+# # K - L divergence evaluation metric -----
+# # K-L Divergence E[log f(y_good_i|theta_i, sig2True)/ f(y_good_i) ], expected value taken with respect to  f(y_good_i|theta_i, sig2True)
+# 
+# 
+# # function to compute the predictive distribution on a grid for one group
+# 
+# 
+# if(New_results){
+# compute_pred_dist<-function(ygrid, thetaSamples, sigma2Samples){
+#   #ygrid: grid of y values to evaluate the pred distribution
+#   #thetaSamples, sigma2Samples MCMC samples from the given group
+#   #OR for the robust regressions, these are just the estimates of theta and sigma2 from the robust regressions
+#   if(length(ygrid)>1000){
+#     sapply(ygrid, FUN=function(x) {
+#       mean(dnorm(x, thetaSamples, sqrt(sigma2Samples)))
+#     } 
+#     ) } else {
+#       ygridN <- matrix(ygrid, nrow = length(thetaSamples), ncol = length(ygrid), byrow = TRUE)
+#       colMeans(dnorm(ygridN, thetaSamples, sqrt(sigma2Samples)))
+#     }
+# }
+# 
+# 
+# 
+# # function to compute the K-L metric, for one group
+# 
+# compute_KL<-function(thetaTrue,thetaSamples, sigma2Samples, sig2True, ngridpts){
+#   #thetaTrue: scalar of the true value of theta for the given group
+#   #thetaSamples: MCMC sample of the theta_i from the given group
+#   #OR for robust regression it is just the estimate of theta for the given group
+#   #sigma2Sample: MCMC sample of the sigma2_i from the given group
+#   #OR for robust regression it is just the estimate of sigma2 for the given group
+#   #sig2True: scalar of the true value of sigma2
+#   #ygrid: grid of y values for the quadrature approximation of the expectation: not used anymore
+#   #ngridpts: number of grid points
+#   
+#   ygrid<-seq(thetaTrue-5*sqrt(sig2True),thetaTrue+5*sqrt(sig2True), length.out=ngridpts)
+#   predDist<-compute_pred_dist(ygrid,  thetaSamples, sigma2Samples)
+#   trueDist<-dnorm(ygrid, thetaTrue, sqrt(sig2True))
+#   dif <- diff(ygrid)
+#   kl <- ((log(trueDist)-log(predDist))*trueDist)[-1]
+#   KL <- sum((kl*dif)) #[kl!=Inf])
+#   KL
+# }
+# 
+# 
+# #exact: for use with the robust regression methods
+# KL_twoNormals<-function(mu1,sigma2_1, mu2, sigma2_2){
+#   #KL(p,q) where p~N(mu_1,sigma2_1),q~N(mu_2, sigma2_2)
+#   sig_1<-sqrt(sigma2_1)
+#   sig_2<-sqrt(sigma2_2)
+#   log(sig_2/sig_1)+(sigma2_1+(mu1-mu2)^2)/(2*sigma2_2)-1/2  
+# }
+# 
+# 
+# 
+# # Function to compute the KL for each group
+# 
+# compute_KL_each_group<-function(ngridpts, thetaTrueVect, sig2True,thetaSamplesMat, sigma2SamplesMat){
+#   # thetaTrueVect: the vector of true theta values for each group
+#   # thetaSampleMat: nTot by nGroups matrix of MCMC samples of the theta_i's
+#   #OR for robust regression a vector of estimates of the theta_is
+#   # sigma2SamplesMat: nTot by nGroups matrix of MCMC samples of the sigma2_i's
+#   #OR for robust regression a vector of estimates of the sigma2_is
+#   if(class(thetaSamplesMat)=='matrix'){
+#     if(class(sigma2SamplesMat)!='matrix'){ stop('error: thetaSamplesMat and sigma2SamplesMat must both be matrices of MCMC sampples or both be vectors of robust regression estimates')}  
+#     #create a list out of the columns of thetaSamplesMat and sigma2SamplesMat
+#     #this will be fed into mapply
+#     thetaSamplesMat<-split(thetaSamplesMat, col(thetaSamplesMat))
+#     sigma2SamplesMat<-split(sigma2SamplesMat, col(sigma2SamplesMat))
+#   } else {
+#     if(class(thetaSamplesMat)!='numeric' || class(sigma2SamplesMat)!='numeric'){
+#       stop('error: thetaSamplesMat and sigma2SamplesMat must both be matrices of MCMC sampples or both be vectors of robust regression estimates')
+#     }
+#   } 
+#   mapply(compute_KL,thetaTrue=thetaTrueVect,thetaSamples=thetaSamplesMat, sigma2Samples=sigma2SamplesMat, MoreArgs=list(sig2True=sig2True, ngridpts=ngridpts))
+# }
+# 
+# # Note: some numerical issues occur for the plug in predictive distribution for the robust regression estimates. The pred dist at the tail ygrid values is numerically zero. Could compute log pred for the robsust estimates. For unified code function fn.compute.pred to handle both MCMC samples and plug in, I handled this in compute.KL by adding KL<-sum((kl*dif)[kl!=Inf]). Both ways work here, but it is a note of caution. 
+# 
+# sig2 <- 4
+# ngridpts <- 100
+# # factor_list <- as.data.frame(do.call(rbind, data$factorsList))  
+# # names(factor_list) <- c('p', 'n','m')
+# 
+# 
+# dfs_all <- vector('list', length(sims))
+# for(data_sim in sims){
+# data <- read_rds(file.path(getwd(),'data_sig2_4', paste0('data_', data_sim, '.rds')))
 # factor_list <- as.data.frame(do.call(rbind, data$factorsList))  
 # names(factor_list) <- c('p', 'n','m')
-
-
-dfs_all <- vector('list', length(sims))
-for(data_sim in sims){
-data <- read_rds(file.path(getwd(),'data_sig2_4', paste0('data_', data_sim, '.rds')))
-factor_list <- as.data.frame(do.call(rbind, data$factorsList))  
-names(factor_list) <- c('p', 'n','m')
-dfs <- vector('list', length(ass.vec)*length(scale_vec)*length(sig2))
-i <- 1
-for(ss in sig2){
-  for(as in ass.vec){
-    for(sc in scale_vec){
-      
-      rds_name <- paste0("_",data_sim, "__as_", as,"__scale_as_", sc, "__sig2_", ss, ".rds")
-      #huber
-      fit <- read_rds(file.path(results_df, paste0("huber", rds_name)))
-      #compute KL 
-      kl <- compute_KL_each_group(ngridpts, thetaTrueVect = data$theta, sig2True = sig2,thetaSamplesMat = fit$theta, sigma2SamplesMat = fit$sigma2)
-      huber_kl <- as_tibble(cbind(factor_list, KL = kl, statistic = 'Huber', method = 'restricted', a_s = as,
-                                      scale_as = sc,
-                                      sigma2 = ss))
-      #KL for classical fit
-      ests<-sapply(fit$robustFits, FUN=function(x) x$coefficients)
-      shat2<-sapply(fit$robustFits, FUN=function(x) x$s^2)
-      kl <-  mapply(KL_twoNormals, mu1=data$theta,sigma2_1=sig2, mu2=ests,  sigma2_2=shat2)
-     
-    huber_kl_rlm <-  as_tibble(cbind(factor_list, KL = kl, statistic = 'Huber', method = 'rlm', a_s = as,
-                         scale_as = sc,
-                         sigma2 = ss))
-      #tukey
-      fit <- read_rds(file.path(results_df, paste0("tukey", rds_name)))
-      #compute KL 
-      kl <- compute_KL_each_group(ngridpts, thetaTrueVect = data$theta, sig2True = sig2,thetaSamplesMat = fit$theta, sigma2SamplesMat = fit$sigma2)
-      tukey_kl <- as_tibble(cbind(factor_list, KL = kl, statistic = 'Tukey', method = 'restricted', a_s = as,
-                                      scale_as = sc,
-                                      sigma2 = ss))
-      #KL for classical fit
-      ests<-sapply(fit$robustFits, FUN=function(x) x$coefficients)
-      shat2<-sapply(fit$robustFits, FUN=function(x) x$s^2)
-      kl <-  mapply(KL_twoNormals, mu1=data$theta,sigma2_1=sig2, mu2=ests,  sigma2_2=shat2)
-      
-      tukey_kl_rlm <-  as_tibble(cbind(factor_list, KL = kl, statistic = 'Tukey', method = 'rlm', a_s = as,
-                                           scale_as = sc,
-                                           sigma2 = ss))
-      
-      #normal
-     fit <- read_rds(file.path(results_df, paste0("normal", rds_name)))
-      #compute KL 
-      kl <- compute_KL_each_group(ngridpts, thetaTrueVect = data$theta, sig2True = sig2,thetaSamplesMat = fit$theta, sigma2SamplesMat = fit$sigma2)
-     normal_kl <- as_tibble(cbind(factor_list, KL = kl, statistic = 'Normal', method = 'Normal', a_s = as,
-                                      scale_as = sc,
-                                      sigma2 = ss))
-      
-      df <- bind_rows(huber_kl,huber_kl_rlm,tukey_kl,tukey_kl_rlm, normal_kl)
-      dfs[[i]] <- df
-      i <- i+1
-    }
-  }
-}
-dfs_all[[data_sim]] <- bind_rows(dfs)
-print(data_sim)
-}
-df_kl <- bind_rows(dfs_all, .id = 'simulation')
-saveRDS(list(df_kl, df_estimates), file = 'summarize_data_frames.rds') 
-} else {
-  summarize_data_frames <- readRDS(file.path(here::here(), "summarize_data_frames.rds")) 
-  df_kl <- summarize_data_frames[[1]]
-}
-
-
-
-#Note - warnings are just coercion rules - variables treated as factors without the same levels coerced to characters...no big deal here. 
-
-#fctrs <- c('p', 'n', 'm', 'statistic', 'method', 'a_s', 'scale_as')
-#df_kl <- df_kl %>% mutate_at(fctrs, funs(factor))
-
-df_kl_mean <- df_kl %>% 
-  group_by(simulation, statistic, method, a_s, scale_as, sigma2) %>% 
-  summarise(KL = mean(KL)) %>% 
-  ungroup() %>% 
-  group_by(statistic, method, a_s, scale_as, sigma2) %>% 
-  summarise(mean_KL = mean(KL), sd_KL = sd(KL))
-
-ggplot(df_kl_mean %>% filter(method != 'Normal', statistic != 'Normal') , aes(x = as.factor(a_s), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(length(sims)), ymax = mean_KL + sd_KL/sqrt(length(sims))), linetype = 1, width = 0, position = position_dodge(width = .5)) +
-  geom_point(position = position_dodge(width = .5)) +
-  facet_wrap(~scale_as,   labeller = label_bquote(c == .(scale_as))) +
-  labs(x = expression(a[s]),  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
-
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_facet_scale.png'), width = 6, height = 4)
-
-# tmp <- df_kl %>% filter(scale_as == 2, a_s == 5, method == 'restricted', statistic == 'Huber')
-# plot(tmp$KL)
-#mean(tmp$KL[-c(1:1000)])
-
-df_kl_mean %>% filter(method == 'Normal', statistic == 'Normal') %>% ungroup() %>% 
-  summarise(min = min(mean_KL), max = max(mean_KL))
-
-library(MCMCpack)
-invg <- function(x){
-  a <<- 10
-  cc <<- 0.5
-  b <<- 4*a*cc
-  dinvgamma(x, a, b)  
-}
-curve(invg, 0, 20, main = paste0('a = ', a, '  ', 'c = ', cc))
-abline(v = 4)
-
-invg <- function(x, a, cc){
-  # a <- a_cc[1]
-  # cc <- a_cc[2]
-  b <- 4*a*cc
-  tibble(x = x, prior = dinvgamma(x, a, b), a = a, cc = cc)
-}
-x <- seq(.01, 20, by = .01)
-
-a_cc <- expand.grid(ass.vec, scale_vec)
-
-priors <- purrr::map2(.x = a_cc[,1], .y = a_cc[,2], .f = invg, x = x) %>% bind_rows() %>% 
-  mutate(a = as.factor(a))
-
-ggplot(priors, aes(x, prior, group = a, col = a)) + 
-  geom_line() + 
-  facet_wrap(~cc,labeller = label_bquote(c == .(cc))) +
-  theme(text = element_text(family = 'Times')) + geom_vline(xintercept = 4, lty = 2, col = 'gray', lwd = .5) + 
-  labs(x = expression(sigma^2),  y = 'density')
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'priors_sigma2.png'), width = 6, height = 4) 
- 
-
-ggplot(df_kl_mean %>% filter(method != 'Normal', statistic != 'Normal'), aes(x = as.factor(scale_as), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(length(sims)), ymax = mean_KL + sd_KL/sqrt(length(sims))), linetype = 1, width = 0, position = position_dodge(width = .5)) +
-  geom_point(position = position_dodge(width = .5)) +
-  facet_wrap(~a_s,   labeller = label_bquote(a[s] == .(a_s))) +
-  labs(x = expression(c),  y = 'Average KL') +  theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
-
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_facet_as.png'), width = 6, height = 4)
-
-# saveRDS(list(df_kl, df_estimates), file = 'summarize_data_frames.rds')
-# investigate convergence of variance estimators in mixture model ---
-
-# Effects of n, p, or m
-
-#note the rlm results are simply repeated for each a_s and scale_as - when grouping by n (or p, or m) - the averages for each simulation are computed over the repeated results too - but these averages are the same as if one result was used. The SE are computed as the sd of these averages - so it doesn't change the calculation if I subset the rlm results to get rid of the repeats
-
-
-
-#n ----
-df_kl_mean_n <- df_kl %>% #filter(method != 'rlm') %>% 
-  group_by(simulation, n, statistic, method, sigma2, a_s, scale_as) %>% 
-  summarise(KL = mean(KL)) %>% 
-  ungroup() %>% 
-  group_by(n, statistic, method, sigma2, a_s, scale_as) %>% 
-  summarise(mean_KL = mean(KL), sd_KL = sd(KL), num = n())
-
-
-
-# m----
-df_kl_mean_m <- df_kl %>% 
-  group_by(simulation, m, statistic, method, sigma2, a_s, scale_as) %>% 
-  summarise(KL = mean(KL)) %>% 
-  ungroup() %>% 
-  group_by(m, statistic, method, sigma2,  a_s, scale_as) %>% 
-  summarise(mean_KL = mean(KL), sd_KL = sd(KL), num = n())
-
-
-
-# p -----
-df_kl_mean_p <- df_kl %>% 
-  group_by(simulation, p, statistic, method, sigma2,  a_s, scale_as) %>% 
-  summarise(KL = mean(KL)) %>% 
-  ungroup() %>% 
-  group_by(p, statistic, method, sigma2,  a_s, scale_as) %>% 
-  summarise(mean_KL = mean(KL), sd_KL = sd(KL), num = n())
-
-
-
-
-# combine for a facet wrap plot
-df_nmp <- (bind_rows(df_kl_mean_n,df_kl_mean_m,df_kl_mean_p))
-df_nmp <- (df_nmp %>% gather(variable, value, n,m,p, na.rm = TRUE))
-
-df_mnp_sub <- df_nmp %>% filter(method != 'Normal', statistic != 'Normal', scale_as == 1, a_s == 5)
-ggplot(df_mnp_sub , aes(x = as.factor(value), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) +
-  geom_point(position = position_dodge(width = .5)) +
-  geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(num), ymax = mean_KL + sd_KL/sqrt(num)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
-  facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") +
-  labs(x = "Value",  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_mnp.png'), width = 6, height = 4)
-
-
-
-
-
-
-# combine for a facet wrap plot
-df_nmp <- (bind_rows(df_kl_mean_n,df_kl_mean_m,df_kl_mean_p))
-df_nmp <- (df_nmp %>% gather(variable, value, n,m,p, na.rm = TRUE))
-
-df_mnp_sub <- df_nmp %>% filter(method != 'Normal', statistic != 'Normal', scale_as == 1, a_s == 5)
-ggplot(df_mnp_sub , aes(x = as.factor(value), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) +
-  geom_point(position = position_dodge(width = .5)) +
-  geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(num), ymax = mean_KL + sd_KL/sqrt(num)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
-  facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") +
-  labs(x = "Value",  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
-ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_mnp.png'), width = 6, height = 4)
-
-
-
-
-
-
-# work in Steve's office ------
-
-
-ave_kl_group <- df_kl %>% filter(a_s == 5, scale_as == 1) %>%
-  group_by(simulation, statistic, method, p,m,n) %>% 
-  summarise(mean_kl = mean(KL)) %>% 
-  ungroup() %>%  
-  group_by(statistic, method, p, m, n) %>% 
-  summarise(mean = mean(mean_kl), sd = sd(mean_kl))
-  
-ave_kl_group %>% ungroup() %>% 
-  group_by(statistic, method) %>% 
-  summarize(mn = mean(mean))
-
-
-
-ggplot(ave_kl_group %>% filter(!method == 'Normal'), aes(x = as.factor(n), y = mean, group = interaction(method, statistic), col = interaction(method, statistic))) +
-  geom_point(position = position_dodge(width = .5)) +
-  geom_errorbar(aes(ymin = mean - sd/sqrt(length(sims)), ymax = mean + sd/sqrt(length(sims))), linetype = 1, width = 0, position = position_dodge(width = .5)) +
-  facet_wrap(~ m + p)
-
-
-
-df_kl %>% filter(a_s == 10, scale_as == 1) %>%
-  group_by(simulation, statistic, method, p,m,n) %>% 
-  summarise(mean_kl = mean(KL)) %>% 
-  ungroup() %>%  
-  filter(method == 'restricted', statistic == 'Huber', m == 9, p == 0.1)
-
-
-
-
-
-
-
-kl_fun  <- function(x){
-  .5*(x^2 - 1) - log(x)
-}
-
-curve(kl_fun, from = .1, to = 2)
+# dfs <- vector('list', length(ass.vec)*length(scale_vec)*length(sig2))
+# i <- 1
+# for(ss in sig2){
+#   for(as in ass.vec){
+#     for(sc in scale_vec){
+#       
+#       rds_name <- paste0("_",data_sim, "__as_", as,"__scale_as_", sc, "__sig2_", ss, ".rds")
+#       #huber
+#       fit <- read_rds(file.path(results_df, paste0("huber", rds_name)))
+#       #compute KL 
+#       kl <- compute_KL_each_group(ngridpts, thetaTrueVect = data$theta, sig2True = sig2,thetaSamplesMat = fit$theta, sigma2SamplesMat = fit$sigma2)
+#       huber_kl <- as_tibble(cbind(factor_list, KL = kl, statistic = 'Huber', method = 'restricted', a_s = as,
+#                                       scale_as = sc,
+#                                       sigma2 = ss))
+#       #KL for classical fit
+#       ests<-sapply(fit$robustFits, FUN=function(x) x$coefficients)
+#       shat2<-sapply(fit$robustFits, FUN=function(x) x$s^2)
+#       kl <-  mapply(KL_twoNormals, mu1=data$theta,sigma2_1=sig2, mu2=ests,  sigma2_2=shat2)
+#      
+#     huber_kl_rlm <-  as_tibble(cbind(factor_list, KL = kl, statistic = 'Huber', method = 'rlm', a_s = as,
+#                          scale_as = sc,
+#                          sigma2 = ss))
+#       #tukey
+#       fit <- read_rds(file.path(results_df, paste0("tukey", rds_name)))
+#       #compute KL 
+#       kl <- compute_KL_each_group(ngridpts, thetaTrueVect = data$theta, sig2True = sig2,thetaSamplesMat = fit$theta, sigma2SamplesMat = fit$sigma2)
+#       tukey_kl <- as_tibble(cbind(factor_list, KL = kl, statistic = 'Tukey', method = 'restricted', a_s = as,
+#                                       scale_as = sc,
+#                                       sigma2 = ss))
+#       #KL for classical fit
+#       ests<-sapply(fit$robustFits, FUN=function(x) x$coefficients)
+#       shat2<-sapply(fit$robustFits, FUN=function(x) x$s^2)
+#       kl <-  mapply(KL_twoNormals, mu1=data$theta,sigma2_1=sig2, mu2=ests,  sigma2_2=shat2)
+#       
+#       tukey_kl_rlm <-  as_tibble(cbind(factor_list, KL = kl, statistic = 'Tukey', method = 'rlm', a_s = as,
+#                                            scale_as = sc,
+#                                            sigma2 = ss))
+#       
+#       #normal
+#      fit <- read_rds(file.path(results_df, paste0("normal", rds_name)))
+#       #compute KL 
+#       kl <- compute_KL_each_group(ngridpts, thetaTrueVect = data$theta, sig2True = sig2,thetaSamplesMat = fit$theta, sigma2SamplesMat = fit$sigma2)
+#      normal_kl <- as_tibble(cbind(factor_list, KL = kl, statistic = 'Normal', method = 'Normal', a_s = as,
+#                                       scale_as = sc,
+#                                       sigma2 = ss))
+#       
+#       df <- bind_rows(huber_kl,huber_kl_rlm,tukey_kl,tukey_kl_rlm, normal_kl)
+#       dfs[[i]] <- df
+#       i <- i+1
+#     }
+#   }
+# }
+# dfs_all[[data_sim]] <- bind_rows(dfs)
+# print(data_sim)
+# }
+# df_kl <- bind_rows(dfs_all, .id = 'simulation')
+# saveRDS(list(df_kl, df_estimates), file = 'summarize_data_frames.rds') 
+# } else {
+#   summarize_data_frames <- readRDS(file.path(here::here(), "summarize_data_frames.rds")) 
+#   df_kl <- summarize_data_frames[[1]]
+# }
+# 
+# 
+# 
+# #Note - warnings are just coercion rules - variables treated as factors without the same levels coerced to characters...no big deal here. 
+# 
+# #fctrs <- c('p', 'n', 'm', 'statistic', 'method', 'a_s', 'scale_as')
+# #df_kl <- df_kl %>% mutate_at(fctrs, funs(factor))
+# 
+# df_kl_mean <- df_kl %>% 
+#   group_by(simulation, statistic, method, a_s, scale_as, sigma2) %>% 
+#   summarise(KL = mean(KL)) %>% 
+#   ungroup() %>% 
+#   group_by(statistic, method, a_s, scale_as, sigma2) %>% 
+#   summarise(mean_KL = mean(KL), sd_KL = sd(KL))
+# 
+# ggplot(df_kl_mean %>% filter(method != 'Normal', statistic != 'Normal') , aes(x = as.factor(a_s), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(length(sims)), ymax = mean_KL + sd_KL/sqrt(length(sims))), linetype = 1, width = 0, position = position_dodge(width = .5)) +
+#   geom_point(position = position_dodge(width = .5)) +
+#   facet_wrap(~scale_as,   labeller = label_bquote(c == .(scale_as))) +
+#   labs(x = expression(a[s]),  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
+# 
+# ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_facet_scale.png'), width = 6, height = 4)
+# 
+# # tmp <- df_kl %>% filter(scale_as == 2, a_s == 5, method == 'restricted', statistic == 'Huber')
+# # plot(tmp$KL)
+# #mean(tmp$KL[-c(1:1000)])
+# 
+# df_kl_mean %>% filter(method == 'Normal', statistic == 'Normal') %>% ungroup() %>% 
+#   summarise(min = min(mean_KL), max = max(mean_KL))
+# 
+# library(MCMCpack)
+# invg <- function(x){
+#   a <<- 10
+#   cc <<- 0.5
+#   b <<- 4*a*cc
+#   dinvgamma(x, a, b)  
+# }
+# curve(invg, 0, 20, main = paste0('a = ', a, '  ', 'c = ', cc))
+# abline(v = 4)
+# 
+# invg <- function(x, a, cc){
+#   # a <- a_cc[1]
+#   # cc <- a_cc[2]
+#   b <- 4*a*cc
+#   tibble(x = x, prior = dinvgamma(x, a, b), a = a, cc = cc)
+# }
+# x <- seq(.01, 20, by = .01)
+# 
+# a_cc <- expand.grid(ass.vec, scale_vec)
+# 
+# priors <- purrr::map2(.x = a_cc[,1], .y = a_cc[,2], .f = invg, x = x) %>% bind_rows() %>% 
+#   mutate(a = as.factor(a))
+# 
+# ggplot(priors, aes(x, prior, group = a, col = a)) + 
+#   geom_line() + 
+#   facet_wrap(~cc,labeller = label_bquote(c == .(cc))) +
+#   theme(text = element_text(family = 'Times')) + geom_vline(xintercept = 4, lty = 2, col = 'gray', lwd = .5) + 
+#   labs(x = expression(sigma^2),  y = 'density')
+# ggsave(file.path(getwd(), "..", "..", "..", "figs", 'priors_sigma2.png'), width = 6, height = 4) 
+#  
+# 
+# ggplot(df_kl_mean %>% filter(method != 'Normal', statistic != 'Normal'), aes(x = as.factor(scale_as), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(length(sims)), ymax = mean_KL + sd_KL/sqrt(length(sims))), linetype = 1, width = 0, position = position_dodge(width = .5)) +
+#   geom_point(position = position_dodge(width = .5)) +
+#   facet_wrap(~a_s,   labeller = label_bquote(a[s] == .(a_s))) +
+#   labs(x = expression(c),  y = 'Average KL') +  theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
+# 
+# ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_facet_as.png'), width = 6, height = 4)
+# 
+# # saveRDS(list(df_kl, df_estimates), file = 'summarize_data_frames.rds')
+# # investigate convergence of variance estimators in mixture model ---
+# 
+# # Effects of n, p, or m
+# 
+# #note the rlm results are simply repeated for each a_s and scale_as - when grouping by n (or p, or m) - the averages for each simulation are computed over the repeated results too - but these averages are the same as if one result was used. The SE are computed as the sd of these averages - so it doesn't change the calculation if I subset the rlm results to get rid of the repeats
+# 
+# 
+# 
+# #n ----
+# df_kl_mean_n <- df_kl %>% #filter(method != 'rlm') %>% 
+#   group_by(simulation, n, statistic, method, sigma2, a_s, scale_as) %>% 
+#   summarise(KL = mean(KL)) %>% 
+#   ungroup() %>% 
+#   group_by(n, statistic, method, sigma2, a_s, scale_as) %>% 
+#   summarise(mean_KL = mean(KL), sd_KL = sd(KL), num = n())
+# 
+# 
+# 
+# # m----
+# df_kl_mean_m <- df_kl %>% 
+#   group_by(simulation, m, statistic, method, sigma2, a_s, scale_as) %>% 
+#   summarise(KL = mean(KL)) %>% 
+#   ungroup() %>% 
+#   group_by(m, statistic, method, sigma2,  a_s, scale_as) %>% 
+#   summarise(mean_KL = mean(KL), sd_KL = sd(KL), num = n())
+# 
+# 
+# 
+# # p -----
+# df_kl_mean_p <- df_kl %>% 
+#   group_by(simulation, p, statistic, method, sigma2,  a_s, scale_as) %>% 
+#   summarise(KL = mean(KL)) %>% 
+#   ungroup() %>% 
+#   group_by(p, statistic, method, sigma2,  a_s, scale_as) %>% 
+#   summarise(mean_KL = mean(KL), sd_KL = sd(KL), num = n())
+# 
+# 
+# 
+# 
+# # combine for a facet wrap plot
+# df_nmp <- (bind_rows(df_kl_mean_n,df_kl_mean_m,df_kl_mean_p))
+# df_nmp <- (df_nmp %>% gather(variable, value, n,m,p, na.rm = TRUE))
+# 
+# df_mnp_sub <- df_nmp %>% filter(method != 'Normal', statistic != 'Normal', scale_as == 1, a_s == 5)
+# ggplot(df_mnp_sub , aes(x = as.factor(value), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) +
+#   geom_point(position = position_dodge(width = .5)) +
+#   geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(num), ymax = mean_KL + sd_KL/sqrt(num)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
+#   facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") +
+#   labs(x = "Value",  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
+# ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_mnp.png'), width = 6, height = 4)
+# 
+# 
+# 
+# 
+# 
+# 
+# # combine for a facet wrap plot
+# df_nmp <- (bind_rows(df_kl_mean_n,df_kl_mean_m,df_kl_mean_p))
+# df_nmp <- (df_nmp %>% gather(variable, value, n,m,p, na.rm = TRUE))
+# 
+# df_mnp_sub <- df_nmp %>% filter(method != 'Normal', statistic != 'Normal', scale_as == 1, a_s == 5)
+# ggplot(df_mnp_sub , aes(x = as.factor(value), y = mean_KL, col = interaction(method,statistic), group = interaction(method,statistic))) +
+#   geom_point(position = position_dodge(width = .5)) +
+#   geom_errorbar(aes(ymin = mean_KL - sd_KL/sqrt(num), ymax = mean_KL + sd_KL/sqrt(num)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
+#   facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") +
+#   labs(x = "Value",  y = 'Average KL') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
+# ggsave(file.path(getwd(), "..", "..", "..", "figs", 'kl_sim2_mnp.png'), width = 6, height = 4)
+# 
+# 
+# 
+# 
+# 
+# 
+# # work in Steve's office ------
+# 
+# 
+# ave_kl_group <- df_kl %>% filter(a_s == 5, scale_as == 1) %>%
+#   group_by(simulation, statistic, method, p,m,n) %>% 
+#   summarise(mean_kl = mean(KL)) %>% 
+#   ungroup() %>%  
+#   group_by(statistic, method, p, m, n) %>% 
+#   summarise(mean = mean(mean_kl), sd = sd(mean_kl))
+#   
+# ave_kl_group %>% ungroup() %>% 
+#   group_by(statistic, method) %>% 
+#   summarize(mn = mean(mean))
+# 
+# 
+# 
+# ggplot(ave_kl_group %>% filter(!method == 'Normal'), aes(x = as.factor(n), y = mean, group = interaction(method, statistic), col = interaction(method, statistic))) +
+#   geom_point(position = position_dodge(width = .5)) +
+#   geom_errorbar(aes(ymin = mean - sd/sqrt(length(sims)), ymax = mean + sd/sqrt(length(sims))), linetype = 1, width = 0, position = position_dodge(width = .5)) +
+#   facet_wrap(~ m + p)
+# 
+# 
+# 
+# df_kl %>% filter(a_s == 10, scale_as == 1) %>%
+#   group_by(simulation, statistic, method, p,m,n) %>% 
+#   summarise(mean_kl = mean(KL)) %>% 
+#   ungroup() %>%  
+#   filter(method == 'restricted', statistic == 'Huber', m == 9, p == 0.1)
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# kl_fun  <- function(x){
+#   .5*(x^2 - 1) - log(x)
+# }
+# 
+# curve(kl_fun, from = .1, to = 2)
 
 
 #Asymptotics -----
