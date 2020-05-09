@@ -1,0 +1,318 @@
+\documentclass{article}
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{natbib}
+\usepackage[colorlinks,citecolor=blue,urlcolor=blue,filecolor=blue,backref=page]{hyperref}
+\usepackage{graphicx}
+\usepackage{graphicx, psfrag, amsfonts, float}
+\usepackage{natbib}
+\usepackage{amsthm}
+\usepackage{multirow}
+\usepackage{hhline}
+ \pdfminorversion=4
+\usepackage{rotating}
+\def\bgam{\mbox{\boldmath $\gamma$}}
+\def\bth{\mbox{\boldmath $\theta$}}
+\def\bbeta{\mbox{\boldmath $\beta$}}
+\def\blam{\mbox{\boldmath $\lambda$}}
+\def\bmu{\mbox{\boldmath $\mu$}}
+
+\newcommand{\bx}{\mbox{\boldmath $x$}}
+\newcommand{\bu}{\mbox{\boldmath $u$}}
+\newcommand{\bc}{\mbox{\boldmath $c$}}
+\newcommand{\bs}{\mbox{\boldmath $s$}}
+\newcommand{\by}{\mbox{\boldmath $y$}}
+\newcommand{\bz}{\mbox{\boldmath $z$}}
+\newcommand{\bv}{\mbox{\boldmath $v$}}
+\newcommand{\bb}{\mbox{\boldmath $b$}}
+\newcommand{\bzero}{\mbox{\boldmath $0$}}
+\newcommand{\thstarj}{\mbox{$\theta^\star_j$}}
+\newcommand{\bths}{\mbox{$\btheta^\star$}}
+\newcommand{\pkg}[1]{{\fontseries{b}\selectfont #1}} 
+
+\newcommand{\ud}{\mathrm{d}}
+\newcommand{\uI}{\mathrm{I}}
+\newcommand{\uP}{\mathrm{P}}
+\newcommand{\up}{\mathrm{p}}
+\newcommand{\mb}{\mathbf}
+\newcommand{\mc}{\mathcal}
+
+
+\newcommand{\Bern}{\mbox{Bern}}
+\newcommand{\Nor}{\mbox{N}}
+\newcommand{\Ga}{\mbox{Gamma}}
+\newcommand{\Dir}{\mbox{Dir}}
+\newcommand{\Ber}{\mbox{Ber}}
+\newcommand{\Be}{\mbox{Be}}
+\newcommand{\Unif}{\mbox{Unif}}
+\newcommand{\Binom}{\mbox{Bin}}
+\newcommand{\IG}{\mbox{IG}}
+
+\newcommand{\Xs}{X^\star}
+\newcommand{\Lc}{{\cal L}}
+
+
+\usepackage[dvipsnames,usenames]{color}
+\newcommand{\yy}{\color{magenta}\it}
+\newcommand{\jj}{\color{Black}\rm}
+\newcommand{\yjnote}[1]{\footnote{\color{Brown}\rm #1 \color{Black}}}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{definition}[theorem]{\bf Definition}
+\newtheorem{lemma}[theorem]{\bf Lemma}
+\newtheorem{corollary}[theorem]{\bf Corollary}
+\newtheorem{proposition}[theorem]{\bf Proposition}
+\newtheorem{assumption}[theorem]{\bf Assumption}
+\newtheorem{example}[theorem]{\bf Example}
+\newtheorem{remark}[theorem]{\bf Remark}
+
+
+\newcommand{\iid}{\stackrel{iid}{\sim}}
+\newcommand{\indep}{\stackrel{indep}{\sim}}
+
+
+\setlength{\textwidth}{6 in}
+\usepackage{color}
+\usepackage{ulem} % \sout
+\newcommand{\red}[1]{{\color{red}#1}}
+\newcommand{\blue}[1]{{\color{blue}#1}}
+\newcommand{\brown}[1]{{\color{brown}#1}}
+\newcommand{\green}[1]{{\color{green}#1}}
+\newcommand{\magenta}[1]{{\color{magenta}#1}}
+\newcommand{\response}[1]{{\color{blue}#1}}
+\DeclareMathOperator*{\argmin}{\arg\!\min}
+\graphicspath{{figures/}{figs/}}
+
+
+
+
+\begin{document}
+
+
+
+\section{Reviewer 1 Comments}
+
+\begin{enumerate}
+\item The authors propose a broad class of the proposal density, but didn't discuss the choice and tuning within the class. Tuning the proposal is crucial to the mixing and efficiency of the MH algorithm, epecially in the high-dimension space, $n-p$-dimensional, that the paper is dealing with. There are two difficulties in tuning within the proposed class. First, since the proposal density is a complicated transformation of $p(z^{*})$ in $R^{n-p-1}$, even if $p(z^{*})$ belongs to a standard parametric family, $p(z^{*})$ does not and it is not straightforward to assess the properties that are usually used in tuning MCMC algorithm, e.g. mode and
+tails behaviour. Second, the proposed algorithm (11) is restrictive because it only works for independent proposal, not the random walk proposal. Random walk is more able to explore a non-standard parameter space like the manifold here, while it seems tricky to design the independent proposal that well covers the probability mass of the target density, which again due to the transformation.
+
+\response{This is an astute observation - we have added the following text after Theorem 3.6:
+
+`The proposal is governed by the choice of $p(z^{*})$ and a poor choice could lead to an inefficient MCMC algorithm. For all examples in this paper we defined $p(z^{*})$ to be the uniform distribution on $\mathbb{S}$. The advantage of this choice is that it requires no further tuning parameters.  We have noticed good mixing in terms of the ability of the chain to generate new data $\mb y$ that is accepted with a reasonable probability. To implement the method in practice, we generate an n-dimensional independent standard normal $\mb y^{*}$ for the proposal and transform this via $h(\cdot)$. Theoretically, the random normal vector would be projected onto $\mc{C}^{\perp}(X)$ and scaled to unit norm to generate the uniform on $\mathbb{S}$. Using simple algebra and conditions \ref{regEq}-\ref{scaleEq2Reg}, one can show that $h(\cdot)$ is invariant to this projection and scaling. Another option for the proposal suggested by a reviewer that the authors have yet to study is generating a random walk. As we are proposing values on a complicated manifold, it might be possible to implement this by conducting the random walk on $\mb y^{*}$ before transforming via $h(\cdot)$. This could provide advantages in some situations, though we have yet to run into any serious issues with convergence using the independence proposal we utilize here.'
+
+
+There are undoubtedly cases where our choice is not optimal.  Here, we generate proposals for the complete data on a manifold that (in our examples and typically) is of much higher dimension than the conditioning statistic.  The independence proposals have reasonably large acceptance probabilities.  Random walk proposals are generally used to ensure that proposals are ``near'' the current state of the Markov chain, reducing proposed movement in exchange for a greater acceptance probability.  Our take on our algorithm is that we offer one solution that has provided effective MCMC in the cases we have explored.  The method applies to a large class of models that are in common use and to a large class of conditioning statistics.  We note that the independence proposals for the complete data are but one part of a larger algorithm.  Given the complete data, generation of the regression parameters may or may not make use of random walk proposals, block proposals, Gibbs steps involving generation from full conditionals, or other techniques.  
+
+With the basic paradigm and one implementation in place, we look forward to many future developments.  Further research is needed to produce these developments.  For computation, the development of random walk proposals on (nonlinear) manifolds is an interesting problem.  
+}
+
+
+
+
+
+
+\item The simulation studies didn't report the choice of $p(z^{*})$, acceptance rates of the MH, and mixing of the overall MCMC algorithm. Due to point 1, I think these issues would be of interest to readers.
+
+\response{Thanks. We report the choice of $p(z^{*})$ above and  we have added acceptance rates for the simulations.}
+
+
+\item The models studied in both the simulation and real data examples are just simple linear regression which is not realistic. Multiple linear regression with at least three independent variables should be studied.
+
+\response{For the real data, we have included two additional covariates related to the number of employees at each agency. These were left out originally after EDA revealed their effect sizes were small, but leaving them in makes for a good study as well. We have kept the first simulation as we feel it is a good and simple illustration of the ability to fit hierarchical models with our method. The real data examples now contain a hierarchical example with more covariates. Additionally, we have included a second simulation where the ground truth is a linear regression model with 3 active covariates.  A model with 30 covariates (27 inactive) is fit.  There is correlation amongst some of the covariates, making this problem more realistic.}
+
+\item What are the benefits of the proposed method over the classical robust point estimators, like Huber or Tukey estimators compared in the examples, to offset the additional computational cost and tuning efforts? From the simulation studies, whether it has improvement or not depends on the prior distribution, which seems to be from comparing Bayesian and Frequentist methods. Actually, literatures on the asymptotic properties of $f(\theta|T(yobs))$ shows that, if $T(yobs)$ is asymptotically unbiased, $T (yobs)$ and $E(\theta | T (yobs))$ have the same asymptotic variance. Hence if the prior doesn't matter, both methods have similar performance.
+
+\response{As you note, one major advantage is that our method is {\em exactly} a Bayesian method, with $T(y_{obs})$ used in Bayes Theorem to move from prior to posterior.  In a typical setting, under relatively mild conditions on the prior distribution and estimator, Bayesian and frequentist methods will agree asymptotically.  This is reflected in the large-sample central limit theorems (Bayesian and frequentist versions) and is not specially connected to our work.  In this paper, our interest is not in these asymptotic settings where we could simply use a limiting normal distribution as the posterior over the parameters, but rather for the finite sample setting where Bayesian and frequentist methods yield different answers.  The simulations and data analyses document this differential performance.  The standard advantages of Bayes apply -- a guarantee of admissibility from a decision-theoretic view; the ability to combine information across a collection of problems (e.g., the hierarchical setting); and the transition from moment-based methods to likelihood-based methods, for example.  The weaknesses are also there -- a really bad prior distribution produces poor finite-sample performance.  There is a greater computational cost (standard for Bayes vs frequentist), but, given our MCMC routine, no real effort is needed to tune the computation.}  
+
+\response{We have added the following to the introduction of the paper to address this comment:}
+
+\response{'The advantages and disadvantages of the method are detailed throughout the paper using simulated and real data. One conceptual advantage of our method is that inferences and predictions are less sensitive to features of the data not captured by
+the conditioning statistics than are methods based on the complete likelihood. Choosing statistics targeting the main features of interest allows for inference that focuses on these features. The analysis can help to better understand other features which may not be captured by the conditioning statistics, such as outliers.} 
+
+\response{The examples in the paper provide a Bayesian analog of classical robust estimators.  The main disadvantage of our methods relative to the classical estimators is computational.  In Section~3 we detail a data-augmentation MCMC algorithm to fit the models proposed in this paper.  The advantages are those of Bayesian methods.  As is standard for Bayes-classical comparisons, the Bayesian method requires greater computational effort while providing better inference.  As a referee notes, asymptotically, the Bayesian and classical parameter estimates are often very close and have the same limiting posterior variance / sampling variance.  In situations where asymptotic approximation suffices, there is no need to use the computational techniques developed in this paper.'}
+
+
+\response{We have also included in the discussion:
+
+`We have found the benefits of using our Bayesian technique to outweigh the additional computational burden (relative to a classical estimator) in the situation where substantive prior information that will impact the results is available.'
+}
+
+
+
+\item I think $f(\theta|T(yobs))$ might perform better in the following scenario: when $T(yobs)$ is asymptotically biased, $E(\theta|T(yobs))$ can still be asymptotically unbiased as long as the true pa- rameter is identifiable conditioning on the summary statistic, i.e the value of $E(T(yobs))$ is unique on the true parameter. One possible example is the robust ridge-regression estimator, but it needs further investigation whether this estimator satisfies C1-C8.
+
+\response{This idea is in perfect alignment with our work.  You are right that $T(yobs)$ need not be unbiased -- in fact, it need not even be an estimator (think of sums of squares in an ANOVA setting as opposed to mean squares).  It is merely a statistic upon which we condition when using Bayes Theorem.  
+
+Our computational strategy provides an implementation for a big variety of conditioning statistics that are also estimators.  The ridge regression estimator does not satisfy property C5 and so, on the surface, would need a new computational development ($\hat\beta = (X'X +\lambda I)^{-1} X'y$:   $(X'X +\lambda I)^{-1} X'(y + Xv) \neq (X'X +\lambda I)^{-1} X'y + v$). But the ridge regression estimator for full rank $X'X$ is equivalent to least squares regression for conditioning.  And the least squares estimator does satisfy C1-C8.  
+
+For any hope of consistency, the models would need to distinguish between different values of $\theta$, and so a condition along the lines of uniqueness of $E(T(yobs)|\theta)$ in $\theta$ is important.  
+}
+
+\item In page 14, should $C^\perp(X)$ n - p-dimensional instead of n - p - 1-dimensional?
+
+\response{Thanks for the double check - $C^\perp(X)$ is indeed $n-p$ dimensional.  $\mathcal{A}$ is $n-p-1$ dimensional as one degree of freedom is lost for each coefficient estimate and another degree of freedom is lost for the scale estimate.}
+
+\end{enumerate}
+
+\section{Reviewer 2 Comments}
+
+\begin{enumerate}
+\item Is the proposed framework useful for practitioners? The proposed framework targets scenario where (i) we know the data is a mixture of good and bad data, and (ii) we only want to 'build models that offer good prediction for the good portion of the data' (from the 1st paragraph of Sec 5). Authors should provide real examples in which (i) and (ii) hold. In any real examples, (i) often holds, but (ii) doesn't: if we already have had a contaminated training sample, why would we expect the test sample to contain only the good portion? In many real applications, learning the heterogeneity of the good and bad samples is precisely the goal of statistical data analysis.
+For the insurance example analyzed in Sec 6, the authors should provide evidence, e.g., literature from actural science or white papers from insurance industry, to justify why it makes sense to assume (i) and (ii) hold.
+
+\response{I think we are in agreement that it is common to encounter data sets where a portion of the data is 'good' and a portion of the data is 'bad' (your point (i)).  The 'bad' data may be bad for many reasons, including a breakdown of the measurement process, misrecorded data, and cases that simply aren't relevant to the problem at hand.  The ability to perform a decent analysis for such data sets is important.  And the typical decent analysis focuses on (ii).  We would have little interest in predicting misrecorded test data in a typical situation or in predicting the recorded values when the measurement process has broken down.  
+
+Developing an understanding of sources of variation in the data is important.  In settings where the mechanism that produces bad data is stable, we might even entertain building a model for the bad data as is one tradition in Bayesian statistics.  But there are many instances where modelling the bad data is of little interest.  
+
+When we are in a situation where (i) and (ii) hold -- we would argue that this is the usual situation and not the exception -- and we have test data available, there would rarely be any reason to believe that the test data would be pure, consisting only of good data.  This is an important motivator of this work as described in the introduction to our paper. 
+
+We have added the following to the introduction in response to your comment and a comment from the other referee.  
+
+\response{'The advantages and disadvantages of the method are detailed throughout the paper using simulated and real data. One conceptual advantage of our method is that inferences and predictions are less sensitive to features of the data not captured by
+the conditioning statistics than are methods based on the complete likelihood. Choosing statistics targeting the main features of interest allows for inference that focuses on these features. The analysis can help to better understand other features which may not be captured by the conditioning statistics, such as outliers.'} 
+
+For the real data example:  The goal for the insurance example was derived from personal collaborations with those in the insurance industry. Privacy concerns and a turnover of executives in the company from which the data come limit our ability to provide a full description and limit our ability to provide the data themselves.  However we have expanded slightly on the goal of the analysis.   
+\response{It is of concern to the company to predict closures and future performance for agencies that remain open. It is important for planning purposes that the predictions are not overly influenced by a handful of over/underperforming agencies. Our analysis focuses on one aspect of the business problem - the prediction of future performance for agencies, given they remain open.} 
+}
+
+
+
+\item As a methodological paper, what's the guideline/recommendation given by the authors? After reading this paper, I don't know how to apply the suggested framework
+on a simple regression model. Apparently, the choice of the likelihood function (for the good data) $f(y|\theta)$ and the choice of the statistic T are related.
+To make things more complicated, each has multiple choices. For example, f could be normal, student-t or other heavy-tailed distribution; T could be something named Huber or Tukey although the authors are not even bothered to provide any mathematical expression.
+  
+Instead of just reporting numerical performance, the authors should provide some guidelines/recommendation on how to apply their framework on linear regression models, e.g., what are the default choices for f and T ? Is there any- way to select which f or T to use based on cross-validation or other empirical methods?
+
+
+\response{Thanks for pointing out the wish by some to have default choices for $f$ and $T$.  We consider regression analysis to be so fundamental to the discipline of statsitics and to the practice of data analysis that we feel it inappropriate to specify defaults in a heavy-handed fashion.  This would be much like specifying a default likelihood if one wishes to build a regression model.  Inthe usual regression setting, many would choose to use a constant variance normal likelihood, as we have done in our examples, but we feel it inappropriate to call this a default likelihood.  As you note, choice of the likelihood is part of the analysis when building a Bayesian model.  To this, we add choice of the conditioning statistic $T$ and illustrate the impact of different choices.  Omission of the formal description of the particular M-estimators that we use is an oversight.  
+
+We have taken the following steps to address your comment.  We now
+
+\begin{enumerate}
+\item Point out that M-estimators have been our default choice in the very first illustrative example:
+ \response{Details of these estimators can be found in many places, including \citep{huber2009}. We return to the two M-estimators throughout this paper as we have found them to offer good default choices for practitioners dealing with outliers. A short review of these estimators is provided in the Supplementary Material.}
+ \item Include a short review of M-estimators in the Supplement
+ \item Include `Practical Considerations for Using the Restricted Likelihood' to the Supplement. 
+\end{enumerate}
+}
+
+
+
+\item What's the real benefit of this computationally expensive approximation framework? The proposed framework replies on a good summary statistic T(yobs), which
+has already provided a robust estimate of the target parameter. On the other
+hand, the proposed MCMC algorithm is computationally expensive. In Sec
+4.2, the authors only discussed the computation cost for their proposal distribution, but ignored the computation cost for obtaining T(y) (see Theorem 4.1). Those statistics are M-estimators, i.e., they are maximizers of some objective functions involving n observations and p parameters. The authors should discuss the computation cost for T(y).
+What's the gain of all the extra computation? 
+
+\response{At the end of Section 3 (note renumbering of sections) we have included a paragraph:}
+
+\response{'Finally, it is clear the estimators themselves must be computed for every iteration of the Markov Chain. We have found this burden to be marginal relative to computation of the needed Jacobian. In the simulations and real data analyses presented below, we will see that the additional computational expense needed to fit the Bayesian model is often worthwhile, leading to better performance compared to traditional, non-Bayesian robust regression estimators.  This is most evident when substantive prior information is available and information in the data is limited.'}
+
+\response{Additionally, we have included a paragraph in the introduction discussing advantages and disadvantages of the new method.}
+}
+
+\item The authors compare KL diver-gence, but 1) few real applications care about KL divergence not mentioning the predictive density f(y|M,yobs) is not available in closed-form; 2) since f(y|M,yobs) is not available close-form, the KL divergence is approximated and it's not clear to me how accurate the approximation is.
+The authors should compare prediction and estimation accuracy, common met- rics used for regression models.
+
+\response{To address the concern you have raised, we have changed our evaluation metric in the simulation to a closed form version of KL divergence.  We use the KL divergence between two normals: $ 
+\log(\hat\sigma^{2}) - \log(\sigma^{2}) + \frac{1}{\hat\sigma^{2}}(\sigma^{2} + (\theta - \hat{\theta_{i}})^{2}
+$
+While we wouldn't be able to compute this in a real application, it does combines estimation error for both the $\theta_{i}$ and $\sigma$ and is a decent metric to compare the methods under the simulation setup. }
+John - I'm puzzled by this one.  I'll have to check the paper when I get dropbox up and running again.  (Steve)
+
+\item The simulation setup is too simple. Suggest to add some linear regression models with large p and/or large n.
+
+\response{We feel that the first hierarchical simulation example shows how to use the method in a hierarchical setting. We have added 2 more regression covariates to the real data analysis which also contains a hierarchical example. We have also included an additional simulation studying variable selection where only a few variables are active out of many.  We hope this satisfies your suggestion.}
+
+\end{enumerate}
+
+\textbf{Some minor issues.}
+\begin{enumerate}
+\item  Abstract '... handling data sets with outliers and dealing with model mis- specification. We outline the drawbacks ... and propose a new method as an alternative.' The proposed method cannot handle 'model misspecification', instead it assumes f is the true model (no misspecification) and what's wrong is part of the data.
+
+\response{We stand by the abstract.  The insurance company example is along the lines of a number of examples in the literature on robust regression.  Outliers -- best defined as cases which do not reflect the mechanism under study -- often have large residuals.  This does not mean that outliers are independent of one another.  They often reflect model misspecification.  The tradition of robust regression is to provide a model that discounts the outliers (that discounts the deficiencies in the model) and results in a sensible, practical analysis of the data set.  The robust analysis often points the way to an understanding of why the model fits some cases well and others poorly.  Our paper is about model misspecification as well as what some feel the word 'outlier' captures.}  
+
+\item  Sec 2 and Sec 3 can be shortened or merged.
+
+\response{We have merged the sections.}
+
+\item  Eq(2) in Sec 2.1, the notation f(yi|?,c(yi)) is not introduced yet; what's introduced is f(y|?).
+
+\response{We have included a sentence for this notation after it's first use.}
+ 
+\item  Sec 4.1, C3 and C4: a maximizer may not be a continuous function of the data and it may not be unique. Instead of saying 'Many estimators satisfy the above properties', the authors should list those estimators and explain why those conditions are satisfied.
+
+\response{We have added:
+
+\response{'These M-estimators satisfy C3 and C4 since they are optimizers of continuous and differentiable objective functions. Constraints C5-C8 are often satisfied by location and scale estimators but should be checked on a case by case basis.'}
+}
+
+
+\item  Bottom of p14, 'Sample z? from a distribution with known density on S.' Any distribution? For example, can it be a point mass or its support has to be equal to S? What's the sampling distribution for z? used in the simulation studies and real data analysis?
+
+\response{Thanks for noticing this detail. It is most natural if it is mutually absolutely continuous with respect to the distribution induced by the model on S.  For the cases we discuss, this is mutually absolutely continuous with respect to the uniform distribution on S.  We now mention the importance of the support.  We have also included a description of what we use for p throughout based on a previous comment. This comment is after Theorem 4.6.}
+
+\item  Eq (18): change dy to d$\tilde{y}$?
+
+\response{Thanks for noticing this typo - based on your other comment on KL divergence, this formula was taken out and now is a closed form version. }
+
+\end{enumerate}
+
+\section{AE Comments}
+This paper proposes a Bayesian approach for making inference based on robust statistics of the data instead of the original observations. The conditioning robust statistics pass the desirable robustness (to outliers) to the posterior distribution of parameters, thus having the potential to improve inference and prediction. This paper addresses an important problem in statistics and contains interesting ideas. However, there are some major concerns.
+The paper focuses on outliers. Although outliers automatically imply that the model is misspecified, model misspecification is much broader including the misspecification of the density of the good data. The paper does not appear to address model misspecification beyond the case when outliers are present. Please revise the scope of the paper as appropriate or provide more examples to ensure outliers and model misspecification are parallel contributions rather than one nested in another. 
+
+\response{Model misspecification covers broad territory.  It includes traditional outliers (retaining the independence of observations, but assuming some have greater variance, for example), misspecification of the mean function in a regression setting, missed covariates for regression, missed dependence among cases, misspecified functional form for the `good' data (one reason for the growth of nonparametric Bayesian methods), and much, much more.  Box' famous aphorism is one direct statement that all models are misspecified.  
+
+Our own belief is that it would be impossible to address {\em all} forms of model misspecification, yet discussion of the issue is important.  Our paper illustrates misspecification in the real data example on the insurance companies.  The inclusion of closed agencies and agencies with different types of contracts represent model misspecification. These `outliers' are not merely the result of a huge chance error, a faulty measurement process, or a failed experimental run.  They are unusual for a reason and the analysis helps to uncover this reason (we are limited in the commentary that we can attach to the analysis).  As with many of the examples used to illustrate robust regression techniques, these data are best described as having a misspecified model.}
+
+There are many implementation details that an interested user would like to learn more but feel difficult to find from the current paper. This includes but not limited to the selection of proposal, parameter tuning, recommendations when a practitioner is being faced with a real-world problem, and computational complexity of the entire procedure. See the two referee reports for more details. 
+
+\response{Thank you - we believe we have addressed each of these concerns based on the two reviewer's comments. Detailed responses are given above.}
+
+The authors are also suggested to possibly provide code that is available online with recommended choices as default.
+
+
+\response{We have included some 'default choices' in the paper and in the Supplement.  Information for where to obtain code on Github (an R package as well as data and code for the examples) is now provided in the Introduction.  As noted in our response to Referee 2, we hesitate to push the notion of a default likelihood and default conditioning statistic.  The paper provides a conceptual framework for data analysis and develops the methodology and computation needed to implement the analysis.  We do not view the work as developing an algorithm into which one should just feed data.}
+
+It is unclear how the proposed method outperforms existing work, either conceptually or practically.
+
+\response{We believe we have addressed similar concerns from the two reviewers - specifically we have included commentary on the advantages and disadvantages of the new method in several places (e.g., see Introduction) as well as some practical recommendations (e.g. See Supplement).}
+
+Referees have provided some competing methods for the authors to consider. I'd like to add another existing strategy in addition to the three solutions mentioned in the bottom paragraph of page 2: Bayesian fractional inference, which uses a fractional likelihood function that raises a usual likelihood function to a fractional power. What is the advantage of the proposed restrictive likelihood approach over Bayesian fractional inference, even conceptually?
+
+\response{The central advantage of our method compared to the fractional Bayes methods is that our method uses Bayes Theorem!  It is exactly Bayesian in that the posterior distribution is a rescaled version of prior distribution times likelihood (of a statistic).  This means that the method inherits a host of properties from Bayesian methods.  
+
+In contrast, the fractional Bayesian methods do not actually follow Bayes Theorem (there are exceptions in special cases).  Fractional Bayes methods use the theorem as an analogy and so miss many of the benefits of Bayes.  The fractional methods are interesting and they deserve study, but they are not the only solution to Bayesian model misspecification. 
+
+In the long run, we suspect that robust and effective Bayesian analyses will make use of ideas from a variety of perspectives that are currently under study.  The various lines of research need groups of researchers investigating them, need time to develop, and they need visibility for the community to appreciate the different perspectives and to develop an understanding of what each brings to the table.}
+
+Overall, the paper deserves publication after careful and thorough revision. I hope the authors can address all concerns raised in this report and the two well-grounded referee reports.
+
+\response{ Thanks!}
+
+
+\section{Editor Comments} 
+
+The paper has received a mixed reaction from the two referees and the AE. I have a similar reaction to the paper but agree with the other readers that the content is such that an opportunity to address the issues raised is appropriate. The AE's comments place the paper on the border between Reject with Resubmission and Major Revision. I mention this because it isn't clear that a revision will be successful as there are some significant criticisms in the reviews.
+
+My concerns might be a little different than the others and perhaps are less technical in nature. It is generally agreed that *all* models are wrong. The incorrectness of the model can arise in a number of ways and some observations being outliers is one of these. The natural question then is: how are we supposed to deal with that? The answer is surely that we don't unless the discrepancy is so substantial that the inferences would be seriously in error if we proceeded using the assumed model. This part of a statistical analysis is the model checking aspect and the solution to any issue, whatever it might be, arises there. For example, for the problem being considered in this paper, I would want a model checking procedure that indicated that there is a serious problem because, no matter what distribution was used from the model, some observations are outlying and I would want the methodology to identify the observations in question. In that case there would several ways to deal with the issue, including modifying the model, but also simply discarding the offending observations as part of "data cleaning". It is worth noting though that the answer isn't simple because notable scientific achievements have been obtained by looking carefully at observations that are clearly discrepant.
+
+So there are some concerns that have relevance for me and that I think the paper needs to address. What method is used to identify that there is a problem with the model such that the inferences will be strongly affected and does it identify outlying observations? 
+
+\response{Our own training in regression is in the style of ``case analysis'' that has been written about so convincingly by Sandy Weisberg, Dennis Cook, and others.  This training matches your view of strong model diagnostics to identify deficiencies in the model.  A competing type of regression analysis common at the time was developed by Peter Huber, Peter Rousseeuw, and others.  These ``robust regression'' methods seek to automatically discount unusual cases.  Though generally described as a means of handling outliers, many of the popular examples used to illustrate the methods are clearly examples of model misspecification.  The robust methods provide excellent fits for the good (or non-to-mildly misspecified data) when there is misspecification.  Much is known and much has been written about the relative merits of the two styles of regression in various settings.  
+
+In the early 1980s, case analysis became the dominant paradigm (though robust regression retained many adherents).  Our natural inclinations match yours for the reasons you give--we would always prefer to build the perfect model.  However, there are a number of reasons why we cannot do so.  These range from the perils of overmodelling (particularly dangerous for Bayesians) to limitations on our ability to identify outliers (from Huber's book, imagine sliding the "y" value for a case from a ridiculous value--surely and outlier--to its case-deleted mean--a zero residual and not identified as an outlier; somewhere along the way, the subjective probability of the case being an outlier must be 0.5 and we would be unable to decide whether the case is an outlier), to our inability to detect modest model misspecification.  Accepting that there are limitations on case analysis and our ability to build the perfect model suggests that we need to develop alternative strategies.  These alternative strategies can even become part of our diagnostic framework:  a discrepancy between the restricted likelihood fit and the traditional Bayesian fit (or predictions) indicates a need for the case-analysis analyst to do more work.  
+
+The modern world revolves around large data sets, often with a hierarchical structure.  While case analysis works with data sets of moderate size, it breaks down when one has thousands to millions of cases.  It also breaks down when one is interested in model selection (among a class of models that are, of course, misspecified to some extent) or model averaging.  Robust methods scale much better than case analysis methods do.  
+
+The tension between case analysis methods and robust methods is not limited to the regression setting, nor is it limited to merely looking at the fits from the model.  In this work, we lay out the restricted likelihood perspective, develop a computational implementation (as referees and AE note, this development is not trivial), implement the method with code that is available on GitHub, and illustrate some of the benefits of this method relative to standard Bayesian and classical methods.  We view this as an early effort and look to tackle further problems in subsequent papers--in fact, we have given talks about issues such as Bayesian hypothesis testing and model averaging in this framework--and we see a clear path forward for a variety of problems.}
+
+
+A minor issue is that there may be no need to do modify the analysis but the major issue is that it introduces an arbitrariness into the analysis based on the need to choose T: The choice of T is clearly subjective and so it needs to be subjected to the same critical analysis that we would apply to the model itself and for that matter, the prior too, and it isn't clear how to do this. I understand that there are
+problems where reducing the data to some T(y) is necessary, perhaps because of computational problems associated with evaluating a likelihood, but this is clearly a compromised analysis and not one we would recommend unless forced to do so. So I don't agree with the statement made in the paper "that deliberate choice of an insufficient statistic T(y) guided by targeted inference is sound practice". There needs to be a much stronger argument for this at least for me.
+
+\response{We understand your point of view.  It focuses on dangerous territory for classical statisticans and Bayesians alike.  In keeping with your statement above that *all* models are misspecified (we agree except for a few very simple exceptions--say a single Bernoulli trial), we believe that *all* analyses are compromised.  It is also true that, as soon as one uses diagnostics that have the potential to change the model or the data (removing outliers, for example), the analysis is compromised.  The appropriate likelihood would need to account for all decisions that one might make.  These are two of the arguments made for the use of robust methods (i) that robust estimators reduce the impact of model misspecification, and (ii) that data cleaning and data-based model adjustment destroys the properties of classical tests and Bayesian methods.  It is difficult to quantify these effects, but we have seen them in the practice of data analysis.}  
+
+The paper is well-written and thought-provoking so my hope is that a revision will be able to address the points raised.
+
+\end{document}
