@@ -208,13 +208,13 @@ What's the gain of all the extra computation?
 \response{'Finally, it is clear the estimators themselves must be computed for every iteration of the Markov Chain. We have found this burden to be marginal relative to computation of the needed Jacobian. In the simulations and real data analyses presented below, we will see that the additional computational expense needed to fit the Bayesian model is often worthwhile, leading to better performance compared to traditional, non-Bayesian robust regression estimators.  This is most evident when substantive prior information is available and information in the data is limited.'}
 
 \response{Additionally, we have included a paragraph in the introduction discussing advantages and disadvantages of the new method.}
-}
+%}
 
 \item The authors compare KL diver-gence, but 1) few real applications care about KL divergence not mentioning the predictive density f(y|M,yobs) is not available in closed-form; 2) since f(y|M,yobs) is not available close-form, the KL divergence is approximated and it's not clear to me how accurate the approximation is.
 The authors should compare prediction and estimation accuracy, common met- rics used for regression models.
 
 \response{To address the concern you have raised, we have changed our evaluation metric in the simulation to a closed form version of KL divergence.  We use the KL divergence between two normals: $ 
-\log(\hat\sigma^{2}) - \log(\sigma^{2}) + \frac{1}{\hat\sigma^{2}}(\sigma^{2} + (\theta - \hat{\theta_{i}})^{2}
+\log(\hat\sigma_{i}^{2}) - \log(\sigma^{2}) + \frac{1}{\hat\sigma_{i}^{2}}(\sigma^{2} + (\theta_{i} - \hat{\theta_{i}})^{2}
 $
 While we wouldn't be able to compute this in a real application, it does combines estimation error for both the $\theta_{i}$ and $\sigma$ and is a decent metric to compare the methods under the simulation setup. }
 John - I'm puzzled by this one.  I'll have to check the paper when I get dropbox up and running again.  (Steve)
@@ -314,5 +314,8 @@ problems where reducing the data to some T(y) is necessary, perhaps because of c
 \response{We understand your point of view.  It focuses on dangerous territory for classical statisticans and Bayesians alike.  In keeping with your statement above that *all* models are misspecified (we agree except for a few very simple exceptions--say a single Bernoulli trial), we believe that *all* analyses are compromised.  It is also true that, as soon as one uses diagnostics that have the potential to change the model or the data (removing outliers, for example), the analysis is compromised.  The appropriate likelihood would need to account for all decisions that one might make.  These are two of the arguments made for the use of robust methods (i) that robust estimators reduce the impact of model misspecification, and (ii) that data cleaning and data-based model adjustment destroys the properties of classical tests and Bayesian methods.  It is difficult to quantify these effects, but we have seen them in the practice of data analysis.}  
 
 The paper is well-written and thought-provoking so my hope is that a revision will be able to address the points raised.
+
+\bibliographystyle{plain}
+\bibliography{../bib/refPaper1}
 
 \end{document}

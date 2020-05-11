@@ -463,7 +463,7 @@ respectively.  Properties \ref{regIn} and \ref{scaleEq2Reg} of $s$ are called \t
 and \textit{scale equivariance}. 
 Many estimators satisfy the above properties, including several traditional simultaneous M-estimators \citep{huber2009, maronna2006} for which the \texttt{R} package \texttt{brlm} (\texttt{github.com/jrlewi/brlm}) is available to implement the MCMC described here. 
 %\response{These M-estimators satisfy \ref{asb}-\ref{as} since they are optimizers of (almost surely) continuous and differentiable objective functions. Constraints  \ref{regEq}-\ref{scaleEq2Reg} are often satisfied by location and scale estimators but should be checked on a case by case basis.}
-\response{These M-estimators satisfy \ref{abs} and \ref{as} since they are optimizers of continuous and differentiable objective functions. Constraints \ref{regEq}-\ref{scaleEq2Reg} are often satisfied by location and scale estimators but should be checked on a case by case basis.}  
+\response{These M-estimators satisfy \ref{asb} and \ref{as} since they are optimizers of continuous and differentiable objective functions. Constraints \ref{regEq}-\ref{scaleEq2Reg} are often satisfied by location and scale estimators but should be checked on a case by case basis.}  
 More software development is required to extend the MCMC implementation beyond the M-estimators discussed here. The current version of the \texttt{R} package also implements the direct methods described in \cite{lewis2014}. These methods are effective in lower dimensional problems and were used in both examples in Section \ref{illustrations}.
 
 %The strategy described in the previous paragraph extends to full-blown regression models.  Robust regression methods lead naturally to a conditioning statistic in the form of a classical M-estimator for $\bbeta$
@@ -810,8 +810,8 @@ $K = 30$ data sets are generated from \eqref{gensim2}. For each data set and eac
 \response{To asses the predictive capability, we seek a metric that takes into account both the estimation of $\theta_{i}$ and $\sigma^{2}$. In this model, estimation of $\theta_{i}$ and prediction are analogous. To this end we consider the loss:
 \begin{equation}
 \label{sim1loss}
-L((\hat\theta_{i}, \hat\sigma), (\theta_{i},\sigma)) =
-\log(\hat\sigma^{2}) - \log(\sigma^{2}) + \frac{1}{\hat\sigma^{2}}(\sigma^{2} + (\theta - \hat{\theta_{i}})^{2})
+L((\hat\theta_{i}, \hat\sigma_{i}), (\theta_{i},\sigma)) =
+\log(\hat\sigma_{i}^{2}) - \log(\sigma^{2}) + \frac{1}{\hat\sigma_{i}^{2}}(\sigma^{2} + (\theta_{i} - \hat{\theta_{i}})^{2})
 \end{equation}
 Note, this loss is proportional to the Kullback-Leibler divergence between two normals with the base normal being the true distribution of the good portion of the data and the the other normal representing the estimate under the fitting method. We are using fixed point estimates $\hat\theta_{i}$ and $\hat\sigma$ which are posterior means under the Bayesian models and the standard point estimates for the classical methods.
 }
