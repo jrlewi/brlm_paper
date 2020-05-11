@@ -155,6 +155,7 @@ kl_two_normals <- function(sigma2_hat, sigma2, theta_hat, theta){
          (1/sigma2_hat)*(sigma2 + (theta - theta_hat)^2)
 }
 
+
 # rowwise() %>% 
 # mutate(weight = wt(sigma2_hat, sigma2)) %>%
 # ungroup %>% 
