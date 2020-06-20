@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  12 APR 2020 22:07
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  20 JUN 2020 21:24
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -461,8 +461,11 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [3]
-[4] [5] [6] [7]
-<figs/speed_of_light_beta.png, id=283, 2127.95pt x 1032.85875pt>
+[4] [5]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [6]
+[7] <figs/speed_of_light_beta.png, id=283, 2127.95pt x 1032.85875pt>
 File: figs/speed_of_light_beta.png Graphic file (type png)
 
 <use figs/speed_of_light_beta.png>
@@ -476,14 +479,8 @@ File: figs/speed_of_light_predictive.png Graphic file (type png)
 Package pdftex.def Info: figs/speed_of_light_predictive.png used on input line 
 400.
 (pdftex.def)             Requested size: 289.07999pt x 170.78934pt.
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [8]
-Underfull \vbox (badness 7814) has occurred while \output is active []
-
- [9pdfTeX warning (ext4): destination with the same identifier (name{figure.1})
- has been already used, duplicate ignored
+ [8] [9pdfTeX warning (ext4): destination with the same identifier (name{figure
+.1}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
@@ -587,20 +584,26 @@ Package pdftex.def Info: figs/MSE_sim2_mnp.png used on input line 830.
 Package hyperref Warning: Token not allowed in a PDF string (PDFDocEncoding):
 (hyperref)                removing `\@ifnextchar' on input line 838.
 
-[24pdfTeX warning (ext4): destination with the same identifier (name{figure.5})
- has been already used, duplicate ignored
+
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [24pdfTeX warning (ext4): destination with the same identifier (name{figure.5}
+) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
 l.842 
-       <./figs/mse_sim2_facet_scale.png>] [25pdfTeX warning (ext4): destination
- with the same identifier (name{figure.6}) has been already used, duplicate ign
-ored
+       <./figs/mse_sim2_facet_scale.png>]
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [25pdfTeX warning (ext4): destination with the same identifier (name{figure.6}
+) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.844 
-       <./figs/MSE_sim2_mnp.png>]
+l.843 F
+       or the simulation, $K = 30$ data sets (including the additional covar...
+ <./figs/MSE_sim2_mnp.png>]
 <figs/mse_sim_many_p.png, id=535, 1806.75pt x 1204.5pt>
 File: figs/mse_sim_many_p.png Graphic file (type png)
 
@@ -618,8 +621,10 @@ Package pdftex.def Info: figs/negll_sim_many_p.png used on input line 854.
 Underfull \vbox (badness 10000) has occurred while \output is active []
 
  [26]
-[27pdfTeX warning (ext4): destination with the same identifier (name{figure.7})
- has been already used, duplicate ignored
+Underfull \vbox (badness 2237) has occurred while \output is active []
+
+ [27pdfTeX warning (ext4): destination with the same identifier (name{figure.7}
+) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
@@ -756,16 +761,16 @@ Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1397.
 Package rerunfilecheck Info: File `paper.out' has not changed.
 (rerunfilecheck)             Checksum: C6D54B13B5E01F1109673CF84B597F9C;1755.
 Package rerunfilecheck Info: File `paper.brf' has not changed.
-(rerunfilecheck)             Checksum: 49FB08DEC8224054D79E30E45113F29E;2741.
+(rerunfilecheck)             Checksum: F04D68F570DBCD2B443BD041E4F0A3D0;2741.
  ) 
 Here is how much of TeX's memory you used:
  8953 strings out of 493089
  129955 string characters out of 6134842
- 227117 words of memory out of 5000000
+ 227101 words of memory out of 5000000
  12100 multiletter control sequences out of 15000+600000
  21637 words of font info for 81 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 32i,17n,34p,3351b,522s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 32i,17n,34p,3352b,522s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb><
 /usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbxsl10.pfb>
@@ -794,9 +799,9 @@ ist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/texlive/2015/texmf-di
 st/fonts/type1/public/amsfonts/cm/cmtt10.pfb></usr/local/texlive/2015/texmf-dis
 t/fonts/type1/public/amsfonts/cm/cmtt8.pfb></usr/local/texlive/2015/texmf-dist/
 fonts/type1/public/amsfonts/symbols/msbm10.pfb>
-Output written on paper.pdf (49 pages, 2265386 bytes).
+Output written on paper.pdf (49 pages, 2271015 bytes).
 PDF statistics:
- 912 PDF objects out of 1000 (max. 8388607)
+ 911 PDF objects out of 1000 (max. 8388607)
  178 named destinations out of 1000 (max. 500000)
  284 words of extra memory for PDF output out of 10000 (max. 10000000)
 

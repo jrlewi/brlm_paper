@@ -112,29 +112,29 @@ summarize_data_frames <- readRDS(file.path(here::here(), "summarize_data_frames.
 }
 
 # get acceptance rates ------
-# results_df <- file.path(getwd(), 'results')
-# accept_rates <- array(NA, c(2,length(sims), length(sig2), length(ass.vec), length(scale_vec)))
-# for(data_sim in sims){
-#   # load the data, along with the factor levels, and true values of theta
-#   data <- read_rds(file.path(getwd(),'data_sig2_4', paste0('data_', data_sim, '.rds')))
-#   for(ss in sig2){
-#     for(as in ass.vec){
-#       for(sc in scale_vec){
-#         rds_name <- paste0("_",data_sim, "__as_", as,"__scale_as_", sc, "__sig2_", ss, ".rds")
-# 
-#         huber <- read_rds(file.path(results_df, paste0("huber", rds_name)))
-# 
-#         accept_rates[1, data_sim, which(ss == sig2),which(as == ass.vec), which(sc == scale_vec)] <- mean(huber$yAccept)
-# 
-# 
-# 
-#         tukey <- read_rds(file.path(results_df, paste0("tukey", rds_name)))
-# 
-#         accept_rates[2,data_sim, which(ss == sig2),which(as == ass.vec), which(sc == scale_vec)] <- mean(tukey$yAccept)
-#       }
-#     }
-#   }
-# }
+results_df <- file.path(getwd(), 'results')
+accept_rates <- array(NA, c(2,length(sims), length(sig2), length(ass.vec), length(scale_vec)))
+for(data_sim in sims){
+  # load the data, along with the factor levels, and true values of theta
+  data <- read_rds(file.path(getwd(),'data_sig2_4', paste0('data_', data_sim, '.rds')))
+  for(ss in sig2){
+    for(as in ass.vec){
+      for(sc in scale_vec){
+        rds_name <- paste0("_",data_sim, "__as_", as,"__scale_as_", sc, "__sig2_", ss, ".rds")
+
+        huber <- read_rds(file.path(results_df, paste0("huber", rds_name)))
+
+        accept_rates[1, data_sim, which(ss == sig2),which(as == ass.vec), which(sc == scale_vec)] <- mean(huber$yAccept)
+
+
+
+        tukey <- read_rds(file.path(results_df, paste0("tukey", rds_name)))
+
+        accept_rates[2,data_sim, which(ss == sig2),which(as == ass.vec), which(sc == scale_vec)] <- mean(tukey$yAccept)
+      }
+    }
+  }
+}
 ############
 range(accept_rates)
 
@@ -142,18 +142,18 @@ range(accept_rates)
 #sims <- 1:length(unique(df_estimates$simulation))
 
 
-wt <- function(x, y, lambda = 0.5){
-  (x^(2*lambda) - y^(2*lambda))^2/(lambda^2*y^(4*lambda))
-}
+# wt <- function(x, y, lambda = 0.5){
+#   (x^(2*lambda) - y^(2*lambda))^2/(lambda^2*y^(4*lambda))
+# }
+# 
+# xx <- seq(.1,10, length.out = 100)
+# wts <- sapply(xx, wt, y = 4)
+# plot(xx,wts)
 
-xx <- seq(.1,10, length.out = 100)
-wts <- sapply(xx, wt, y = 4)
-plot(xx,wts)
-
-kl_two_normals <- function(sigma2_hat, sigma2, theta_hat, theta){
-  log(sigma2_hat) - log(sigma2) + 
-         (1/sigma2_hat)*(sigma2 + (theta - theta_hat)^2)
-}
+# kl_two_normals <- function(sigma2_hat, sigma2, theta_hat, theta){
+#   log(sigma2_hat) - log(sigma2) + 
+#          (1/sigma2_hat)*(sigma2 + (theta - theta_hat)^2)
+# }
 
 
 # rowwise() %>% 
@@ -161,8 +161,8 @@ kl_two_normals <- function(sigma2_hat, sigma2, theta_hat, theta){
 # ungroup %>% 
 df_mse <- df_estimates %>% #dplyr::select(-p,n,-m) %>%  
   group_by(simulation, statistic, method, a_s, scale_as, sigma2) %>% 
-  summarise(MSE_1 = mean((theta_hat - theta)^2 + .5*wt(sigma2_hat, sigma2)),
-            MSE = mean(kl_two_normals(sigma2_hat, sigma2, theta_hat, theta))) %>% 
+  summarise(MSE = mean((theta_hat - theta)^2)) %>% 
+  #mean(kl_two_normals(sigma2_hat, sigma2, theta_hat, theta)))
   ungroup() %>% 
   group_by(statistic, method, a_s, scale_as, sigma2) %>% 
   summarise(mean_MSE = mean(MSE), sd_MSE = sd(MSE)) %>% ungroup() %>% 
@@ -186,7 +186,7 @@ df_mse <- df_mse %>%
 theme_set(theme_bw())
 ggplot(df_mse %>%  filter(method != 'Normal' & statistic != 'Normal'), aes(x = as.factor(a_s), y = mean_MSE, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_MSE - sd_MSE/sqrt(length(sims)), ymax = mean_MSE + sd_MSE/sqrt(length(sims))), linetype = 1, width = .1, position = position_dodge(width = .5)) + geom_point(position = position_dodge(width = .5)) +
   facet_wrap(~scale_as,  labeller = label_bquote(c == .(scale_as))) +
-  labs(x = expression(a[s]), y = 'Average Loss') + labels_vals + theme(text = element_text(family = 'Times')) #+ylim(c(0,10))
+  labs(x = expression(a[s]), y = 'Average MSE') + labels_vals + theme(text = element_text(family = 'Times')) #+ylim(c(0,10))
   
 #  theme(text = element_text(family = 'Times')) + guides(col = guide_legend(title="Method/Statistic")) +
 #+  guides(fill=guide_legend(title="Method/Statistic"))
@@ -195,7 +195,7 @@ ggsave(file.path(getwd(), "..", "..", "..", "figs", 'mse_sim2_facet_scale.png'),
 df_mse %>% filter(method == 'Normal') %>% 
   summarize(min(mean_MSE), max(mean_MSE))
 
-ggplot(df_mse, aes(x = as.factor(scale_as), y = mean_MSE, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_MSE - sd_MSE/sqrt(length(sims)), ymax = mean_MSE + sd_MSE/sqrt(length(sims))), linetype = 1, width = .1, position = position_dodge(width = .5)) +
+ggplot(df_mse %>%  filter(method != 'Normal' & statistic != 'Normal'), aes(x = as.factor(scale_as), y = mean_MSE, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_MSE - sd_MSE/sqrt(length(sims)), ymax = mean_MSE + sd_MSE/sqrt(length(sims))), linetype = 1, width = .1, position = position_dodge(width = .5)) +
   geom_point(position = position_dodge(width = .5)) +
   facet_wrap(~a_s,   labeller = label_bquote(a[s] == .(a_s))) +
   labs(x = expression(c),  y = 'Average MSE') + labels_vals + theme(text = element_text(family = 'Times')) 
@@ -209,7 +209,7 @@ ggsave(file.path(getwd(), "..", "..", "..", "figs", 'mse_sim2_facet_as.png'),wid
 
 df_mse_mean_n <- df_estimates %>% 
   group_by(simulation, n, statistic, method, sigma2,  a_s, scale_as) %>% 
-  summarise(MSE = mean(kl_two_normals(sigma2_hat, sigma2, theta_hat, theta))) %>% 
+  summarise(MSE =  mean((theta_hat - theta)^2)) %>% #mean(kl_two_normals(sigma2_hat, sigma2, theta_hat, theta))) %>% 
   ungroup() %>% 
   group_by(n, statistic, method, sigma2,  a_s, scale_as) %>% 
   summarise(mean_MSE = mean(MSE), sd_MSE = sd(MSE), num = n())
@@ -218,7 +218,7 @@ df_mse_mean_n <- df_estimates %>%
 #m ----
 df_mse_mean_m <- df_estimates %>% 
   group_by(simulation, m, statistic, method, sigma2,  a_s, scale_as) %>% 
-  summarise(MSE = mean(kl_two_normals(sigma2_hat, sigma2, theta_hat, theta))) %>% 
+  summarise(MSE = mean((theta_hat - theta)^2)) %>% #summarise(MSE = mean(kl_two_normals(sigma2_hat, sigma2, theta_hat, theta))) %>% 
   ungroup() %>% 
   group_by(m, statistic, method, sigma2,  a_s, scale_as) %>% 
   summarise(mean_MSE = mean(MSE), sd_MSE = sd(MSE), num = n())
@@ -228,7 +228,7 @@ df_mse_mean_m <- df_estimates %>%
 #p ----
 df_mse_mean_p <- df_estimates %>% 
   group_by(simulation, p, statistic, method, sigma2,  a_s, scale_as) %>% 
-  summarise(MSE = mean(kl_two_normals(sigma2_hat, sigma2, theta_hat, theta))) %>% 
+  summarise(MSE =  mean((theta_hat - theta)^2)) %>% #summarise(MSE = mean(kl_two_normals(sigma2_hat, sigma2, theta_hat, theta))) %>% 
   ungroup() %>% 
   group_by(p, statistic, method, sigma2,  a_s, scale_as) %>% 
   summarise(mean_MSE = mean(MSE), sd_MSE = sd(MSE), num = n())
@@ -243,7 +243,7 @@ ggplot(df_mnp_sub , aes(x = as.factor(value), y = mean_MSE, col = interaction(me
   geom_point(position = position_dodge(width = .5)) +
   geom_errorbar(aes(ymin = mean_MSE - sd_MSE/sqrt(num), ymax = mean_MSE + sd_MSE/sqrt(num)), linetype = 1, width = 0, position = position_dodge(width = .5)) +
   facet_wrap(~ variable,   labeller = label_bquote(.(variable)), scales = "free_x") +
-  labs(x = "Value",  y = 'Average Loss') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
+  labs(x = "Value",  y = 'Average MSE') + theme_bw() + labels_vals + theme(text = element_text(family = 'Times'))
 ggsave(file.path(getwd(), "..", "..", "..", "figs", 'MSE_sim2_mnp.png'), width = 6, height = 4)
 
 
@@ -587,16 +587,16 @@ ggsave(file.path(getwd(), "..", "..", "..", "figs", 'MSE_sim2_mnp.png'), width =
 
 
 #Asymptotics -----
-library(MASS)
-gen_data <- function(n,m,p){
-  sigma2 <- 4
-  ps <- rbinom(n,1,p)
-  vars <- ifelse(ps, m, 1)*sigma2
-  rnorm(n, 0, sqrt(vars))
-}
-x <- gen_data(n = 1000000 ,m = 25,p = .3)
-fit <- rlm(x ~ 1, psi = psi.huber, scale.est = 'Huber')
-fit$s^2
+# library(MASS)
+# gen_data <- function(n,m,p){
+#   sigma2 <- 4
+#   ps <- rbinom(n,1,p)
+#   vars <- ifelse(ps, m, 1)*sigma2
+#   rnorm(n, 0, sqrt(vars))
+# }
+# x <- gen_data(n = 1000000 ,m = 25,p = .3)
+# fit <- rlm(x ~ 1, psi = psi.huber, scale.est = 'Huber')
+# fit$s^2
 
 #investigate behavior of KL main effects a functions of m,n,p by looking at estimates
 
