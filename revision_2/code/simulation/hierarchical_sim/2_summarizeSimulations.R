@@ -184,7 +184,13 @@ df_mse <- df_mse %>%
   mutate(a_s = as_factor(a_s, levels = c('1.25', '5', '10')))
 
 theme_set(theme_bw())
-ggplot(df_mse %>%  filter(method != 'Normal' & statistic != 'Normal'), aes(x = as.factor(a_s), y = mean_MSE, col = interaction(method,statistic), group = interaction(method,statistic))) + geom_errorbar(aes(ymin = mean_MSE - sd_MSE/sqrt(length(sims)), ymax = mean_MSE + sd_MSE/sqrt(length(sims))), linetype = 1, width = .1, position = position_dodge(width = .5)) + geom_point(position = position_dodge(width = .5)) +
+ggplot(df_mse %>%  filter(method != 'Normal' & statistic != 'Normal'), 
+       aes(x = as.factor(a_s), y = mean_MSE, col = interaction(method,statistic), 
+           group = interaction(method,statistic))) + 
+  geom_errorbar(aes(ymin = mean_MSE - sd_MSE/sqrt(length(sims)), 
+                    ymax = mean_MSE + sd_MSE/sqrt(length(sims))), 
+                linetype = 1, width = .1, position = position_dodge(width = .5)) + 
+  geom_point(position = position_dodge(width = .5)) +
   facet_wrap(~scale_as,  labeller = label_bquote(c == .(scale_as))) +
   labs(x = expression(a[s]), y = 'Average MSE') + labels_vals + theme(text = element_text(family = 'Times')) #+ylim(c(0,10))
   

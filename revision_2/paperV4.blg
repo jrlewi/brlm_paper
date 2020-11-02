@@ -1,0 +1,48 @@
+This is BibTeX, Version 0.99d (TeX Live 2015)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: paperV4.aux
+The style file: bib/ba.bst
+Database file #1: bib/refPaper1.bib
+Warning--empty journal in jung2014
+You've used 44 entries,
+            2760 wiz_defined-function locations,
+            866 strings with 11603 characters,
+and the built_in function-call counts, 25513 in all, are:
+= -- 2130
+> -- 957
+< -- 30
++ -- 355
+- -- 303
+* -- 1919
+:= -- 4008
+add.period$ -- 174
+call.type$ -- 44
+change.case$ -- 280
+chr.to.int$ -- 44
+cite$ -- 45
+duplicate$ -- 1800
+empty$ -- 1925
+format.name$ -- 443
+if$ -- 4998
+int.to.chr$ -- 1
+int.to.str$ -- 1
+missing$ -- 396
+newline$ -- 274
+num.names$ -- 176
+pop$ -- 712
+preamble$ -- 2
+purify$ -- 276
+quote$ -- 0
+skip$ -- 700
+stack$ -- 0
+substring$ -- 1338
+swap$ -- 985
+text.length$ -- 0
+text.prefix$ -- 0
+top$ -- 0
+type$ -- 381
+warning$ -- 1
+while$ -- 192
+width$ -- 0
+write$ -- 623
+(There was 1 warning)

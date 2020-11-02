@@ -1,0 +1,10 @@
+ \newcommand{\noop}[1]{}
+\begin{thebibliography}{1}
+
+\bibitem{huber2009}
+P.J. Huber and E.M. Ronchetti.
+\newblock {\em {Robust Statistics}}.
+\newblock Wiley Series in Probability and Statistics. John Wiley \& Sons, Inc,
+  Hoboken, New Jersey, 2nd edition, 2009.
+
+\end{thebibliography}
