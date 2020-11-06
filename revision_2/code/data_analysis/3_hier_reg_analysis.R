@@ -250,7 +250,7 @@ converge <- array(NA, c(nModels, p + 4, reps))
       #type 1, open agencies to predict in holdout set
       open <- hold$Count_2012 > 0 
       type1 <- hold$Type == '1'
-      y_open[i,] <-open
+      y_open[i,] <- open
       y_type1[i,] <-type1
       
       

@@ -8,14 +8,16 @@ ns <- c(1547)
 num_batch <- 5
 rds_path <- "~/Dropbox/school/osu/dissertationResearch/snm/journal_papers/brlm_paper/revision_2/code/data_analysis/hier_reg_n1547_sim_number_"
 tmp1 <- readRDS(file.path(paste0(rds_path, 1, '.rds')))
-
+print(dim(tmp1$y_type1))
+print(dim(tmp1$y_hold))
 #combine results into one
 for(i in 2:num_batch){
   tmp <-  readRDS(file.path(paste0(rds_path, i, '.rds')))
   
   tmp1$y_hold <- rbind(tmp1$y_hold, tmp$y_hold)
   tmp1$y_open <- rbind(tmp1$y_open, tmp$y_open)
-  tmp1$y_type1 <- rbind(tmp1$y_hold, tmp$y_type1)
+  tmp1$y_type1 <- rbind(tmp1$y_type1, tmp$y_type1)
+  print(dim(tmp$y_type1))
   tmp1$holdIndices <- rbind(tmp1$holdIndices, tmp$holdIndices)
   tmp1$group_estimates <- abind(tmp1$group_estimates, tmp$group_estimates, along = 4)
   tmp1$group_estimates_sds <- abind(tmp1$group_estimates_sds, tmp$group_estimates_sds, along = 4)
@@ -30,8 +32,96 @@ for(i in 2:num_batch){
   
   }
 
+# add the abc results ----
+hier_abc <- read_rds(file.path(getwd(), paste0("hier_abc_reg_n", ns, ".rds")))
+
+
+y_hold_abc <- do.call(rbind, lapply(hier_abc, function(one_hold){
+                unlist(one_hold$y_hold)
+}))
+
+y_open_abc <- do.call(rbind, lapply(hier_abc, function(one_hold){
+                      one_hold$y_open }))
+
+y_type1_abc <- do.call(rbind, lapply(hier_abc, function(one_hold){
+  one_hold$y_type1}))
+
+holdIndices_abc <-do.call(rbind, lapply(hier_abc, function(one_hold){
+  one_hold$holdIndices}))
+
+#double check the same holdout sets were used since these were run seperately. 
+all.equal(y_hold_abc, tmp1$y_hold, check.attributes = FALSE)
+all.equal(y_open_abc, tmp1$y_open, check.attributes = FALSE)
+all.equal(y_type1_abc, tmp1$y_type1, check.attributes = FALSE)
+all.equal(holdIndices_abc, tmp1$holdIndices, check.attributes = FALSE)
+
+list_to_array <- function(hier_abc, name){
+  #strange R behavior here with $name vs [name] subsetting
+  # causing need to do two sapply to get into array. 
+  sapply(sapply(hier_abc, function(x){
+    x[name]}), function(x) x,  simplify = "array")
+}
+# will add the abc results to the "model" dimension, which is the first dim. 
+add_to_model_dim <- function(original, new){
+  abind(original, new, along = 1)
+}
+
+group_estimates_abc <- list_to_array(hier_abc, "group_estimates")
+group_estimates_sd_abc <-  list_to_array(hier_abc, "group_estimates_sds")
+dim(group_estimates_abc)
+dim(group_estimates_sd_abc )
+
+tmp1$group_estimates <- add_to_model_dim(tmp1$group_estimates, 
+                                         group_estimates_abc) 
+tmp1$group_estimates_sds <- add_to_model_dim(tmp1$group_estimates_sds, 
+                                             group_estimates_sd_abc) 
+dim(tmp1$group_estimates)
+dim(tmp1$group_estimates_sds)
+
+
+estimates_abc <-  list_to_array(hier_abc, "estimates")
+estimates_sd_abc <-  list_to_array(hier_abc, "estimates_sd")
+dim(estimates_abc)
+dim(estimates_sd_abc)
+
+tmp1$estimates <- add_to_model_dim(tmp1$estimates, 
+                                         estimates_abc) 
+tmp1$estimates_sd <- add_to_model_dim(tmp1$estimates_sd, 
+                                             estimates_sd_abc) 
+dim(tmp1$estimates)
+dim(tmp1$estimates_sd)
+
+
+marginals_abc <- t(list_to_array(hier_abc, "marginals"))
+marginals_sd_abc <- t(list_to_array(hier_abc, "marginals_sd"))
+dim(marginals_abc)
+dim(marginals_sd_abc)
+tmp1$marginals <- add_to_model_dim(tmp1$marginals, 
+                                   marginals_abc) 
+tmp1$marginals_sd <- add_to_model_dim(tmp1$marginals_sd, 
+                                      marginals_sd_abc) 
+dim(tmp1$marginals)
+dim(tmp1$marginals_sd)
+
+
+predictions_abc <- t(list_to_array(hier_abc, "predictions"))
+dim(predictions_abc)
+tmp1$predictions <- 
+acceptY_abc <- list_to_array(hier_abc, "acceptY")
+dim(acceptY_abc)
+
+tmp1$predictions <- add_to_model_dim(tmp1$predictions, 
+                                   predictions_abc) 
+dim(tmp1$predictions)
+
+tmp1$acceptY <- add_to_model_dim(tmp1$acceptY, 
+                                     acceptY_abc) 
+dim(tmp1$acceptY)
+
+
 #write combined results to rds.
 write_rds(tmp1, file.path(file.path(getwd(), paste0('hier_reg_n', ns,".rds"))))
+
 
 
 analysis_data <- read_rds(file.path(here::here(), 'data', 'analysis_data.rds'))
@@ -78,6 +168,8 @@ hold_index <- holdout_tibble(hier_results$holdIndices)
 
 margs <- apply(hier_results$marginals, 1, function(marg) {
   marg <- t(marg)
+  attributes(marg)$dimnames[[2]] <- NULL
+  attributes(marg)$dimnames[[1]] <- NULL
   rownames(marg) <- 1:nrow(marg)
   marg <- as_tibble(marg, rownames = 'holdout sample')
   marg <- marg %>% 
@@ -89,6 +181,8 @@ full_join(marg, hold_index, by = c("holdout sample", "Repetition"))
 })
 margs_sd <- apply(hier_results$marginals_sd, 1, function(marg) {
   marg <- t(marg)
+  attributes(marg)$dimnames[[2]] <- NULL
+  attributes(marg)$dimnames[[1]] <- NULL
   rownames(marg) <- 1:nrow(marg)
   marg <- as_tibble(marg, rownames = 'holdout sample')
   marg <- marg %>% 
@@ -106,7 +200,8 @@ names(margs) <-names(margs_sd) <- c("OLS",
                                     "Normal", 
                                     "Restricted - Tukey", 
                                     "Restricted - Huber",
-                                    "Student-t")
+                                    "Student-t",
+                                    "ABC - Tukey")
 margs <- bind_rows(margs, .id = 'Model') %>% 
   mutate(n = factor(n, levels = ns))
 
@@ -120,8 +215,8 @@ full_join(margs, margs_sd,  by = c("Model", "holdout sample", "Repetition", "hol
 
 
 
-hier_marginals <- ns %>% map(.f = function(n){
-  hier_results <- readRDS(file.path(getwd(), paste0('hier_reg_n', n,".rds")))
+hier_marginals <- n %>% map(.f = function(n){
+  hier_results <- readRDS(file.path(getwd(), paste0('hier_reg_n', ns,".rds")))
   get_marginals(hier_results,n)
 }) %>% 
   bind_rows()
@@ -137,7 +232,8 @@ marginals_open_type1 <- marginals_tibble %>%
 base_model_marg <-  marginals_open_type1 %>% 
   filter(Model == base_model) 
 
-summary_tibble_by_trim <- purrr::map_dfr(trimming_fractions, .f = function(trimming_fraction){
+summary_tibble_by_trim <- purrr::map_dfr(trimming_fractions, 
+                                         .f = function(trimming_fraction){
 lower_tlm_vals <- base_model_marg %>% 
   group_by(Repetition, State, n) %>% 
   summarise(lower_tlm = quantile(Marginal, trimming_fraction)) 
@@ -148,7 +244,15 @@ holdout_include <- left_join(base_model_marg,lower_tlm_vals, by = c('Repetition'
 # %>% 
 #   filter(include == TRUE)
 
-holdout_include_all <- c('Restricted - Huber','Rlm - Huber', 'Restricted - Tukey', 'Rlm - Tukey','Student-t', 'Normal', 'OLS') %>% map_dfr(.f = function(model){
+models_to_include <- c('Restricted - Huber',
+  'Rlm - Huber', 
+  'Restricted - Tukey', 
+  'Rlm - Tukey','Student-t', 
+  'Normal', 'OLS', 
+  'ABC - Tukey')
+
+holdout_include_all <- models_to_include %>% 
+    map_dfr(.f = function(model){
     tmp <- marginals_open_type1 %>% 
       filter(Model == model) 
     full_join(holdout_include, tmp, by = c('holdout sample', 'holdout index', 'State', 'Repetition', 'Type', 'Open', 'n')
@@ -165,14 +269,16 @@ holdout_include_all <- c('Restricted - Huber','Rlm - Huber', 'Restricted - Tukey
   # summarise(mean = mean(tlm_mean), 
   #           sd = sd(tlm_mean)) %>% 
   # ungroup() %>% 
-  mutate(Model = factor(Model, levels = c('Restricted - Huber','Rlm - Huber', 'Restricted - Tukey', 'Rlm - Tukey','Student-t', 'Normal', 'OLS')), n = factor(n), `Trimming Fraction` = trimming_fraction)
+  mutate(Model = factor(Model, 
+                        levels = models_to_include), 
+         n = factor(n), `Trimming Fraction` = trimming_fraction)
 })
 summary_tibble_by_trim %>% 
   mutate(`Trimming Fraction` = as.factor(`Trimming Fraction`))
 }
 
 summary_tibble <- get_tlm_tibble(hier_marginals, base_model = 'Student-t', trimming_fractions = c(0, .1, .15, 0.2,.25, .3))
-
+summary_tibble$Model %>% table()
 
 # overall average ------
 #by rep - average over states, then average over reps
@@ -186,11 +292,25 @@ overall_average <- summary_tibble %>%
 #K <- length(unique(summary_tibble$Repetition))
 
 theme_set(theme_bw(base_family = 'Times'))
-ggplot(overall_average %>% filter(`Trimming Fraction` %in% c(0.1,.15,.2,.25,.3)) , aes(x = `Trimming Fraction` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + labs(y = 'Average TLM') + xlab(bquote(`Trimming Fraction`(alpha))) 
+ggplot(overall_average %>% filter(`Trimming Fraction` %in% c(0.1,.15,.2,.25,.3)), 
+       aes(x = `Trimming Fraction` , y = mean, col = Model, group = Model)) + 
+    geom_point(position = position_dodge(width = .5))  + 
+    geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, 
+                  position  = position_dodge(width = .5), linetype = 1) + 
+    labs(y = 'Average TLM') + 
+    xlab(bquote(`Trimming Fraction`(alpha))) 
 ggsave(file.path(getwd(), "..", "..", "figs", 'hier_average_tlm.png'), width = 6, height = 4)
 
 
-ggplot(overall_average %>%  filter(!Model %in% c('OLS', 'Normal', 'Student-t')), aes(x = `Trimming Fraction` , y = sd, col = Model, group = Model)) + geom_point(position = position_dodge(width = .0))  + geom_line(position  = position_dodge(width = .0), linetype = 1) + xlab(bquote(`Trimming Fraction`(alpha)))
+
+#######
+#######
+
+ggplot(overall_average %>%  filter(!Model %in% c('OLS', 'Normal', 'Student-t')), 
+       aes(x = `Trimming Fraction` , y = sd, col = Model, group = Model)) + 
+      geom_point(position = position_dodge(width = .0))  + 
+      geom_line(position  = position_dodge(width = .0), linetype = 1) + 
+      xlab(bquote(`Trimming Fraction`(alpha)))
 ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm.png'), width = 6, height = 4)
 
 
@@ -205,17 +325,30 @@ average_by_state <- summary_tibble %>%
 state_count <- analysis_data %>% group_by(State) %>% 
   summarize(state_count = n())
 
-average_by_state <- left_join(average_by_state, state_count, by = 'State') %>% unite(col = 'State(n)', c('State', 'state_count'), sep = '(', remove = FALSE) %>% 
-  mutate(')' = ')') %>% unite(col = 'State(n)', c('State(n)', ')'), sep = '', remove = FALSE) %>%  mutate(`State(n)` = reorder(as.factor(`State(n)`), state_count))
+average_by_state <- left_join(average_by_state, state_count, by = 'State') %>% 
+  unite(col = 'State(n)', c('State', 'state_count'), sep = '(', remove = FALSE) %>% 
+  mutate(')' = ')') %>% unite(col = 'State(n)', c('State(n)', ')'), sep = '', remove = FALSE) %>% 
+  mutate(`State(n)` = reorder(as.factor(`State(n)`), state_count))
 
 
 theme_set(theme_bw(base_family = 'Times'))
-ggplot(average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Tukey', 'Rlm - Tukey'), State != '28'), aes(x = `State(n)` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(y = "Average TLM") #+ scale_y_log10() + 
+ggplot(average_by_state  %>% 
+         filter(`Trimming Fraction` == '0.3', 
+                Model %in% c('Restricted - Tukey', 
+                             'Rlm - Tukey',
+                            'ABC - Tukey'), State != '28'), 
+       aes(x = `State(n)` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(y = "Average TLM") #+ scale_y_log10() + 
 ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state.png'), width = 7.5, height = 5)
 
 
 theme_set(theme_bw(base_family = 'Times'))
-ggplot(average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Huber', 'Rlm - Huber'), State != '28'), aes(x = `State(n)` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(y = "Average TLM") #+ scale_y_log10() + 
+ggplot(average_by_state  %>% 
+         filter(`Trimming Fraction` == '0.3', 
+                Model %in% c('Restricted - Huber', 'Rlm - Huber'), 
+                State != '28'), 
+       aes(x = `State(n)` , y = mean, col = Model, group = Model)) + 
+  geom_point(position = position_dodge(width = .5))  + 
+  geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(y = "Average TLM") #+ scale_y_log10() + 
 ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state_huber.png'), width = 7.5, height = 5)
 
 
@@ -248,7 +381,9 @@ ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state_huber.png'), w
 # ggplot(filter_df, aes(x = `Trimming Fraction` , y = sd/mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line(position = position_dodge(width = 0)) + facet_wrap(~State, scales = 'free')
 
 theme_set(theme_bw(base_family = 'Times'))
-sub_df <- average_by_state  %>% filter(`Trimming Fraction` == '0.3', Model %in% c('Restricted - Tukey', 'Rlm - Tukey'))
+sub_df <- average_by_state  %>% 
+          filter(`Trimming Fraction` == '0.3', 
+                 Model %in% c('Restricted - Tukey', 'Rlm - Tukey', 'ABC - Tukey'))
 ggplot(sub_df, aes(x = `State(n)` , y = sd/abs(mean), col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_log10()
 ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm_state.png'), width = 7.5, height = 5)
 

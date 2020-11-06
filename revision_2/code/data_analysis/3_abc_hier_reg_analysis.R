@@ -13,10 +13,13 @@ lib.loc = file.path("/Users", "john", "Dropbox",
 library(brlm, lib.loc = lib.loc)
 library(tidyverse)
 
-nburn <- 2e3
-nkeep <- 2e3
+nburn <- 5e3
+nkeep <- 5e3
 maxit <- 1000 #parameter in MASS::rlm
 
+iter_check <- 200
+bw_mult <- 2
+min_accept_rate <- 0.1
 
 # aux funcitons ----
 
@@ -134,12 +137,15 @@ fits <- function(betahats, X){X %*% betahats}
 # simulation -----
 strt <- Sys.time()
 
-output_to_save <- function(abc_fit, yhold, Xhold){
+#set this up to follow same naming convention as in 3_hier_reg_analysis.R
+# for the most part with some added info for abc specific anslysis. 
+output_to_save <- function(abc_fit, yhold, Xhold, hold){
   
   out <- list()
   out$nkeep <- nrow(abc_fit$sigma2s)
-  out$yhold
-  out$Xhold
+  out$y_hold <- yhold
+  out$y_open <- hold$Count_2012 > 0 
+  out$y_type1 <- hold$Type == '1'
   
   betal <- aperm(abc_fit$betal, c(1,3,2)) #format expected for marginals computation
   
@@ -155,25 +161,29 @@ output_to_save <- function(abc_fit, yhold, Xhold){
   
   
   postMeansBetal <- apply(betal,c(1,3) , mean)
-  out$postMeansBetal <- postMeansBetal
+  #out$postMeansBetal <- postMeansBetal
   postSDsBetal<-apply(betal,c(1,3) , sd)
-  out$postSDsBetal <-postSDsBetal
+  #out$postSDsBetal <-postSDsBetal
   
   #sigma2s
   postMeansSigma2s  <- colMeans(abc_fit$sigma2s)
-  out$postMeansSigma2s <- postMeansSigma2s 
+  #out$postMeansSigma2s <- postMeansSigma2s 
+  
   
   postSDsSigma2s <- apply(abc_fit$sigma2s,2,sd)
-  out$postSDsSigma2s <- postSDsSigma2s
+  #out$postSDsSigma2s <- postSDsSigma2s
+  
+  out$group_estimates <- rbind(postMeansBetal, postMeansSigma2s)
+  out$group_estimates_sds <- rbind(postSDsBetal, postSDsSigma2s)
   
   out$group_converge_sigma2 <- 
     abs(geweke.diag(mcmc(abc_fit$sigma2s))$z)
   
   #Beta
   postMeansBETA <- colMeans(abc_fit$Beta)
-  out$postMeansBETA <- postMeansBETA
+  out$estimates <- postMeansBETA
   postSDsBeta <- apply(abc_fit$Beta,2 , sd)
-  out$postSDsBeta <- postSDsBeta
+  out$estimates_sd <- postSDsBeta
   
   out$converge_beta <- abs(geweke.diag(mcmc(abc_fit$Beta))$z)
   
@@ -188,7 +198,7 @@ output_to_save <- function(abc_fit, yhold, Xhold){
     abs(geweke.diag(mcmc(abc_fit$rho))$z))
   
   #Acceptance rates for new y's
-  out$yAccept <- abc_fit$yAccept 
+  out$acceptY <- abc_fit$yAccept 
   
   #predictionss on holdout set
   postMeansBetalList <- split(postMeansBetal, 
@@ -197,22 +207,22 @@ output_to_save <- function(abc_fit, yhold, Xhold){
   restrictedPreds <- mapply(fits, postMeansBetalList, Xhold)
   
   predictions <- restrictedPreds %>% unlist()
-  out$holdout_predictions <- predictions
+  out$predictions <- predictions
   #computing marginal likelihoods for each element in holdout sample
   rest_marg_mn_sd <- 
     fn.compute.marginals.hierModelNormal(betal, abc_fit$sigma2s, yhold,Xhold)
   rest_marg <- lapply(rest_marg_mn_sd, function(x) x[,1])
   rest_marg <- rest_marg %>% unlist() 
-  out$abc_marg <- rest_marg
+  out$marginals <- rest_marg
   rest_marg_sd <- lapply(rest_marg_mn_sd, function(x) x[,2])
   rest_marg_sd <- rest_marg_sd %>% unlist() 
-  out$abc_marg_sd <- rest_marg_sd
-  
+  out$marginals_sd <- rest_marg_sd
+  out$bandwidth <- abc_fit$bandwidth
   out
   
   
 } 
-
+i <- 1
 one_abc_fit <- function(i, holdIndicesMatrix, 
                         trainIndicesMatrix, 
                         analysis_data){
@@ -227,7 +237,7 @@ one_abc_fit <- function(i, holdIndicesMatrix,
     nest() 
   nis <- apply(by_state,1, function(dd) dd$data %>% nrow())
   state_lm <- function(df){
-    rlm(trend, y.ret = TRUE, x.ret = TRUE, data = df, maxit = maxit)
+    MASS::rlm(trend, y.ret = TRUE, x.ret = TRUE, data = df, maxit = maxit)
   }
   
   models_lm <- by_state$data %>% 
@@ -285,9 +295,8 @@ one_abc_fit <- function(i, holdIndicesMatrix,
   }  
   
   #bandwidth for abc kernel
-  bandwidth <- 5*sapply(models_lm, function(fit) sum(sqrt(diag(vcov(fit)))))
+  bandwidth <- 1 #sapply(models_lm, function(fit) sum(sqrt(diag(vcov(fit)))))
   bandwidth
-  
   ################################################
   # ABC Versions -----
   ################################################
@@ -317,9 +326,14 @@ one_abc_fit <- function(i, holdIndicesMatrix,
                                            rho_step,
                                            step_Z,
                                            abc = TRUE,
-                                           bandwidth = bandwidth)
+                                           bandwidth = bandwidth,
+                                           iter_check = iter_check,
+                                           min_accept_rate = min_accept_rate,
+                                           bw_mult = bw_mult)
   
-  output_to_save(abc_fit, yhold, Xhold)
+ out <-  output_to_save(abc_fit, yhold, Xhold, hold)
+ out$holdIndices <- holdIndices
+ out
   }
 
 
@@ -333,6 +347,10 @@ outs <- parallel::mclapply(X = seq(nrow(holdIndicesMatrix)), FUN = one_abc_fit,
 
 print(
   lapply(outs, function(x) x$yAccept)
+)
+
+print(
+  lapply(outs, function(x) x$bandwidth)
 )
 
 
