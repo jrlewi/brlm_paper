@@ -33,7 +33,7 @@ for(i in 2:num_batch){
   }
 
 # add the abc results ----
-hier_abc <- read_rds(file.path(getwd(), paste0("hier_abc_reg_n", ns, ".rds")))
+hier_abc <- read_rds(file.path(getwd(), paste0("hier_abc_reg_n", ns, "_n_keep20000", ".rds")))
 
 
 y_hold_abc <- do.call(rbind, lapply(hier_abc, function(one_hold){
@@ -65,6 +65,36 @@ list_to_array <- function(hier_abc, name){
 add_to_model_dim <- function(original, new){
   abind(original, new, along = 1)
 }
+
+summarize_convergence_values <- function(hier_abc, name){
+cov <- list_to_array(hier_abc, name)
+print(paste0("prop less than 2: ", round(mean(abs(cov) < 2), 2)))
+print(paste0("prop more than 3: ", round(mean(abs(cov) > 3), 2)))
+plot(as.numeric(cov), pch = 19, cex = .2, main = name)
+abline(h = 3)
+}
+
+summarize_convergence_values(hier_abc, "group_converge_betas")
+summarize_convergence_values(hier_abc, "group_converge_sigma2")
+summarize_convergence_values(hier_abc, "converge_beta")
+summarize_convergence_values(hier_abc, "converge_hyper")
+
+#for restricted versions
+restricted_group_convergence <- tmp1$group_converge[-c(1:6),,,] 
+mean(restricted_group_convergence < 2)
+mean(restricted_group_convergence > 3)
+plot(as.numeric(restricted_group_convergence), pch = 19, 
+     cex = .2,
+     main = "restricted_group_convergence")
+abline(h = 3)
+
+restricted_convergence <- tmp1$converge[-c(1:6),,] 
+mean(restricted_convergence < 2)
+mean(restricted_convergence > 3)
+plot(as.numeric(restricted_convergence), pch = 19, 
+     cex = .2,
+     main = "restricted_convergence")
+abline(h = 3)
 
 group_estimates_abc <- list_to_array(hier_abc, "group_estimates")
 group_estimates_sd_abc <-  list_to_array(hier_abc, "group_estimates_sds")
@@ -106,7 +136,6 @@ dim(tmp1$marginals_sd)
 
 predictions_abc <- t(list_to_array(hier_abc, "predictions"))
 dim(predictions_abc)
-tmp1$predictions <- 
 acceptY_abc <- list_to_array(hier_abc, "acceptY")
 dim(acceptY_abc)
 
@@ -117,6 +146,9 @@ dim(tmp1$predictions)
 tmp1$acceptY <- add_to_model_dim(tmp1$acceptY, 
                                      acceptY_abc) 
 dim(tmp1$acceptY)
+
+
+
 
 
 #write combined results to rds.
@@ -215,8 +247,8 @@ full_join(margs, margs_sd,  by = c("Model", "holdout sample", "Repetition", "hol
 
 
 
-hier_marginals <- n %>% map(.f = function(n){
-  hier_results <- readRDS(file.path(getwd(), paste0('hier_reg_n', ns,".rds")))
+hier_marginals <- ns %>% map(.f = function(n){
+  hier_results <- readRDS(file.path(getwd(), paste0('hier_reg_n', n,".rds")))
   get_marginals(hier_results,n)
 }) %>% 
   bind_rows()
@@ -337,18 +369,27 @@ ggplot(average_by_state  %>%
                 Model %in% c('Restricted - Tukey', 
                              'Rlm - Tukey',
                             'ABC - Tukey'), State != '28'), 
-       aes(x = `State(n)` , y = mean, col = Model, group = Model)) + geom_point(position = position_dodge(width = .5))  + geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(y = "Average TLM") #+ scale_y_log10() + 
+       aes(x = `State(n)` , y = mean, col = Model, group = Model)) + 
+  geom_point(position = position_dodge(width = .5))  + 
+  geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), 
+                width = 0.05, position  = position_dodge(width = .5), 
+                linetype = 1) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  labs(y = "Average TLM", x = "State(n)") #+ scale_y_log10() + 
 ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state.png'), width = 7.5, height = 5)
 
 
 theme_set(theme_bw(base_family = 'Times'))
 ggplot(average_by_state  %>% 
          filter(`Trimming Fraction` == '0.3', 
-                Model %in% c('Restricted - Huber', 'Rlm - Huber'), 
+                Model %in% c('Restricted - Huber', 
+                             'Rlm - Huber'), 
                 State != '28'), 
        aes(x = `State(n)` , y = mean, col = Model, group = Model)) + 
   geom_point(position = position_dodge(width = .5))  + 
-  geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + theme(axis.text.x = element_text(angle = 90, hjust = 1)) + labs(y = "Average TLM") #+ scale_y_log10() + 
+  geom_errorbar(mapping = aes(ymin = mean - sd, ymax = mean + sd), width = 0.05, position  = position_dodge(width = .5), linetype = 1) + 
+  theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
+  labs(y = "Average TLM", x = "State(n)") #+ scale_y_log10() + 
 ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state_huber.png'), width = 7.5, height = 5)
 
 
@@ -384,7 +425,7 @@ theme_set(theme_bw(base_family = 'Times'))
 sub_df <- average_by_state  %>% 
           filter(`Trimming Fraction` == '0.3', 
                  Model %in% c('Restricted - Tukey', 'Rlm - Tukey', 'ABC - Tukey'))
-ggplot(sub_df, aes(x = `State(n)` , y = sd/abs(mean), col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_log10()
+ggplot(sub_df, aes(x = `State(n)` , y = sd, col = Model, group = Model)) + geom_point(position = position_dodge(width = 0)) + geom_line() + theme(axis.text.x = element_text(angle = 90, hjust = 1))#+ scale_y_log10()
 ggsave(file.path(getwd(), "..", "..", "figs", 'hier_sd_tlm_state.png'), width = 7.5, height = 5)
 
 # ----- 

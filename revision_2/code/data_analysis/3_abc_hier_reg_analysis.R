@@ -11,15 +11,20 @@ lib.loc = file.path("/Users", "john", "Dropbox",
                     "snm", "rPackage", "brlm", "packrat", "lib",
                     "x86_64-apple-darwin15.6.0", "3.4.3")
 library(brlm, lib.loc = lib.loc)
+brlm:::update_group_abc
+brlm:::proposal_group_abc
 library(tidyverse)
 
-nburn <- 5e3
-nkeep <- 5e3
+nburn <- 20000
+nkeep <- 20000
 maxit <- 1000 #parameter in MASS::rlm
 
 iter_check <- 200
-bw_mult <- 2
+bw_mult <- 1.2
 min_accept_rate <- 0.1
+
+#starting bandwidth for abc kernel for each group.
+bandwidth <- .01 #sapply(models_lm, function(fit) sum(sqrt(diag(vcov(fit)))))
 
 # aux funcitons ----
 
@@ -68,6 +73,19 @@ analysis_data <- analysis_data %>%
 #             u2 = length(unique(Office_Employee_Count)),
 #             n())
 
+# center and scale X variables - to make scale of
+# coefficients consistent for the ABC distance measure.
+# columns_to_scale <- c("sqrt_count_2010",
+#                        "Associate_Count", 
+#                        "Office_Employee_Count")
+# 
+# analysis_data[, columns_to_scale] <- 
+#   scale(analysis_data[, columns_to_scale])
+
+# apply(analysis_data[, columns_to_scale], 2, mean)
+# apply(analysis_data[, columns_to_scale], 2, sd)
+
+
 #defined globally.
 nGroups <<- length(unique(analysis_data$State))
 
@@ -87,9 +105,9 @@ w1 <<- parms_prior$w1
 w2 <<- parms_prior$w2
 a_psir <<- parms_prior$a_psir
 b_psir <<- parms_prior$b_psir
+parms_prior$trend
 
-
-trend <- sqrt_count_2012 ~ sqrt_count_2010 - 1 + 
+trend <- sqrt_count_2012 ~ sqrt_count_2010  + -1 +
   Associate_Count +
   Office_Employee_Count
 
@@ -139,6 +157,8 @@ strt <- Sys.time()
 
 #set this up to follow same naming convention as in 3_hier_reg_analysis.R
 # for the most part with some added info for abc specific anslysis. 
+
+
 output_to_save <- function(abc_fit, yhold, Xhold, hold){
   
   out <- list()
@@ -198,7 +218,7 @@ output_to_save <- function(abc_fit, yhold, Xhold, hold){
     abs(geweke.diag(mcmc(abc_fit$rho))$z))
   
   #Acceptance rates for new y's
-  out$acceptY <- abc_fit$yAccept 
+  out$acceptY <- abc_fit$yAccept
   
   #predictionss on holdout set
   postMeansBetalList <- split(postMeansBetal, 
@@ -224,8 +244,8 @@ output_to_save <- function(abc_fit, yhold, Xhold, hold){
 } 
 i <- 1
 one_abc_fit <- function(i, holdIndicesMatrix, 
-                        trainIndicesMatrix, 
-                        analysis_data){
+                         trainIndicesMatrix, 
+                         analysis_data){
   holdIndices <- holdIndicesMatrix[i, ]
   trainIndices <- trainIndicesMatrix[i,]
   train <- analysis_data[trainIndices,]
@@ -294,15 +314,12 @@ one_abc_fit <- function(i, holdIndicesMatrix,
     step_Z <- abs(brlm:::fn.compute.Z(mean(sigs2), a0, b0)/(sqrt(nis)))
   }  
   
-  #bandwidth for abc kernel
-  bandwidth <- 1 #sapply(models_lm, function(fit) sum(sqrt(diag(vcov(fit)))))
-  bandwidth
   ################################################
   # ABC Versions -----
   ################################################
   #Tukey version ---
   
-  abc_fit   <- brlm::hierNormTheoryRestLm(y,
+  abc_fit <- brlm::hierNormTheoryRestLm(y,
                                            X,
                                            regEst = 'Tukey',
                                            scaleEst = 'Huber',
@@ -330,7 +347,6 @@ one_abc_fit <- function(i, holdIndicesMatrix,
                                            iter_check = iter_check,
                                            min_accept_rate = min_accept_rate,
                                            bw_mult = bw_mult)
-  
  out <-  output_to_save(abc_fit, yhold, Xhold, hold)
  out$holdIndices <- holdIndices
  out
@@ -346,7 +362,7 @@ outs <- parallel::mclapply(X = seq(nrow(holdIndicesMatrix)), FUN = one_abc_fit,
                            mc.cores = 4)
 
 print(
-  lapply(outs, function(x) x$yAccept)
+  lapply(outs, function(x) x$acceptY)
 )
 
 print(
@@ -358,7 +374,8 @@ print(
   sapply(outs, function(x) x$nkeep)
 )
 
-write_rds(outs, file.path(here::here(), paste0('hier_abc_reg_n', n, '.rds' )))
+write_rds(outs, file.path(here::here(), 
+                          paste0('hier_abc_reg_n', n, "_n_keep", nkeep, '.rds' )))
 
 Sys.time() - strt
 

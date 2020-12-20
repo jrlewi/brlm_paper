@@ -9,21 +9,25 @@ prior_data <- prior_data %>%
   mutate(sqrt_count_2008 = sqrt(Count_2008), 
          sqrt_count_2010 = sqrt(Count_2010))  %>% filter(Type == 1)
 
-trend <- sqrt_count_2010 ~ sqrt_count_2008 - 1 + 
-  Associate_Count +
-  Office_Employee_Count
+trend <- sqrt_count_2010 ~ sqrt_count_2008  -1 +
+    Associate_Count +
+    Office_Employee_Count  
+
+
+
 # pooled regression analysis ----
 prior_fit <- MASS::rlm(trend, 
                        scale.est = 'Huber', data =  prior_data)
 
-
+summary(prior_fit)
+summary(lm(trend, data=prior_data))
 # MASS::rlm(sqrt_count_2012 ~ sqrt_count_2010 - 1, scale.est = 'Huber', data =  analysis_data )
 
 theme_set(theme_bw(base_family = 'Times'))
 #+ xlim(c(0,150)) +  ylim(c(0, 130)) +
 ggplot(prior_data, aes(x = sqrt_count_2008, y = sqrt_count_2010, 
                        col = Type)) + geom_point(size = .3) + 
-  stat_smooth(method = "rlm", formula = y ~ x -1, 
+  stat_smooth(method = "rlm", formula = y ~ x, 
               method.args = list(scale.est = 'Huber'), 
               size = .5, lty = 2, se = FALSE, col = 1) + 
   guides(col = guide_legend(title = 'Agency Type'))
@@ -268,5 +272,6 @@ hier_parms_prior <- list(mu_0 = beta_0,
                          beta_var_inflate = nrow(prior_data), #beta_var_inflate,
                          prior_fit = prior_fit,
                          trend = trend)
-write_rds(hier_parms_prior, "hier_parms_prior.rds")
 
+
+write_rds(hier_parms_prior, "hier_parms_prior.rds")
