@@ -110,7 +110,7 @@
 \newcommand{\magenta}[1]{{\color{magenta}#1}}
 \newcommand{\response}[1]{{\color{blue}#1}}
 \DeclareMathOperator*{\argmin}{\arg\!\min}
-\graphicspath{{figures/}{figs/}}
+\graphicspath{{figures_final/}}
 
 
 \makeatletter
@@ -404,8 +404,8 @@ Four versions of the restricted likelihood are fit with conditioning statistics:
 The posterior of $\beta$ under each model appears in Figure \ref{fig:newcomb_post}.  The posteriors group into two batches.  The normal model and restricted likelihood with LMS do not discount the outliers and have posteriors centered at low values of $\beta$.  These posteriors are also quite diffuse.  In contrast, the t-model, mixture model, and the other restricted likelihood methods discount the outliers and have posteriors centered at higher values.  There is modest variation among these centers.  Posteriors in this second group have less dispersion than those in the first group.   
 \begin{figure}[t]
 \centering
-{\includegraphics[width = 4in]{figs/speed_of_light_beta.png}}
-{\includegraphics[width = 4in]{figs/speed_of_light_predictive.png}}
+{\includegraphics[width = 4in]{speed_of_light_beta.png}}
+{\includegraphics[width = 4in]{speed_of_light_predictive.png}}
 \caption{Results from the analysis of the speed of light data. Top: Posterior distributions of $\beta$ under each model. Bottom: Log posterior predictive distributions under each model. The differences in the tails are emphasized in the bottom plot. The horizontal axis is strategically labeled to help compare the centers of the distributions in each of the plots.}
 \label{fig:newcomb_post}
 \end{figure}
@@ -424,7 +424,7 @@ Four models are compared: 1) the normal theory base model 2) a two component nor
 The data and  $95\%$ credible bands for the posterior predictive distribution under each model are displayed in Figure \ref{fig:calls_predictive}. The normal model fit to all cases results in a very wide posterior predictive distribution due to an inflated estimate of the variance. The t-model provides a similar predictive distribution.  The pocket of outliers from 1963 to 1970 overwhelms the natural robustness of the model and leads to wide prediction bands.  The outliers, falling toward the end of the time period, lead to a relatively high slope for the regression.  In contrast, the normal theory model fit to only the good data results in a smaller slope and narrower prediction bands.  The predictive distribution under the restricted likelihood approach is much more precise and is close to that of the normal theory fit to the non-outlying cases. The two component mixture model provides similar results, where the predictive distribution is formulated using only the good component. For these data, the large outliers are easily identified as following a distinct regression, leaving the primary component of the mixture for non-outlying data.  In a more complex situation where the outlier generating mechanism is transient (i.e., ever changing and more complex than for these data), modeling the outliers is more difficult. As in classical robust estimation, the restricted likelihood approach avoids explicitly modeling the outliers. 
 \begin{figure}[t]
 \centering
-{\includegraphics[width = 4in]{figs/calls_predictive.png}}
+{\includegraphics[width = 4in]{calls_predictive.png}}
 \caption{Pointwise posterior predictive intervals of log(calls) under the normal theory model fit to the non-outliers, the restricted likelihood model with Tukey's M-estimator for the slope and intercept with Huber's `proposal 2'  for scale, and a heavy-tailed t-distribution model. The first three data points were used to specify the prior with each model using the remaining 21 for fitting. The normal theory model was also fit after removing observations 14-20 (years 1963 - 1970).}
 \label{fig:calls_predictive}
 \end{figure}
