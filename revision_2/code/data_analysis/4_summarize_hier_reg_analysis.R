@@ -333,6 +333,14 @@ ggplot(overall_average %>% filter(`Trimming Fraction` %in% c(0.1,.15,.2,.25,.3))
     xlab(bquote(`Trimming Fraction`(alpha))) 
 ggsave(file.path(getwd(), "..", "..", "figs", 'hier_average_tlm.png'), width = 6, height = 4)
 
+overall_average %>% filter(`Trimming Fraction` %in% c(.3),
+                           Model %in% c("Restricted - Tukey", "ABC - Tukey")) %>% 
+                    ungroup() %>% 
+                    dplyr::select(-n) %>% 
+                    knitr::kable(format = "latex", digits = c(0, 2, 2, 3),
+                                 caption = "Comparison of the average TLM over all the states for Restricted and ABC methods with 
+                                            trimming fraction 0.3",
+                                 align = "c")
 
 
 #######
@@ -360,7 +368,8 @@ state_count <- analysis_data %>% group_by(State) %>%
 average_by_state <- left_join(average_by_state, state_count, by = 'State') %>% 
   unite(col = 'State(n)', c('State', 'state_count'), sep = '(', remove = FALSE) %>% 
   mutate(')' = ')') %>% unite(col = 'State(n)', c('State(n)', ')'), sep = '', remove = FALSE) %>% 
-  mutate(`State(n)` = reorder(as.factor(`State(n)`), state_count))
+  mutate(`State(n)` = reorder(as.factor(`State(n)`), state_count)) %>% 
+  dplyr::select(-")")
 
 
 theme_set(theme_bw(base_family = 'Times'))
@@ -377,6 +386,23 @@ ggplot(average_by_state  %>%
   theme(axis.text.x = element_text(angle = 90, hjust = 1)) + 
   labs(y = "Average TLM", x = "State(n)") #+ scale_y_log10() + 
 ggsave(file.path(getwd(), "..", "..", "figs", 'hier_ave_tlm_state.png'), width = 7.5, height = 5)
+
+
+
+(differences_by_state <- average_by_state  %>% 
+  filter(`Trimming Fraction` == '0.3', 
+         Model %in% c('Restricted - Tukey', 
+                      'ABC - Tukey')) %>%  ungroup() %>% 
+  dplyr::select(-n, -`State(n)`, -`Trimming Fraction`, -state_count, -sd) %>% 
+  tidyr::spread(Model, mean) %>% 
+  mutate(difference = `Restricted - Tukey` - `ABC - Tukey`) %>% 
+  dplyr::select(State, difference))
+
+differences_by_state %>% #filter(State != '28') %>% 
+  summarise(mean_difference = mean(difference),
+            median_difference = median(difference),
+            number_greater = sum(difference > 0), 
+            n = n())
 
 
 theme_set(theme_bw(base_family = 'Times'))
