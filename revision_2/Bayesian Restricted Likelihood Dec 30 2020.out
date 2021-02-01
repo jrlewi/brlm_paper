@@ -1,0 +1,26 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Restricted Likelihood}{}% 2
+\BOOKMARK [2][-]{subsection.2.1}{Examples}{section.2}% 3
+\BOOKMARK [2][-]{subsection.2.2}{Generalization}{section.2}% 4
+\BOOKMARK [2][-]{subsection.2.3}{Literature review}{section.2}% 5
+\BOOKMARK [2][-]{subsection.2.4}{Illustrative Examples}{section.2}% 6
+\BOOKMARK [1][-]{section.3}{Restricted Likelihood for the Linear Model}{}% 7
+\BOOKMARK [2][-]{subsection.3.1}{The Bayesian linear model}{section.3}% 8
+\BOOKMARK [2][-]{subsection.3.2}{Computational strategy}{section.3}% 9
+\BOOKMARK [3][-]{section*.1}{Construction of the proposal}{subsection.3.2}% 10
+\BOOKMARK [3][-]{section*.2}{Evaluation of the proposal density}{subsection.3.2}% 11
+\BOOKMARK [1][-]{section.4}{Simulated Data}{}% 12
+\BOOKMARK [2][-]{subsection.4.1}{Simulation 1}{section.4}% 13
+\BOOKMARK [2][-]{subsection.4.2}{Simulation 2}{section.4}% 14
+\BOOKMARK [1][-]{section.5}{Real Data}{}% 15
+\BOOKMARK [2][-]{subsection.5.1}{State Level Regression model}{section.5}% 16
+\BOOKMARK [3][-]{section*.3}{Method of model comparison}{subsection.5.1}% 17
+\BOOKMARK [3][-]{section*.4}{Comparison of predictive performance}{subsection.5.1}% 18
+\BOOKMARK [2][-]{subsection.5.2}{Hierarchical regression model}{section.5}% 19
+\BOOKMARK [1][-]{section.6}{Discussion}{}% 20
+\BOOKMARK [1][-]{section.7}{Supplementary Material}{}% 21
+\BOOKMARK [2][-]{subsection.7.1}{Practical Considerations for Using the Restricted Likelihood}{section.7}% 22
+\BOOKMARK [2][-]{subsection.7.2}{Proofs}{section.7}% 23
+\BOOKMARK [2][-]{subsection.7.3}{Setting the hierarchical prior values}{section.7}% 24
+\BOOKMARK [2][-]{subsection.7.4}{M-estimators}{section.7}% 25
+\BOOKMARK [1][-]{section*.6}{References}{}% 26

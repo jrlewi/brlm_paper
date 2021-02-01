@@ -1,0 +1,363 @@
+ \newcommand{\noop}[1]{}
+\begin{thebibliography}{51}
+\newcommand{\enquote}[1]{``#1''}
+\expandafter\ifx\csname natexlab\endcsname\relax\def\natexlab#1{#1}\fi
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{{\tt #1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\ifx\endbibitem\undefined \let\endbibitem\relax\fi
+
+\bibitem[{Beaumont et~al.(2009)Beaumont, Cornuet, Marin, and
+  Robert}]{beaumont2009}
+Beaumont, M.~A., Cornuet, J.-M., Marin, J.-M., and Robert, C.~P. (2009).
+\newblock \enquote{Adaptive approximate {B}ayesian computation.}
+\newblock {\em Biometrika\/}, 96(4): \ 983--990.
+\endbibitem
+
+\bibitem[{Beaumont et~al.(2002)Beaumont, Zhang, and Balding}]{beaumont2002}
+Beaumont, M.~A., Zhang, W., and Balding, D.~J. (2002).
+\newblock \enquote{{A}pproximate {B}ayesian Computation in Population
+  Genetics.}
+\newblock {\em Genetics\/}, 162: 2025--2035.
+\endbibitem
+
+\bibitem[{Berger(2006)}]{berger2006}
+Berger, J. (2006).
+\newblock \enquote{The Case for Objective {B}ayesian Analysis.}
+\newblock {\em {B}ayesian Analysis\/}, 1: 385--402.
+\endbibitem
+
+\bibitem[{Bernardo and Smith(2000)}]{bernardo2000}
+Bernardo, J.~M. and Smith, A. (2000).
+\newblock {\em Bayesian Theory\/}.
+\newblock John Wiley \& Sons Ltd.
+\endbibitem
+
+\bibitem[{Clarke and Ghosh(1995)}]{clarke1995}
+Clarke, B. and Ghosh, J.~K. (1995).
+\newblock \enquote{Posterior Convergence Given the Mean.}
+\newblock {\em The Annals of Statistics\/}, 23: 2116--2144.
+\endbibitem
+
+\bibitem[{Clarke et~al.(2013)Clarke, Clarke, Yu et~al.}]{clarke2013Complete}
+Clarke, J.~L., Clarke, B., Yu, C.-W., et~al. (2013).
+\newblock \enquote{Prediction in M-complete Problems with Limited Sample Size.}
+\newblock {\em Bayesian Analysis\/}, 8(3): 647--690.
+\endbibitem
+
+\bibitem[{Clyde and George(2004)}]{clyde2004}
+Clyde, M. and George, E.~I. (2004).
+\newblock \enquote{Model uncertainty.}
+\newblock {\em Statistical science\/}, 81--94.
+\endbibitem
+
+\bibitem[{Clyde and Iversen(2013)}]{clyde2013}
+Clyde, M.~A. and Iversen, E.~S. (2013).
+\newblock \enquote{Bayesian model averaging in the M-open framework.}
+\newblock {\em Bayesian theory and applications\/}.
+\endbibitem
+
+\bibitem[{Doksum and Lo(1990)}]{doksum1990}
+Doksum, K.~A. and Lo, A.~Y. (1990).
+\newblock \enquote{Consistent and Robust {B}ayes Procedures for Location Based
+  on Partial Information.}
+\newblock {\em The Annals of Statistics\/}, 18: 443--453.
+\endbibitem
+
+\bibitem[{Drovandi et~al.(2015)Drovandi, Pettitt, and Lee}]{drovandi2015}
+Drovandi, C., Pettitt, A., and Lee, A. (2015).
+\newblock \enquote{Bayesian Indirect Inference Using a Parametric Auxiliary
+  Model.}
+\newblock {\em Statistical Science\/}, 30: \ 72--95.
+\endbibitem
+
+\bibitem[{Fearnhead and Prangle(2012)}]{fearnhead2012}
+Fearnhead, P. and Prangle, D. (2012).
+\newblock \enquote{Constructing Summary Statistics for Approximate {B}ayesian
+  Computation: Semi-Automatic Approximate {B}ayesian Computation.}
+\newblock {\em Journal of the Royal Statistical Society: Series B\/}, 74:
+  419--474.
+\endbibitem
+
+\bibitem[{Garthwaite et~al.(2005)Garthwaite, Kadane, and
+  O'Hagan}]{garthwaite2005}
+Garthwaite, P.~H., Kadane, J.~B., and O'Hagan, A. (2005).
+\newblock \enquote{Statistical Methods for Eliciting Probability
+  Distributions.}
+\newblock {\em Journal of the American Statistical Association\/}, 100:
+  680--701.
+\endbibitem
+
+\bibitem[{Gelfand and Smith(1990)}]{gelfand1990}
+Gelfand, A.~E. and Smith, A. F.~M. (1990).
+\newblock \enquote{Sampling-based approaches to calculating marginal
+  densities.}
+\newblock {\em Journal of the American Statistical Association\/}, 85:
+  398--409.
+\endbibitem
+
+\bibitem[{Gelman(2006)}]{gelman2006}
+Gelman, A. (2006).
+\newblock \enquote{Multilevel (hierarchical) modeling: what it can and cannot
+  do.}
+\newblock {\em Technometrics\/}, 48(3): 432--435.
+\endbibitem
+
+\bibitem[{Hampel(1971)}]{hampel1971}
+Hampel, F.~R. (1971).
+\newblock \enquote{A General Qualitative Definition of Robustness.}
+\newblock {\em The Annals of Mathematical Statistics\/}, 42: \ 1887--1896.
+\endbibitem
+
+\bibitem[{Hastings(1970)}]{hastings1970}
+Hastings, W.~K. (1970).
+\newblock \enquote{{M}onte {C}arlo sampling methods using {M}arkov chains and
+  their applications.}
+\newblock {\em Biometrika\/}, 57: 97--109.
+\endbibitem
+
+\bibitem[{Hoff et~al.(2013)Hoff, Fosdick, Volfovsky, and Stovel}]{hoff2013}
+Hoff, P., Fosdick, B., Volfovsky, A., and Stovel, K. (2013).
+\newblock \enquote{Likelihoods for Fixed Rank Nomination Networks.}
+\newblock {\em Network Science\/}, 1: 253--277.
+\endbibitem
+
+\bibitem[{Huber and Ronchetti(2009)}]{huber2009}
+Huber, P. and Ronchetti, E. (2009).
+\newblock {\em {Robust Statistics}\/}.
+\newblock Wiley Series in Probability and Statistics. Hoboken, New Jersey: John
+  Wiley \& Sons, Inc, 2nd edition.
+\endbibitem
+
+\bibitem[{Huber(1964)}]{huber1964}
+Huber, P.~J. (1964).
+\newblock \enquote{Robust Estimation of a Location Parameter.}
+\newblock {\em The Annals of Mathematical Statistics\/}, 35(1): \ 73--101.
+\endbibitem
+
+\bibitem[{Hwang et~al.(2005)Hwang, So, and Kim}]{hwang2005}
+Hwang, H., So, B., and Kim, Y. (2005).
+\newblock \enquote{On Limiting Posterior Distributions.}
+\newblock {\em Test\/}, 14: 567--580.
+\endbibitem
+
+\bibitem[{Joyce and Marjoram(2008)}]{joyce2008}
+Joyce, P. and Marjoram, P. (2008).
+\newblock \enquote{Approximately sufficient statistics and {B}ayesian
+  computation.}
+\newblock {\em Statistical Applications in Genetics and Molecular Biology\/},
+  7(1).
+\endbibitem
+
+\bibitem[{Jung et~al.(2014)Jung, MacEachern, and Lee}]{jung2014}
+Jung, Y., MacEachern, S., and Lee, Y. (2014).
+\newblock \enquote{Cross-validation via Outlier Trimming.}
+\newblock In preparation.
+\endbibitem
+
+\bibitem[{Kass and Raftery(1995)}]{kass1995}
+Kass, R.~E. and Raftery, A.~E. (1995).
+\newblock \enquote{{B}ayes Factors.}
+\newblock {\em Journal of the American Statistical Association\/}, 90:
+  773--795.
+\endbibitem
+
+\bibitem[{Kass and Wasserman(1995)}]{kass1995reference}
+Kass, R.~E. and Wasserman, L. (1995).
+\newblock \enquote{A reference Bayesian test for nested hypotheses and its
+  relationship to the Schwarz criterion.}
+\newblock {\em Journal of the american statistical association\/}, 90(431):
+  928--934.
+\endbibitem
+
+\bibitem[{Lee and MacEachern(2014)}]{lee2014}
+Lee, J. and MacEachern, S.~N. (2014).
+\newblock \enquote{Inference functions in high dimensional Bayesian inference.}
+\newblock {\em Statistics and Its Interface\/}, 7(4): 477--486.
+\endbibitem
+
+\bibitem[{Lewis(2014)}]{lewis2014}
+Lewis, J. (2014).
+\newblock \enquote{{B}ayesian Restricted Likelihood Methods.}
+\newblock Ph.D. thesis, The Ohio State University.
+\endbibitem
+
+\bibitem[{Lewis et~al.(2012)Lewis, Lee, and MacEachern}]{lewis2012}
+Lewis, J., Lee, Y., and MacEachern, S. (2012).
+\newblock \enquote{Robust Inference via the Blended Paradigm.}
+\newblock In {\em JSM Proceedings\/}, Section on {B}ayesian Statistical
+  Science, 1773--1786. American Statistical Association.
+\endbibitem
+
+\bibitem[{Liang et~al.(2008)Liang, Paulo, Molina, Clyde, and
+  Berger}]{liang2008}
+Liang, F., Paulo, R., Molina, G., Clyde, M.~A., and Berger, J.~O. (2008).
+\newblock \enquote{Mixtures of g Priors for {B}ayesian Variable Selection.}
+\newblock {\em Journal of the American Statistical Association\/}, 103:
+  410--423.
+\endbibitem
+
+\bibitem[{Liu(1994)}]{liu1994}
+Liu, J.~S. (1994).
+\newblock \enquote{The Collapsed {G}ibbs Sampler in {B}ayesian Computations
+  with Applications to a Gene Regulation Problem.}
+\newblock {\em Journal of the American Statistical Association\/}, 89:
+  958--966.
+\endbibitem
+
+\bibitem[{Marjoram et~al.(2003)Marjoram, Molitor, Plagnol, and
+  Tavar\'{e}}]{marjoram2003}
+Marjoram, P., Molitor, J., Plagnol, V., and Tavar\'{e}, S. (2003).
+\newblock \enquote{Markov Chain {M}onte {C}arlo without Likelihoods.}
+\newblock {\em Proceedings of the National Academy of Sciences of the United
+  States of America\/}, 100: 15324--15328.
+\endbibitem
+
+\bibitem[{Maronna et~al.(2006)Maronna, Martin, and Yohai}]{maronna2006}
+Maronna, R., Martin, D., and Yohai, V. (2006).
+\newblock {\em Robust Statistics: Theory and Methods\/}.
+\newblock Wiley Series in Probability and Statistics. West Sussex, England:
+  John Wiley \& Sons, Ltd.
+\endbibitem
+
+\bibitem[{Miao and Ben-Israel(1992)}]{miao1992}
+Miao, J. and Ben-Israel, A. (1992).
+\newblock \enquote{On Principal Angles Between Subspaces in $\mathbb{R}^n$.}
+\newblock {\em Linear Algebra and its Applications\/}, 171: 81--98.
+\endbibitem
+
+\bibitem[{O'Hagan et~al.(2006)O'Hagan, Buck, Daneshkhah, Eiser, Garthwaite,
+  Jenkinson, Oakley, and Rakow}]{ohagan2006}
+O'Hagan, A., Buck, C.~E., Daneshkhah, A., Eiser, J.~R., Garthwaite, P.~H.,
+  Jenkinson, D.~J., Oakley, J.~E., and Rakow, T. (2006).
+\newblock {\em Uncertain judgements: eliciting experts' probabilities\/}.
+\newblock John Wiley \& Sons.
+\endbibitem
+
+\bibitem[{Pettitt(1982)}]{pettitt1982}
+Pettitt, A.~N. (1982).
+\newblock \enquote{Inference for the Linear Model using a Likelihood Based on
+  Ranks.}
+\newblock {\em Journal of the Royal Statistical Society. Series B\/}, 44:
+  234--243.
+\endbibitem
+
+\bibitem[{Pettitt(1983)}]{pettitt1983}
+--- (1983).
+\newblock \enquote{Likelihood Based Inference Using Signed Ranks for Matched
+  Pairs.}
+\newblock {\em Journal of the Royal Statistical Society. Series B\/}, 45:
+  287--296.
+\endbibitem
+
+\bibitem[{Pratt(1965)}]{pratt1965}
+Pratt, J.~W. (1965).
+\newblock \enquote{{B}ayesian Interpretation of Standard Inference Statements.}
+\newblock {\em Journal of the Royal Statistical Society. Series B\/}, 27:
+  169--203.
+\endbibitem
+
+\bibitem[{Pritchard et~al.(1999)Pritchard, Seielstad, Perez-Lezaun, and
+  Feldman}]{pritchard1999}
+Pritchard, J.~K., Seielstad, M.~T., Perez-Lezaun, A., and Feldman, M.~W.
+  (1999).
+\newblock \enquote{Population Growth of Human {Y} Chromosomes: {A} Study of Y
+  Chromosome Microsatellites.}
+\newblock {\em Molecular Biology and Evolution\/}, 16: 1791--1798.
+\endbibitem
+
+\bibitem[{Ratcliff(1993)}]{ratcliff1993}
+Ratcliff, R. (1993).
+\newblock \enquote{Methods for Dealing with Reaction Time Outliers.}
+\newblock {\em Psychological Bulletin\/}, 114: 510.
+\endbibitem
+
+\bibitem[{Ronchetti et~al.(1997)Ronchetti, Field, and
+  Blanchard}]{ronchetti1997}
+Ronchetti, E., Field, C., and Blanchard, W. (1997).
+\newblock \enquote{Robust Linear Model Selection by Cross-Validation.}
+\newblock {\em Journal of the American Statistical Association\/}, 92:
+  1017--1023.
+\endbibitem
+
+\bibitem[{Rousseeuw and Leroy(1987)}]{rousseeuw1987}
+Rousseeuw, P.~J. and Leroy (1987).
+\newblock {\em Robust regression and outlier detection\/}.
+\newblock John Wiley \& Sons.
+\endbibitem
+
+\bibitem[{Savage(1969)}]{savage1969}
+Savage, I.~R. (1969).
+\newblock \enquote{Nonparametric Statistics: A Personal Review.}
+\newblock {\em Sankhya: The Indian Journal of Statistics, Series A
+  (1961-2002)\/}, 31: 107--144.
+\endbibitem
+
+\bibitem[{Stigler(1977)}]{stigler1977}
+Stigler, S.~M. (1977).
+\newblock \enquote{Do Robust Estimators Work with Real Data?}
+\newblock {\em The Annals of Statistics\/}, 5(6): 1055--1098.
+\endbibitem
+
+\bibitem[{Tavar{\'e} et~al.(1997)Tavar{\'e}, Balding, Griffiths, and
+  Donnelly}]{tavare1997}
+Tavar{\'e}, S., Balding, D.~J., Griffiths, R., and Donnelly, P. (1997).
+\newblock \enquote{Inferring Coalescence Times from {DNA} Sequence Data.}
+\newblock {\em Genetics\/}, 145: 505--518.
+\endbibitem
+
+\bibitem[{Turner and Van~Zandt(2012)}]{turner2012}
+Turner, B.~M. and Van~Zandt, T. (2012).
+\newblock \enquote{A tutorial on approximate Bayesian computation.}
+\newblock {\em Journal of Mathematical Psychology\/}, 56(2): 69--85.
+\endbibitem
+
+\bibitem[{Turner and Van~Zandt(2014)}]{turner2014}
+--- (2014).
+\newblock \enquote{Hierarchical approximate Bayesian computation.}
+\newblock {\em Psychometrika\/}, 79(2): 185--209.
+\endbibitem
+
+\bibitem[{Wilkinson(2013)}]{wilkinson2013}
+Wilkinson, R.~D. (2013).
+\newblock \enquote{Approximate Bayesian computation (ABC) gives exact results
+  under the assumption of model error.}
+\newblock {\em Statistical applications in genetics and molecular biology\/},
+  12(2): 129--141.
+\endbibitem
+
+\bibitem[{Wong and Clarke(2004)}]{wong2004}
+Wong, H. and Clarke, B. (2004).
+\newblock \enquote{Improvement over Bayes prediction in small samples in the
+  presence of model uncertainty.}
+\newblock {\em Canadian Journal of Statistics\/}, 32(3): 269--283.
+\endbibitem
+
+\bibitem[{Yuan and Clarke(2004)}]{yuan2004}
+Yuan, A. and Clarke, B. (2004).
+\newblock \enquote{Asymptotic Normality of the Posterior Given a Statistic.}
+\newblock {\em The Canadian Journal of Statistics\/}, 32: 119--137.
+\endbibitem
+
+\bibitem[{Yuan and Clarke(1999)}]{yuan1999minimally}
+Yuan, A. and Clarke, B.~S. (1999).
+\newblock \enquote{A minimally informative likelihood for decision analysis:
+  illustration and robustness.}
+\newblock {\em Canadian Journal of Statistics\/}, 27(3): 649--665.
+\endbibitem
+
+\bibitem[{Zellner(1986)}]{zellner1986}
+Zellner, A. (1986).
+\newblock \enquote{On assessing prior distributions and {B}ayesian regression
+  analysis with g-prior distributions.}
+\newblock {\em {In} {B}ayesian Inference and Decision Techniques: Essays in
+  Honor of Bruno de Finetti\/}, 233.
+\endbibitem
+
+\bibitem[{Zhu et~al.(2011)Zhu, Ibrahim, and Tang}]{zhu2011}
+Zhu, H., Ibrahim, J.~G., and Tang, N. (2011).
+\newblock \enquote{Bayesian influence analysis: a geometric approach.}
+\newblock {\em Biometrika\/}, 98(2): 307--323.
+\endbibitem
+
+\end{thebibliography}
