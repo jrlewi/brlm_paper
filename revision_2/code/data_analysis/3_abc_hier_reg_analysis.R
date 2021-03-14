@@ -119,7 +119,7 @@ p <<- length(mu0)
 
 #get the training/holdout indices used in the original analysis in 3_hier_reg_analysis
 num_batch <- 5
-rds_path <- "~/Dropbox/school/osu/dissertationResearch/snm/journal_papers/brlm_paper/revision_2/code/data_analysis/hier_reg_n1547_sim_number_"
+rds_path <- file.path(here::here(), "hier_reg_n1547_sim_number_")
 tmp1 <- readRDS(file.path(paste0(rds_path, 1, '.rds')))
 holdIndicesMatrix <- tmp1$holdIndices
 #combine results into one
@@ -359,7 +359,7 @@ outs <- parallel::mclapply(X = seq(nrow(holdIndicesMatrix)), FUN = one_abc_fit,
                             holdIndicesMatrix = holdIndicesMatrix,
                             trainIndicesMatrix = trainIndicesMatrix,
                             analysis_data = analysis_data,
-                           mc.cores = 4)
+                           mc.cores = parallel::detectCores())
 
 print(
   lapply(outs, function(x) x$acceptY)

@@ -75,7 +75,8 @@ models <- by_state$data %>%
 
 betaHats <-
   models %>% 
-  map(as.data.frame(coef)) 
+  map(coef) %>% 
+  map(as.data.frame)
 
 
 var_betaHats <-
@@ -202,7 +203,7 @@ rho_seq <- seq(0, .99, by = .01)
 #plot(rho_seq ,sapply(rho_seq , function(rho) log.like.rho(rho)))
 plot(rho_seq ,sapply(rho_seq , function(rho) log.like.rho2(rho)))
 
-curve(log.like.rho,0.001,.999)
+#curve(log.like.rho,0.001,.999)
 #maximize
 # op<-optim(.5, log.like.rho,control=list(fnscale=-1), lower=0, upper=.9999, method = c("L-BFGS-B"), hessian=TRUE)
 #MLE of rho 

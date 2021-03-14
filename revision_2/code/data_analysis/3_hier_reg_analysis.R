@@ -9,6 +9,7 @@ library(MASS)
 library(brlm)
 library(tidyverse)
 
+
 sim_number <- 5 #for batch processing
 nburn <- 2e3 #set length of mcmc chains
 nkeep <- 2e3
@@ -130,7 +131,7 @@ trend <- sqrt_count_2012 ~ sqrt_count_2010 - 1 +
 
 nu <<- 5 #df for t-model
 ns <- floor(nrow(analysis_data)*.5)  #c(1000, 2000) #sample size for training set
-# reps <- 10 #50 # number of training sets
+reps <- 10 #50 # number of training sets
 # sim_number <- 1 #for batch processing
 # nburn <- 1e4 #set length of mcmc chains
 # nkeep <- 1e4
