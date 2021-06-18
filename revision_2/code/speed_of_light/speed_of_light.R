@@ -85,6 +85,7 @@ fit_t <- brlm::bayesTdistLm(y, X, mu0 = eta, Sigma0 = tau^2, a0 = alpha, b0 = be
 
 traceplot(fit_t$mcmc)
 mean(fit_t$acceptSigma2)
+head(fit_t$mcmc)
 
 saveRDS(fit_t$mcmc, 'out/fit_t.rds')
 
@@ -104,17 +105,17 @@ fit_restricted_t <-
     a0 = alpha,
     b0 = beta_t,
     nu = nu,
-    nkeep = 200,
-    nburn = 100,
+    nkeep = 20000,
+    nburn = 10000,
     rwTune = 6
   )
 
 traceplot(fit_restricted_t$mcmc)
 mean(fit_restricted_t$acceptSigma2)
+mean(fit_restricted_t$yAccept)
+head(fit_restricted_t$mcmc)
 
-saveRDS(fit_t$mcmc, 'out/fit_restricted_t.rds')
-
-apply(fit_restricted_t$mcmc, 2, mean)
+saveRDS(fit_restricted_t$mcmc, 'out/fit_restricted_t.rds')
 
 
 rlm_tukey(y)

@@ -10,7 +10,15 @@ fit_lms <- readRDS('out/fit_lms.rds')
 fit_lts <- readRDS('out/fit_lts.rds')
 fit_normal <- readRDS('out/fit_normal.rds')
 fit_t <- readRDS('out/fit_t.rds')
+fit_restricted_t <- readRDS("out/fit_restricted_t.rds")
 fit_mixture <- readRDS('out/fit_mixture.rds')
+
+apply(fit_t, 2, mean)
+apply(fit_t, 2, sd)
+
+apply(fit_restricted_t, 2, mean)
+apply(fit_restricted_t, 2, sd)
+
 
 extract_pdf <- function(fit, model){
 beta <- tibble(beta = fit$muPost[,1], posterior = fit$muPost[,2], Model = model)
@@ -37,19 +45,27 @@ pdf_normal <- compute_pdf(fit_normal, 'Normal')
 pdf_t <- compute_pdf(fit_t, 't')
 fit_mix_good <- cbind(fit_mixture$beta, fit_mixture$sigma2)
 pdf_mixture <- compute_pdf(fit_mix_good, 'Mixture')
+pdf_restricted_t <- compute_pdf(fit_restricted_t, 'Restricted_t')
 
-model_order <- c('Normal', 't', 'Mixture', 'Tukey', 'Huber', 'LMS', 'LTS')
-beta_pdfs <- bind_rows(pdf_normal$beta, pdf_t$beta, pdf_mixture$beta, pdf_tukey$beta, pdf_huber$beta, pdf_lms$beta, pdf_lts$beta)
+
+model_order <- c('Normal', 't', 'Mixture', 'Tukey', 'Huber', 'LMS', 'LTS', 'Restricted_t')
+beta_pdfs <- bind_rows(pdf_normal$beta, pdf_t$beta, pdf_mixture$beta, 
+                       pdf_tukey$beta, pdf_huber$beta, pdf_lms$beta, pdf_lts$beta,
+                       pdf_restricted_t$beta)
 beta_pdfs$Model <- factor(beta_pdfs$Model, levels = model_order)
 
 
-sigma2_pdfs <- bind_rows(pdf_normal$sigma2, pdf_t$sigma2, pdf_mixture$sigma2, pdf_tukey$sigma2, pdf_huber$sigma2, pdf_lms$sigma2, pdf_lts$sigma2)
+sigma2_pdfs <- bind_rows(pdf_normal$sigma2, pdf_t$sigma2, pdf_mixture$sigma2, 
+                         pdf_tukey$sigma2, pdf_huber$sigma2, pdf_lms$sigma2, pdf_lts$sigma2,
+                         pdf_restricted_t$sigma2)
 sigma2_pdfs$Model <- factor(sigma2_pdfs$Model, levels = model_order)
 
 
 # plot beta ----
 
-ggplot(beta_pdfs, aes(x = beta, y = posterior, group = Model, col = Model))  + geom_line() + theme_bw() + scale_color_brewer(palette = 'Set2') + xlab(expression(beta)) + ylab('Posterior')#+ geom_hline(yintercept = 0, col = 'black')
+ggplot(beta_pdfs, aes(x = beta, y = posterior, group = Model, col = Model))  + 
+  geom_line() + theme_bw() + scale_color_brewer(palette = 'Set2') + 
+  xlab(expression(beta)) + ylab('Posterior')#+ geom_hline(yintercept = 0, col = 'black')
 
 ggsave(file.path(fig_path, 'speed_of_light_beta.png'))
 
@@ -64,21 +80,27 @@ ggsave(file.path(fig_path, 'speed_of_light_sigma2.png'))
 # Predictive Distributions ----
 
 
-predictive_t <- function(fit_t){
+predictive_t <- function(fit_t, model){
   mu <- as.numeric(fit_t[,1])
   sigma2 <- as.numeric(fit_t[,2])
   y_tilde <- seq(-50, 100, length.out = 100)
   pred_dist <- sapply(y_tilde, function(yy){
     mean(dt((yy-mu)/sqrt(sigma2), df = nu)/sqrt(sigma2))
   })
-  tibble(y_tilde = y_tilde, pred_dist = pred_dist, Model = 't')
+  tibble(y_tilde = y_tilde, pred_dist = pred_dist, Model = model)
 }
 
-post_pred_t <- predictive_t(fit_t)
+post_pred_t <- predictive_t(fit_t, model='t')
 plot(post_pred_t$y_tilde, log(post_pred_t$pred_dist), type = 'l')
 sum(diff(post_pred_t$y_tilde)*post_pred_t$pred_dist[-1])
-
 sum(diff(post_pred_t$y_tilde)*post_pred_t$y_tilde[-1]*post_pred_t$pred_dist[-1])
+
+
+post_pred_restricted_t <- predictive_t(fit_restricted_t, model= "Restricted_t")
+plot(post_pred_restricted_t$y_tilde, log(post_pred_restricted_t$pred_dist), type = 'l')
+sum(diff(post_pred_restricted_t$y_tilde)*post_pred_restricted_t$pred_dist[-1])
+sum(diff(post_pred_restricted_t$y_tilde)*post_pred_restricted_t$y_tilde[-1]*post_pred_restricted_t$pred_dist[-1])
+
 
 predictive_normal <- function(fit_normal){
   mu <- as.numeric(fit_normal[,1])
@@ -150,7 +172,14 @@ sum(post_pred_lms$pred_dist[-1]*diff(post_pred_lms$y_tilde)*post_pred_lms$y_tild
 
 
 
-predictive_distributions <- bind_rows(post_pred_normal, post_pred_t,post_pred_mixture, post_pred_tukey, post_pred_huber, post_pred_lms, post_pred_lts)
+predictive_distributions <- bind_rows(post_pred_normal, 
+                                      post_pred_t,
+                                      post_pred_mixture, 
+                                      post_pred_tukey, 
+                                      post_pred_huber, 
+                                      post_pred_lms, 
+                                      post_pred_lts,
+                                      post_pred_restricted_t)
 predictive_distributions$Model <- factor(predictive_distributions$Model, levels = model_order)
 
 predictive_distributions <- predictive_distributions %>% 
@@ -160,7 +189,11 @@ predictive_distributions <- predictive_distributions %>%
 #xlim(c(-10, 60))
 
 # plot posterior predictive ----
-ggplot(predictive_distributions, aes(x = y_tilde, y = log_density, col = Model)) + geom_line() + ylim(c(-25,-2)) + theme_bw() + scale_color_brewer(palette = 'Set2') + xlab(expression(y)) + ylab(expression(log('predictive density'))) + scale_x_continuous(limits = c(-10,60),breaks = c(-10,20, 25, 30, 35,60))
+ggplot(predictive_distributions, aes(x = y_tilde, y = log_density, col = Model)) + 
+  geom_line() + ylim(c(-25,-2)) + theme_bw() +
+  scale_color_brewer(palette = 'Set2') + xlab(expression(y)) + 
+  ylab(expression(log('predictive density'))) + 
+  scale_x_continuous(limits = c(-10,60), breaks = c(-10,20, 25, 30, 35,60))
 ggsave(file.path(fig_path, 'speed_of_light_predictive.png'))
 
 
