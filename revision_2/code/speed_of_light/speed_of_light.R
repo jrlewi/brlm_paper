@@ -89,6 +89,33 @@ mean(fit_t$acceptSigma2)
 saveRDS(fit_t$mcmc, 'out/fit_t.rds')
 
 
+# fit restricted t-model with Tukey estimate -----
+
+set.seed(1)
+
+fit_restricted_t <-
+  brlm::restrictedBayesTdistLm(
+    y,
+    X,
+    regEst = 'Tukey',
+    scaleEst = 'Huber',
+    mu0 = eta,
+    Sigma0 = tau ^ 2,
+    a0 = alpha,
+    b0 = beta_t,
+    nu = nu,
+    nkeep = 200,
+    nburn = 100,
+    rwTune = 6
+  )
+
+traceplot(fit_restricted_t$mcmc)
+mean(fit_restricted_t$acceptSigma2)
+
+saveRDS(fit_t$mcmc, 'out/fit_restricted_t.rds')
+
+apply(fit_restricted_t$mcmc, 2, mean)
+
 
 rlm_tukey(y)
 rlm_huber(y)
