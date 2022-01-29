@@ -1,0 +1,136 @@
+ \newcommand{\noop}[1]{}
+\begin{thebibliography}{}
+
+\bibitem[Beaumont et~al., 2009]{beaumont2009}
+Beaumont, M.~A., Cornuet, J.-M., Marin, J.-M., and Robert, C.~P. (2009).
+\newblock Adaptive approximate {B}ayesian computation.
+\newblock {\em Biometrika}, 96(4):\ 983--990.
+
+\bibitem[Beaumont et~al., 2002]{beaumont2002}
+Beaumont, M.~A., Zhang, W., and Balding, D.~J. (2002).
+\newblock {A}pproximate {B}ayesian computation in population genetics.
+\newblock {\em Genetics}, 162:2025--2035.
+
+\bibitem[Clarke and Ghosh, 1995]{clarke1995}
+Clarke, B. and Ghosh, J.~K. (1995).
+\newblock Posterior convergence given the mean.
+\newblock {\em The Annals of Statistics}, 23:2116--2144.
+
+\bibitem[Doksum and Lo, 1990]{doksum1990}
+Doksum, K.~A. and Lo, A.~Y. (1990).
+\newblock Consistent and robust {B}ayes procedures for location based on
+  partial information.
+\newblock {\em The Annals of Statistics}, 18:443--453.
+
+\bibitem[Drovandi et~al., 2015]{drovandi2015}
+Drovandi, C., Pettitt, A., and Lee, A. (2015).
+\newblock Bayesian indirect inference using a parametric auxiliary model.
+\newblock {\em Statistical Science}, 30:\ 72--95.
+
+\bibitem[Fearnhead and Prangle, 2012]{fearnhead2012}
+Fearnhead, P. and Prangle, D. (2012).
+\newblock Constructing summary statistics for approximate {B}ayesian
+  computation: Semi-automatic approximate {B}ayesian computation.
+\newblock {\em Journal of the Royal Statistical Society: Series B},
+  74:419--474.
+
+\bibitem[Hoff et~al., 2013]{hoff2013}
+Hoff, P., Fosdick, B., Volfovsky, A., and Stovel, K. (2013).
+\newblock Likelihoods for fixed rank nomination networks.
+\newblock {\em Network Science}, 1:253--277.
+
+\bibitem[Huber, 1964]{huber1964}
+Huber, P.~J. (1964).
+\newblock Robust estimation of a location parameter.
+\newblock {\em The Annals of Mathematical Statistics}, 35(1):\ 73--101.
+
+\bibitem[Hwang et~al., 2005]{hwang2005}
+Hwang, H., So, B., and Kim, Y. (2005).
+\newblock On limiting posterior distributions.
+\newblock {\em Test}, 14:567--580.
+
+\bibitem[Joyce and Marjoram, 2008]{joyce2008}
+Joyce, P. and Marjoram, P. (2008).
+\newblock Approximately sufficient statistics and {B}ayesian computation.
+\newblock {\em Statistical Applications in Genetics and Molecular Biology},
+  7(1).
+
+\bibitem[Jung et~al., 2014]{jung2014}
+Jung, Y., MacEachern, S., and Lee, Y. (2014).
+\newblock Cross-validation via outlier trimming.
+\newblock In preparation.
+
+\bibitem[Lewis, 2014]{lewis2014}
+Lewis, J. (2014).
+\newblock {\em {B}ayesian Restricted Likelihood Methods}.
+\newblock PhD thesis, The Ohio State University.
+
+\bibitem[Lewis et~al., 2012]{lewis2012}
+Lewis, J., Lee, Y., and MacEachern, S. (2012).
+\newblock Robust inference via the blended paradigm.
+\newblock In {\em JSM Proceedings}, Section on {B}ayesian Statistical Science,
+  pages 1773--1786. American Statistical Association.
+
+\bibitem[Marjoram et~al., 2003]{marjoram2003}
+Marjoram, P., Molitor, J., Plagnol, V., and Tavar\'{e}, S. (2003).
+\newblock Markov chain {M}onte {C}arlo without likelihoods.
+\newblock {\em Proceedings of the National Academy of Sciences of the United
+  States of America}, 100:15324--15328.
+
+\bibitem[Pettitt, 1982]{pettitt1982}
+Pettitt, A.~N. (1982).
+\newblock Inference for the linear model using a likelihood based on ranks.
+\newblock {\em Journal of the Royal Statistical Society. Series B},
+  44:234--243.
+
+\bibitem[Pettitt, 1983]{pettitt1983}
+Pettitt, A.~N. (1983).
+\newblock Likelihood based inference using signed ranks for matched pairs.
+\newblock {\em Journal of the Royal Statistical Society. Series B},
+  45:287--296.
+
+\bibitem[Pratt, 1965]{pratt1965}
+Pratt, J.~W. (1965).
+\newblock {B}ayesian interpretation of standard inference statements.
+\newblock {\em Journal of the Royal Statistical Society. Series B},
+  27:169--203.
+
+\bibitem[Pritchard et~al., 1999]{pritchard1999}
+Pritchard, J.~K., Seielstad, M.~T., Perez-Lezaun, A., and Feldman, M.~W.
+  (1999).
+\newblock Population growth of human {Y} chromosomes: {A} study of y chromosome
+  microsatellites.
+\newblock {\em Molecular Biology and Evolution}, 16:1791--1798.
+
+\bibitem[Ratcliff, 1993]{ratcliff1993}
+Ratcliff, R. (1993).
+\newblock Methods for dealing with reaction time outliers.
+\newblock {\em Psychological Bulletin}, 114:510.
+
+\bibitem[Savage, 1969]{savage1969}
+Savage, I.~R. (1969).
+\newblock Nonparametric statistics: A personal review.
+\newblock {\em Sankhya: The Indian Journal of Statistics, Series A
+  (1961-2002)}, 31:107--144.
+
+\bibitem[Tavar{\'e} et~al., 1997]{tavare1997}
+Tavar{\'e}, S., Balding, D.~J., Griffiths, R., and Donnelly, P. (1997).
+\newblock Inferring coalescence times from {DNA} sequence data.
+\newblock {\em Genetics}, 145:505--518.
+
+\bibitem[Turner and Van~Zandt, 2012]{turner2012}
+Turner, B.~M. and Van~Zandt, T. (2012).
+\newblock A tutorial on approximate bayesian computation.
+\newblock {\em Journal of Mathematical Psychology}, 56(2):69--85.
+
+\bibitem[Turner and Van~Zandt, 2014]{turner2014}
+Turner, B.~M. and Van~Zandt, T. (2014).
+\newblock Hierarchical approximate bayesian computation.
+\newblock {\em Psychometrika}, 79(2):185--209.
+
+\bibitem[Yuan and Clarke, 2004]{yuan2004}
+Yuan, A. and Clarke, B. (2004).
+\newblock Asymptotic normality of the posterior given a statistic.
+\newblock {\em The Canadian Journal of Statistics}, 32:119--137.
+
+\end{thebibliography}
